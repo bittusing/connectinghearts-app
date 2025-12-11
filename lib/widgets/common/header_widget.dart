@@ -66,7 +66,8 @@ class HeaderWidget extends StatelessWidget implements PreferredSizeWidget {
               Stack(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.notifications_outlined, color: Colors.white),
+                    icon: const Icon(Icons.notifications_outlined,
+                        color: Colors.white),
                     onPressed: () => context.push('/notifications'),
                   ),
                   if (notificationCount != null && notificationCount! > 0)
@@ -103,4 +104,3 @@ class HeaderWidget extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 }
-

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../theme/colors.dart';
 import '../../widgets/common/confirm_modal.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class SidebarWidget extends StatelessWidget {
   const SidebarWidget({super.key});
@@ -17,39 +19,50 @@ class SidebarWidget extends StatelessWidget {
     final currentPath = GoRouterState.of(context).uri.path;
 
     return Drawer(
-      backgroundColor: const Color(0xFF0F172A), // slate-900
+      backgroundColor: Colors.white,
       child: SafeArea(
         child: Column(
           children: [
             // User Profile Section
             if (authProvider.user != null)
               Container(
-                margin: const EdgeInsets.all(16),
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(12),
-                ),
                 child: Row(
                   children: [
+                    // Profile Picture
                     Container(
-                      width: 64,
-                      height: 64,
+                      width: 60,
+                      height: 60,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.2),
-                          width: 2,
-                        ),
-                        color: Colors.white.withOpacity(0.1),
+                        color: Colors.grey[200],
                       ),
-                      child: const Icon(
-                        Icons.person,
-                        color: Colors.white,
-                        size: 32,
+                      child: ClipOval(
+                        child: authProvider.user?.avatarUrl != null
+                            ? CachedNetworkImage(
+                                imageUrl: authProvider.user!.avatarUrl!,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => const Icon(
+                                  Icons.person,
+                                  color: Colors.grey,
+                                  size: 30,
+                                ),
+                                errorWidget: (context, url, error) =>
+                                    const Icon(
+                                  Icons.person,
+                                  color: Colors.grey,
+                                  size: 30,
+                                ),
+                              )
+                            : const Icon(
+                                Icons.person,
+                                color: Colors.grey,
+                                size: 30,
+                              ),
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 12),
+                    // Name and ID
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,36 +70,19 @@ class SidebarWidget extends StatelessWidget {
                           Text(
                             authProvider.user?.name ?? 'User',
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: Colors.black87,
                               fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.bold,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(height: 4),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pop(context);
-                              context.push('/my-profile');
-                            },
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.edit,
-                                  size: 14,
-                                  color: Colors.white70,
-                                ),
-                                const SizedBox(width: 4),
-                                const Text(
-                                  'Edit Profile',
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
+                          const SizedBox(height: 2),
+                          Text(
+                            'ID - ${authProvider.user?.heartsId != null ? 'UWSS${authProvider.user!.heartsId}' : (authProvider.user?.id ?? 'N/A')}',
+                            style: const TextStyle(
+                              color: Colors.black54,
+                              fontSize: 13,
                             ),
                           ),
                         ],
@@ -95,6 +91,46 @@ class SidebarWidget extends StatelessWidget {
                   ],
                 ),
               ),
+            // Upgrade Membership Button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: InkWell(
+                onTap: () {
+                  Navigator.pop(context);
+                  context.go('/membership');
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEC4899), // Pink/red color
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    'Upgrade Membership',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
+            // Promotional Text
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: const Text(
+                'UPTO 65% OFF ALL MEMBERSHIP PLANS',
+                style: TextStyle(
+                  color: Colors.black54,
+                  fontSize: 11,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
             // Menu Label
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
@@ -105,7 +141,7 @@ class SidebarWidget extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 10,
                     letterSpacing: 3,
-                    color: Colors.white.withOpacity(0.5),
+                    color: Colors.black.withOpacity(0.5),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -175,41 +211,6 @@ class SidebarWidget extends StatelessWidget {
                   ),
                   _buildMenuItem(
                     context,
-                    icon: Icons.favorite_outline,
-                    title: 'Interests Received',
-                    route: '/interests-received',
-                    currentPath: currentPath,
-                  ),
-                  _buildMenuItem(
-                    context,
-                    icon: Icons.send,
-                    title: 'Interests Sent',
-                    route: '/interests-sent',
-                    currentPath: currentPath,
-                  ),
-                  _buildMenuItem(
-                    context,
-                    icon: Icons.star_border,
-                    title: 'Shortlisted',
-                    route: '/shortlisted',
-                    currentPath: currentPath,
-                  ),
-                  _buildMenuItem(
-                    context,
-                    icon: Icons.block,
-                    title: 'Blocked Profiles',
-                    route: '/blocked',
-                    currentPath: currentPath,
-                  ),
-                  _buildMenuItem(
-                    context,
-                    icon: Icons.visibility_off,
-                    title: 'Ignored Profiles',
-                    route: '/ignored',
-                    currentPath: currentPath,
-                  ),
-                  _buildMenuItem(
-                    context,
                     icon: Icons.lock,
                     title: 'Change Password',
                     route: '/change-password',
@@ -257,13 +258,17 @@ class SidebarWidget extends StatelessWidget {
                     route: null,
                     currentPath: currentPath,
                     external: true,
-                    externalUrl: 'https://contributions.heartfulness.org/in-en/donation-general-fund',
+                    externalUrl:
+                        'https://contributions.heartfulness.org/in-en/donation-general-fund',
                   ),
-                  const Divider(color: Colors.white10),
+                  const Divider(color: Colors.grey),
                   _buildMenuItem(
                     context,
-                    icon: themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                    title: themeProvider.isDarkMode ? 'Light Mode' : 'Dark Mode',
+                    icon: themeProvider.isDarkMode
+                        ? Icons.light_mode
+                        : Icons.dark_mode,
+                    title:
+                        themeProvider.isDarkMode ? 'Light Mode' : 'Dark Mode',
                     route: null,
                     currentPath: currentPath,
                     onTap: () => themeProvider.toggleTheme(),
@@ -293,24 +298,26 @@ class SidebarWidget extends StatelessWidget {
     String? externalUrl,
     VoidCallback? onTap,
   }) {
-    final isActive = route != null && (currentPath == route || currentPath.startsWith('$route/'));
-    
+    final isActive = route != null &&
+        (currentPath == route || currentPath.startsWith('$route/'));
+
     return Container(
       margin: const EdgeInsets.only(bottom: 4),
       decoration: BoxDecoration(
-        color: isActive ? AppColors.primary.withOpacity(0.2) : Colors.transparent,
+        color:
+            isActive ? AppColors.primary.withOpacity(0.2) : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(
         leading: Icon(
           icon,
-          color: isActive ? Colors.white : Colors.white70,
+          color: isActive ? AppColors.primary : Colors.black54,
           size: 20,
         ),
         title: Text(
           title,
           style: TextStyle(
-            color: isActive ? Colors.white : Colors.white70,
+            color: isActive ? AppColors.primary : Colors.black87,
             fontSize: 14,
             fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
           ),
@@ -325,13 +332,17 @@ class SidebarWidget extends StatelessWidget {
                 child: Text(
                   badge,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: Colors.black87,
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               )
-            : null,
+            : const Icon(
+                Icons.chevron_right,
+                color: Colors.black54,
+                size: 20,
+              ),
         onTap: () {
           Navigator.pop(context); // Close drawer
           if (onTap != null) {

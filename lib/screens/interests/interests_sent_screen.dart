@@ -124,7 +124,8 @@ class _InterestsSentScreenState extends State<InterestsSentScreen> {
                                   const SizedBox(height: 8),
                                   Text(
                                     'Interests Sent',
-                                    style: theme.textTheme.headlineSmall?.copyWith(
+                                    style:
+                                        theme.textTheme.headlineSmall?.copyWith(
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -161,7 +162,9 @@ class _InterestsSentScreenState extends State<InterestsSentScreen> {
                                     religion: profile['religion'],
                                     salary: profile['income'],
                                     imageUrl: profile['imageUrl'],
-                                    onSendInterest: () => _handleUnsendInterest(profile['id']),
+                                    gender: profile['gender'],
+                                    onSendInterest: () =>
+                                        _handleUnsendInterest(profile['id']),
                                   ),
                                 );
                               },

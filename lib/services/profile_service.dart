@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'api_client.dart';
 import '../models/profile_models.dart';
 
@@ -32,6 +33,14 @@ class ProfileService {
     return ApiProfileResponse.fromJson(response);
   }
 
+  // Get profile detail using getDetailView1 endpoint
+  Future<Map<String, dynamic>> getDetailView1(String clientId) async {
+    final response = await _apiClient.get<Map<String, dynamic>>(
+      '/dashboard/getDetailView1/$clientId',
+    );
+    return response;
+  }
+
   Future<ProfileDetailResponse> getProfileDetail(String profileId) async {
     final response = await _apiClient.get<Map<String, dynamic>>(
       '/profile/getProfileDetail/$profileId',
@@ -46,7 +55,16 @@ class ProfileService {
     return MyProfileResponse.fromJson(response);
   }
 
-  Future<ApiProfileResponse> searchProfiles(ProfileSearchPayload payload) async {
+  // Get user profile data from personalDetails endpoint
+  Future<Map<String, dynamic>> getUserProfileData() async {
+    final response = await _apiClient.get<Map<String, dynamic>>(
+      '/personalDetails/getUserProfileData/',
+    );
+    return response;
+  }
+
+  Future<ApiProfileResponse> searchProfiles(
+      ProfileSearchPayload payload) async {
     final response = await _apiClient.post<Map<String, dynamic>>(
       '/profile/searchProfiles',
       body: payload.toJson(),
@@ -82,7 +100,8 @@ class ProfileService {
     );
   }
 
-  Future<void> unsendInterest(String targetId, {bool useReceiverId = false}) async {
+  Future<void> unsendInterest(String targetId,
+      {bool useReceiverId = false}) async {
     await _apiClient.post<Map<String, dynamic>>(
       '/interest/unsendInterest',
       body: useReceiverId ? {'receiver_id': targetId} : {'targetId': targetId},
@@ -252,7 +271,8 @@ class ProfileService {
   }
 
   // Update SRCM details
-  Future<Map<String, dynamic>> updateSrcmDetails(Map<String, dynamic> payload) async {
+  Future<Map<String, dynamic>> updateSrcmDetails(
+      Map<String, dynamic> payload) async {
     final response = await _apiClient.patch<Map<String, dynamic>>(
       '/srcmDetails/updateSrcmDetails',
       body: payload,
@@ -262,15 +282,23 @@ class ProfileService {
 
   // Upload SRCM ID image
   Future<Map<String, dynamic>> uploadSrcmIdImage(String filePath) async {
-    // This will need multipart/form-data implementation
-    // For now, return a placeholder
-    throw UnimplementedError('Image upload needs multipart/form-data support');
+    final file = File(filePath);
+    final response = await _apiClient.uploadFile<Map<String, dynamic>>(
+      path: '/srcmDetails/uploadSrcmId',
+      file: file,
+      fieldName: 'srcmIdImage',
+    );
+    return response;
   }
 
   // Upload profile image
   Future<Map<String, dynamic>> uploadProfileImage(String filePath) async {
-    // This will need multipart/form-data implementation
-    // For now, return a placeholder
-    throw UnimplementedError('Image upload needs multipart/form-data support');
+    final file = File(filePath);
+    final response = await _apiClient.uploadFile<Map<String, dynamic>>(
+      path: '/personalDetails/uploadProfilePic',
+      file: file,
+      fieldName: 'profilePic',
+    );
+    return response;
   }
 }

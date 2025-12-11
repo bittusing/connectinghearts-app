@@ -13,8 +13,18 @@ class ApiResponse<T> {
     Map<String, dynamic> json, [
     T Function(dynamic)? fromJsonT,
   ]) {
+    // Handle both formats: 'success' field or 'status'/'code' format
+    bool success = false;
+    if (json['success'] != null) {
+      success = json['success'] == true;
+    } else if (json['status'] != null && json['code'] != null) {
+      success = json['status'] == 'success' && json['code'] == 'CH200';
+    } else if (json['status'] != null) {
+      success = json['status'] == 'success';
+    }
+
     return ApiResponse<T>(
-      success: json['success'] ?? false,
+      success: success,
       message: json['message'],
       data: json['data'] != null && fromJsonT != null
           ? fromJsonT(json['data'])
@@ -28,20 +38,26 @@ class LoginResponse {
   final String? userId;
   final String? screenName;
   final String? message;
+  final String? code;
+  final String? status;
 
   LoginResponse({
     this.token,
     this.userId,
     this.screenName,
     this.message,
+    this.code,
+    this.status,
   });
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
     return LoginResponse(
       token: json['token'],
-      userId: json['userId'],
+      userId: json['userId'] ?? json['id'], // Handle both 'userId' and 'id'
       screenName: json['screenName'],
       message: json['message'],
+      code: json['code'],
+      status: json['status'],
     );
   }
 }

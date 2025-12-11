@@ -13,6 +13,7 @@ class ApiProfile {
   final String? occupation;
   final String? income;
   final String? qualification;
+  final String? gender;
   final List<ProfilePic>? profilePic;
 
   ApiProfile({
@@ -30,25 +31,46 @@ class ApiProfile {
     this.occupation,
     this.income,
     this.qualification,
+    this.gender,
     this.profilePic,
   });
 
   factory ApiProfile.fromJson(Map<String, dynamic> json) {
+    // Helper function to convert dynamic to String
+    String? _toString(dynamic value) {
+      if (value == null) return null;
+      if (value is String) return value.isEmpty ? null : value;
+      return value.toString();
+    }
+
+    // Helper to safely get ID (can be String or ObjectId)
+    String? _getId(dynamic value) {
+      if (value == null) return null;
+      if (value is String) return value.isEmpty ? null : value;
+      if (value is Map) return value['\$oid']?.toString() ?? value.toString();
+      return value.toString();
+    }
+
     return ApiProfile(
-      id: json['_id'] ?? json['id'],
-      clientID: json['clientID'],
+      id: _getId(json['_id'] ?? json['id']),
+      clientID: _toString(json['clientID']),
       heartsId: json['heartsId']?.toString(),
-      name: json['name'],
-      age: json['age'],
-      height: json['height'],
-      religion: json['religion'],
-      caste: json['caste'] ?? json['cast'],
-      city: json['city'],
-      state: json['state'],
-      country: json['country'],
-      occupation: json['occupation'],
-      income: json['income'],
-      qualification: json['qualification'],
+      name: _toString(json['name']),
+      age: json['age'] is int
+          ? json['age']
+          : (json['age'] is String
+              ? int.tryParse(json['age'])
+              : (json['age'] is num ? json['age'].toInt() : null)),
+      height: json['height']?.toString(), // Can be int or String
+      religion: _toString(json['religion']),
+      caste: _toString(json['caste'] ?? json['cast']),
+      city: _toString(json['city']),
+      state: _toString(json['state']),
+      country: _toString(json['country']),
+      occupation: _toString(json['occupation']),
+      income: json['income']?.toString(), // Can be int, double, or String
+      qualification: _toString(json['qualification']),
+      gender: _toString(json['gender']),
       profilePic: (json['profilePic'] as List<dynamic>?)
           ?.map((pic) => ProfilePic.fromJson(pic))
           .toList(),
@@ -63,9 +85,15 @@ class ProfilePic {
   ProfilePic({this.id, this.s3Link});
 
   factory ProfilePic.fromJson(Map<String, dynamic> json) {
+    // Handle both int and String IDs
+    String? idValue;
+    if (json['id'] != null) {
+      idValue = json['id'].toString();
+    }
+
     return ProfilePic(
-      id: json['id']?.toString(),
-      s3Link: json['s3Link'],
+      id: idValue,
+      s3Link: json['s3Link']?.toString(),
     );
   }
 }
@@ -85,7 +113,7 @@ class ApiProfileResponse {
 
   factory ApiProfileResponse.fromJson(Map<String, dynamic> json) {
     List<ApiProfile> profiles = [];
-    
+
     // Handle different response formats
     if (json['filteredProfiles'] != null) {
       profiles = (json['filteredProfiles'] as List<dynamic>)
@@ -104,7 +132,7 @@ class ApiProfileResponse {
           .map((profile) => ApiProfile.fromJson(profile))
           .toList();
     }
-    
+
     return ApiProfileResponse(
       status: json['status'] ?? 'success',
       data: profiles,
@@ -155,7 +183,8 @@ class ProfileSearchPayload {
     if (city?.isNotEmpty ?? false) map['city'] = city;
     if (religion?.isNotEmpty ?? false) map['religion'] = religion;
     if (motherTongue?.isNotEmpty ?? false) map['motherTongue'] = motherTongue;
-    if (maritalStatus?.isNotEmpty ?? false) map['maritalStatus'] = maritalStatus;
+    if (maritalStatus?.isNotEmpty ?? false)
+      map['maritalStatus'] = maritalStatus;
     if (age?.isNotEmpty ?? false) map['age'] = age;
     if (height?.isNotEmpty ?? false) map['height'] = height;
     if (income?.isNotEmpty ?? false) map['income'] = income;
@@ -258,8 +287,9 @@ class UnlockProfileResponse {
 
   factory UnlockProfileResponse.fromJson(Map<String, dynamic> json) {
     final err = json['err'];
-    final redirectToMembership = err is Map && err['redirectToMembership'] == true;
-    
+    final redirectToMembership =
+        err is Map && err['redirectToMembership'] == true;
+
     return UnlockProfileResponse(
       success: json['code'] != 'CH400' && json['status'] == 'success',
       message: json['message'] ?? (err is Map ? err['msg'] : null),

@@ -16,6 +16,7 @@ import '../screens/search/search_results_screen.dart';
 import '../screens/profiles/profiles_screen.dart';
 import '../screens/membership/membership_screen.dart';
 import '../screens/daily_picks/daily_picks_screen.dart';
+import '../screens/profile_visitors/profile_visitors_screen.dart';
 import '../screens/interests/interests_received_screen.dart';
 import '../screens/interests/interests_sent_screen.dart';
 import '../screens/profile_actions/shortlisted_profiles_screen.dart';
@@ -33,6 +34,7 @@ import '../screens/feedback/feedback_screen.dart';
 import '../screens/legal/terms_screen.dart';
 import '../screens/legal/privacy_policy_screen.dart';
 import '../screens/settings/partner_preference_screen.dart';
+import '../screens/splash/splash_screen.dart';
 import '../models/profile_models.dart';
 import '../theme/colors.dart';
 import '../widgets/common/header_widget.dart';
@@ -40,207 +42,226 @@ import '../widgets/common/sidebar_widget.dart';
 import '../providers/auth_provider.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
-final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> _shellNavigatorKey =
+    GlobalKey<NavigatorState>();
 
 GoRouter createAppRouter(AuthProvider authProvider) {
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/login',
+    initialLocation: '/splash', // Start with splash screen
     refreshListenable: authProvider,
     redirect: (context, state) {
-      final isLoggedIn = authProvider.isAuthenticated;
-      final isGoingToLogin = state.uri.path == '/login' || state.uri.path == '/register';
-      
-      // If not logged in and trying to access protected route
-      if (!isLoggedIn && !isGoingToLogin && state.uri.path != '/forgot-password') {
-        return '/login';
+      final currentPath = state.uri.path;
+
+      // Allow splash screen to handle its own navigation
+      if (currentPath == '/splash') {
+        return null;
       }
-      
-      // If logged in and trying to access login/register
+
+      // Wait for initial auth check to complete
+      if (authProvider.isCheckingAuth) {
+        return '/splash'; // Redirect to splash while checking
+      }
+
+      final isLoggedIn = authProvider.isAuthenticated;
+      final isGoingToLogin =
+          currentPath == '/login' || currentPath == '/register';
+      final isGoingToForgotPassword = currentPath == '/forgot-password';
+
+      // If logged in and trying to access login/register, redirect to dashboard
       if (isLoggedIn && isGoingToLogin) {
         return '/';
       }
-      
+
+      // If not logged in and trying to access protected route, redirect to login
+      if (!isLoggedIn && !isGoingToLogin && !isGoingToForgotPassword) {
+        return '/login';
+      }
+
       return null; // No redirect needed
     },
     routes: [
-    // Auth Routes
-    GoRoute(
-      path: '/login',
-      builder: (context, state) => const LoginScreen(),
-    ),
-    GoRoute(
-      path: '/register',
-      builder: (context, state) => const RegisterScreen(),
-    ),
-    GoRoute(
-      path: '/forgot-password',
-      builder: (context, state) => const ForgotPasswordScreen(),
-    ),
-    GoRoute(
-      path: '/verification-pending',
-      builder: (context, state) => const VerificationPendingScreen(),
-    ),
-    // Onboarding Routes
-    GoRoute(
-      path: '/personal-details',
-      builder: (context, state) => const PersonalDetailsScreen(),
-    ),
-    GoRoute(
-      path: '/career-details',
-      builder: (context, state) => const CareerDetailsScreen(),
-    ),
-    GoRoute(
-      path: '/social-details',
-      builder: (context, state) => const SocialDetailsScreen(),
-    ),
-    GoRoute(
-      path: '/srcm-details',
-      builder: (context, state) => const SRCMDetailsScreen(),
-    ),
-    GoRoute(
-      path: '/family-details',
-      builder: (context, state) => const FamilyDetailsScreen(),
-    ),
-    GoRoute(
-      path: '/about-you',
-      builder: (context, state) => const AboutYouScreen(),
-    ),
-    // Main Shell with Bottom Navigation
-    ShellRoute(
-      navigatorKey: _shellNavigatorKey,
-      builder: (context, state, child) => MainTabsScreen(child: child),
-      routes: [
-        GoRoute(
-          path: '/',
-          builder: (context, state) => const DashboardScreen(),
-        ),
-        GoRoute(
-          path: '/search',
-          builder: (context, state) => const SearchScreen(),
-        ),
-        GoRoute(
-          path: '/daily-picks',
-          builder: (context, state) => const DailyPicksScreen(),
-        ),
-        GoRoute(
-          path: '/profiles',
-          builder: (context, state) => const ProfilesScreen(),
-        ),
-        GoRoute(
-          path: '/membership',
-          builder: (context, state) => const MembershipScreen(),
-        ),
-      ],
-    ),
-    // Profile Detail
-    GoRoute(
-      path: '/profile/:id',
-      builder: (context, state) {
-        final profileId = state.pathParameters['id']!;
-        return ProfileDetailScreen(profileId: profileId);
-      },
-    ),
-    // Search Results
-    GoRoute(
-      path: '/search-results',
-      builder: (context, state) {
-        final filters = state.extra as ProfileSearchPayload? ?? ProfileSearchPayload();
-        return SearchResultsScreen(filters: filters);
-      },
-    ),
-    // Profile Lists
-    GoRoute(
-      path: '/interests-received',
-      builder: (context, state) => const InterestsReceivedScreen(),
-    ),
-    GoRoute(
-      path: '/interests-sent',
-      builder: (context, state) => const InterestsSentScreen(),
-    ),
-    GoRoute(
-      path: '/shortlisted',
-      builder: (context, state) => const ShortlistedProfilesScreen(),
-    ),
-    GoRoute(
-      path: '/blocked',
-      builder: (context, state) => const BlockedProfilesScreen(),
-    ),
-    GoRoute(
-      path: '/ignored',
-      builder: (context, state) => const IgnoredProfilesScreen(),
-    ),
-    GoRoute(
-      path: '/acceptance',
-      builder: (context, state) => const AcceptanceScreen(),
-    ),
-    GoRoute(
-      path: '/just-joined',
-      builder: (context, state) => const ProfileListScreen(
-        listType: ProfileListType.justJoined,
+      // Splash Screen
+      GoRoute(
+        path: '/splash',
+        builder: (context, state) => const SplashScreen(),
       ),
-    ),
-    GoRoute(
-      path: '/profile-visitors',
-      builder: (context, state) => const ProfileListScreen(
-        listType: ProfileListType.profileVisitors,
+      // Auth Routes
+      GoRoute(
+        path: '/login',
+        builder: (context, state) => const LoginScreen(),
       ),
-    ),
-    GoRoute(
-      path: '/daily-recommendations',
-      builder: (context, state) => const ProfileListScreen(
-        listType: ProfileListType.dailyRecommendations,
+      GoRoute(
+        path: '/register',
+        builder: (context, state) => const RegisterScreen(),
       ),
-    ),
-    GoRoute(
-      path: '/all-profiles',
-      builder: (context, state) => const ProfileListScreen(
-        listType: ProfileListType.allProfiles,
+      GoRoute(
+        path: '/forgot-password',
+        builder: (context, state) => const ForgotPasswordScreen(),
       ),
-    ),
-    // My Profile
-    GoRoute(
-      path: '/my-profile',
-      builder: (context, state) => const MyProfileScreen(),
-    ),
-    // Partner Preference
-    GoRoute(
-      path: '/partner-preference',
-      builder: (context, state) => const PartnerPreferenceScreen(),
-    ),
-    // Settings
-    GoRoute(
-      path: '/change-password',
-      builder: (context, state) => const ChangePasswordScreen(),
-    ),
-    GoRoute(
-      path: '/help',
-      builder: (context, state) => const HelpCenterScreen(),
-    ),
-    GoRoute(
-      path: '/delete-profile',
-      builder: (context, state) => const DeleteProfileScreen(),
-    ),
-    // Notifications
-    GoRoute(
-      path: '/notifications',
-      builder: (context, state) => const NotificationsScreen(),
-    ),
-    // Feedback
-    GoRoute(
-      path: '/feedback',
-      builder: (context, state) => const FeedbackScreen(),
-    ),
-    // Legal
-    GoRoute(
-      path: '/terms',
-      builder: (context, state) => const TermsScreen(),
-    ),
-    GoRoute(
-      path: '/privacy',
-      builder: (context, state) => const PrivacyPolicyScreen(),
-    ),
-  ],
+      GoRoute(
+        path: '/verification-pending',
+        builder: (context, state) => const VerificationPendingScreen(),
+      ),
+      // Onboarding Routes
+      GoRoute(
+        path: '/personal-details',
+        builder: (context, state) => const PersonalDetailsScreen(),
+      ),
+      GoRoute(
+        path: '/career-details',
+        builder: (context, state) => const CareerDetailsScreen(),
+      ),
+      GoRoute(
+        path: '/social-details',
+        builder: (context, state) => const SocialDetailsScreen(),
+      ),
+      GoRoute(
+        path: '/srcm-details',
+        builder: (context, state) => const SRCMDetailsScreen(),
+      ),
+      GoRoute(
+        path: '/family-details',
+        builder: (context, state) => const FamilyDetailsScreen(),
+      ),
+      GoRoute(
+        path: '/about-you',
+        builder: (context, state) => const AboutYouScreen(),
+      ),
+      // Main Shell with Bottom Navigation
+      ShellRoute(
+        navigatorKey: _shellNavigatorKey,
+        builder: (context, state, child) => MainTabsScreen(child: child),
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => const DashboardScreen(),
+          ),
+          GoRoute(
+            path: '/search',
+            builder: (context, state) => const SearchScreen(),
+          ),
+          GoRoute(
+            path: '/daily-picks',
+            builder: (context, state) => const DailyPicksScreen(),
+          ),
+          GoRoute(
+            path: '/profile-visitors',
+            builder: (context, state) => const ProfileVisitorsScreen(),
+          ),
+          GoRoute(
+            path: '/profiles',
+            builder: (context, state) => const ProfilesScreen(),
+          ),
+          GoRoute(
+            path: '/membership',
+            builder: (context, state) => const MembershipScreen(),
+          ),
+        ],
+      ),
+      // Profile Detail
+      GoRoute(
+        path: '/profile/:id',
+        builder: (context, state) {
+          final profileId = state.pathParameters['id']!;
+          return ProfileDetailScreen(profileId: profileId);
+        },
+      ),
+      // Search Results
+      GoRoute(
+        path: '/search-results',
+        builder: (context, state) {
+          final filters =
+              state.extra as ProfileSearchPayload? ?? ProfileSearchPayload();
+          return SearchResultsScreen(filters: filters);
+        },
+      ),
+      // Profile Lists
+      GoRoute(
+        path: '/interests-received',
+        builder: (context, state) => const InterestsReceivedScreen(),
+      ),
+      GoRoute(
+        path: '/interests-sent',
+        builder: (context, state) => const InterestsSentScreen(),
+      ),
+      GoRoute(
+        path: '/shortlisted',
+        builder: (context, state) => const ShortlistedProfilesScreen(),
+      ),
+      GoRoute(
+        path: '/blocked',
+        builder: (context, state) => const BlockedProfilesScreen(),
+      ),
+      GoRoute(
+        path: '/ignored',
+        builder: (context, state) => const IgnoredProfilesScreen(),
+      ),
+      GoRoute(
+        path: '/acceptance',
+        builder: (context, state) => const AcceptanceScreen(),
+      ),
+      GoRoute(
+        path: '/just-joined',
+        builder: (context, state) => const ProfileListScreen(
+          listType: ProfileListType.justJoined,
+        ),
+      ),
+      GoRoute(
+        path: '/daily-recommendations',
+        builder: (context, state) => const ProfileListScreen(
+          listType: ProfileListType.dailyRecommendations,
+        ),
+      ),
+      GoRoute(
+        path: '/all-profiles',
+        builder: (context, state) => const ProfileListScreen(
+          listType: ProfileListType.allProfiles,
+        ),
+      ),
+      // My Profile
+      GoRoute(
+        path: '/my-profile',
+        builder: (context, state) => const MyProfileScreen(),
+      ),
+      // Partner Preference
+      GoRoute(
+        path: '/partner-preference',
+        builder: (context, state) => const PartnerPreferenceScreen(),
+      ),
+      // Settings
+      GoRoute(
+        path: '/change-password',
+        builder: (context, state) => const ChangePasswordScreen(),
+      ),
+      GoRoute(
+        path: '/help',
+        builder: (context, state) => const HelpCenterScreen(),
+      ),
+      GoRoute(
+        path: '/delete-profile',
+        builder: (context, state) => const DeleteProfileScreen(),
+      ),
+      // Notifications
+      GoRoute(
+        path: '/notifications',
+        builder: (context, state) => const NotificationsScreen(),
+      ),
+      // Feedback
+      GoRoute(
+        path: '/feedback',
+        builder: (context, state) => const FeedbackScreen(),
+      ),
+      // Legal
+      GoRoute(
+        path: '/terms',
+        builder: (context, state) => const TermsScreen(),
+      ),
+      GoRoute(
+        path: '/privacy',
+        builder: (context, state) => const PrivacyPolicyScreen(),
+      ),
+    ],
   );
 }
 
@@ -266,7 +287,7 @@ class AppRouter {
 
 class MainTabsScreen extends StatefulWidget {
   final Widget child;
-  
+
   const MainTabsScreen({
     super.key,
     required this.child,
@@ -309,7 +330,7 @@ class _MainTabsScreenState extends State<MainTabsScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       appBar: const HeaderWidget(),
       drawer: const SidebarWidget(),

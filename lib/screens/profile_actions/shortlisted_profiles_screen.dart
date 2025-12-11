@@ -11,7 +11,8 @@ class ShortlistedProfilesScreen extends StatefulWidget {
   const ShortlistedProfilesScreen({super.key});
 
   @override
-  State<ShortlistedProfilesScreen> createState() => _ShortlistedProfilesScreenState();
+  State<ShortlistedProfilesScreen> createState() =>
+      _ShortlistedProfilesScreenState();
 }
 
 class _ShortlistedProfilesScreenState extends State<ShortlistedProfilesScreen> {
@@ -133,7 +134,8 @@ class _ShortlistedProfilesScreenState extends State<ShortlistedProfilesScreen> {
                                   const SizedBox(height: 8),
                                   Text(
                                     'Shortlisted Profiles',
-                                    style: theme.textTheme.headlineSmall?.copyWith(
+                                    style:
+                                        theme.textTheme.headlineSmall?.copyWith(
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -170,8 +172,11 @@ class _ShortlistedProfilesScreenState extends State<ShortlistedProfilesScreen> {
                                     religion: profile['religion'],
                                     salary: profile['income'],
                                     imageUrl: profile['imageUrl'],
-                                    onShortlist: () => _handleUnshortlist(profile['id']),
-                                    onSendInterest: () => _handleSendInterest(profile['id']),
+                                    gender: profile['gender'],
+                                    onShortlist: () =>
+                                        _handleUnshortlist(profile['id']),
+                                    onSendInterest: () =>
+                                        _handleSendInterest(profile['id']),
                                   ),
                                 );
                               },

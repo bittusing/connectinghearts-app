@@ -171,6 +171,7 @@ class _InterestsReceivedScreenState extends State<InterestsReceivedScreen> {
                                     religion: profile['religion'],
                                     salary: profile['income'],
                                     imageUrl: profile['imageUrl'],
+                                    gender: profile['gender'],
                                     onAcceptInterest: () => _handleAccept(profile['id']),
                                     onDeclineInterest: () => _handleDecline(profile['id']),
                                   ),

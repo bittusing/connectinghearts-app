@@ -150,6 +150,7 @@ class _AcceptanceScreenState extends State<AcceptanceScreen>
                               religion: profile['religion'],
                               salary: profile['income'],
                               imageUrl: profile['imageUrl'],
+                              gender: profile['gender'],
                               customActions: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -211,4 +212,3 @@ class _AcceptanceScreenState extends State<AcceptanceScreen>
     );
   }
 }
-

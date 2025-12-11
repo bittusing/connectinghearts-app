@@ -32,14 +32,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
-    
+
     try {
       // Load stats
       final acceptanceResponse = await _profileService.getProfilesByEndpoint(
         'dashboard/getAcceptanceProfiles/acceptedMe',
       );
       final justJoinedResponse = await _profileService.getJustJoinedProfiles();
-      
+
       // Load sections
       final dailyRecs = await _profileService.getDailyRecommendations();
       final visitors = await _profileService.getProfileVisitors();
@@ -49,9 +49,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         setState(() {
           _acceptanceCount = acceptanceResponse.data.length;
           _justJoinedCount = justJoinedResponse.data.length;
-          _dailyRecommendations = dailyRecs.data.map((p) => transformProfile(p)).toList();
-          _profileVisitors = visitors.data.map((p) => transformProfile(p)).toList();
-          _allProfiles = allProfiles.data.map((p) => transformProfile(p)).toList();
+          _dailyRecommendations =
+              dailyRecs.data.map((p) => transformProfile(p)).toList();
+          _profileVisitors =
+              visitors.data.map((p) => transformProfile(p)).toList();
+          _allProfiles =
+              allProfiles.data.map((p) => transformProfile(p)).toList();
           _isLoading = false;
         });
       }
@@ -149,7 +152,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              authProvider.user?.name ?? 
+                              authProvider.user?.name ??
                                   'HEARTS-${authProvider.user?.heartsId ?? ''}',
                               style: const TextStyle(
                                 fontSize: 22,
@@ -350,17 +353,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   : ListView.builder(
                       scrollDirection: Axis.horizontal,
                       padding: const EdgeInsets.symmetric(horizontal: 0),
-                      itemCount: profiles.length > 5 ? 5 : profiles.length,
+                      itemCount: profiles.length > 3 ? 3 : profiles.length,
                       itemBuilder: (context, index) {
                         final profile = profiles[index];
                         return Padding(
                           padding: const EdgeInsets.only(right: 16),
                           child: ProfileCard(
-                            name: profile['name'] ?? 'HEARTS-${profile['id'] ?? ''}',
+                            name: profile['name'] ??
+                                'HEARTS-${profile['id'] ?? ''}',
                             age: profile['age'] ?? 0,
                             height: profile['height'] ?? '',
                             location: profile['location'] ?? '',
-                            onTap: () => context.push('/profile/${profile['id']}'),
+                            imageUrl: profile['imageUrl'],
+                            gender: profile['gender'],
+                            onTap: () => context.push(
+                                '/profile/${profile['clientID'] ?? profile['id']}'),
                           ),
                         );
                       },

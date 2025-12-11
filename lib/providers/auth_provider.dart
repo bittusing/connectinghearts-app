@@ -42,11 +42,13 @@ class AuthProvider extends ChangeNotifier {
   final StorageService _storageService = StorageService();
 
   bool _isLoading = false;
+  bool _isCheckingAuth = true; // Track initial auth check
   bool _isAuthenticated = false;
   String? _error;
   UserData? _user;
 
   bool get isLoading => _isLoading;
+  bool get isCheckingAuth => _isCheckingAuth;
   bool get isAuthenticated => _isAuthenticated;
   String? get error => _error;
   UserData? get user => _user;
@@ -56,19 +58,47 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> _checkAuthStatus() async {
+    _isCheckingAuth = true;
+    notifyListeners();
+
     try {
       final token = await _storageService.getToken();
-      if (token != null) {
+      if (token != null && token.isNotEmpty) {
         final response = await _authService.validateToken();
-        if (response.success && response.data != null) {
+        // Check if token is valid (status == 'success' && code == 'CH200')
+        if (response.success) {
           _isAuthenticated = true;
-          _user = UserData.fromJson(response.data!.toJson());
+          // If response has user data, use it; otherwise fetch profile
+          if (response.data != null) {
+            _user = UserData.fromJson(response.data!.toJson());
+          } else {
+            // Fetch user profile if validateToken doesn't return user data
+            await _fetchUserProfile();
+          }
+        } else {
+          // Token is invalid, clear it
+          await _storageService.deleteToken();
+          _isAuthenticated = false;
+          _user = null;
         }
+      } else {
+        _isAuthenticated = false;
+        _user = null;
       }
     } catch (e) {
+      // Token validation failed, clear auth state
       _isAuthenticated = false;
+      _user = null;
+      // Only delete token if it's clearly invalid (not network errors)
+      try {
+        await _storageService.deleteToken();
+      } catch (_) {
+        // Ignore errors when deleting token
+      }
+    } finally {
+      _isCheckingAuth = false;
+      notifyListeners();
     }
-    notifyListeners();
   }
 
   Future<bool> login(String phoneNumber, String password) async {

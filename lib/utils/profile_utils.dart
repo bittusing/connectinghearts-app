@@ -1,6 +1,16 @@
 import '../config/api_config.dart';
 import '../models/profile_models.dart';
 
+/// Get gender-based placeholder image
+String getGenderPlaceholder(String? gender) {
+  if (gender == null) return 'assets/images/girl-placeholder-lazy.png';
+  final normalized = gender.trim().toUpperCase();
+  if (normalized == 'M' || normalized == 'MALE') {
+    return 'assets/images/boy-planceholder-lazy.png';
+  }
+  return 'assets/images/girl-placeholder-lazy.png';
+}
+
 /// Build profile image URL from clientId and imageId
 String buildImageUrl(String clientId, String imageId) {
   return ApiConfig.buildImageUrl(clientId, imageId);
@@ -19,49 +29,170 @@ String? getProfileImageUrl(ApiProfile profile) {
 }
 
 /// Transform API profile to display format
-Map<String, dynamic> transformProfile(ApiProfile apiProfile) {
-  final location = [
-    apiProfile.city,
-    apiProfile.state,
-    apiProfile.country,
-  ].where((s) => s != null && s.isNotEmpty).join(', ');
+Map<String, dynamic> transformProfile(
+  ApiProfile apiProfile, {
+  Map<String, List<LookupOption>>? lookupData,
+  String? dob,
+}) {
+  // Calculate age from DOB if available
+  int? age;
+  if (dob != null && dob.isNotEmpty) {
+    try {
+      final dobDate = DateTime.parse(dob);
+      age = calculateAge(dobDate);
+    } catch (_) {}
+  }
+
+  // Get location labels
+  String location = '';
+  if (lookupData != null) {
+    final cityLabel = _getLabelFromLookup(lookupData, 'city', apiProfile.city);
+    final stateLabel =
+        _getLabelFromLookup(lookupData, 'state', apiProfile.state);
+    final countryLabel =
+        _getLabelFromLookup(lookupData, 'country', apiProfile.country);
+    location = [cityLabel, stateLabel, countryLabel]
+        .where((s) => s != null && s.isNotEmpty && s != 'Not Filled')
+        .join(', ');
+  }
+
+  if (location.isEmpty) {
+    location = [
+      apiProfile.city,
+      apiProfile.state,
+      apiProfile.country,
+    ].where((s) => s != null && s.isNotEmpty).join(', ');
+  }
+
+  // Get primary image
+  String? imageUrl;
+  if (apiProfile.profilePic != null && apiProfile.profilePic!.isNotEmpty) {
+    final primaryPic = apiProfile.profilePic!.firstWhere(
+      (pic) =>
+          pic.s3Link != null &&
+          pic.s3Link!.isNotEmpty &&
+          pic.id != null &&
+          pic.id!.isNotEmpty,
+      orElse: () => apiProfile.profilePic!.first,
+    );
+    if (primaryPic.id != null && primaryPic.id!.isNotEmpty) {
+      final clientId = apiProfile.clientID ?? apiProfile.id ?? '';
+      imageUrl = buildImageUrl(clientId, primaryPic.id!);
+    }
+  }
 
   return {
     'id': apiProfile.clientID ?? apiProfile.id ?? '',
-    'name': apiProfile.heartsId != null 
-        ? 'HEARTS-${apiProfile.heartsId}' 
+    'clientID': apiProfile.clientID ?? apiProfile.id ?? '',
+    'name': apiProfile.heartsId != null
+        ? 'HEARTS-${apiProfile.heartsId}'
         : (apiProfile.name ?? 'Unknown'),
-    'age': apiProfile.age ?? 0,
-    'height': apiProfile.height ?? '',
+    'age': age ?? apiProfile.age ?? 0,
+    'height': formatHeight(apiProfile.height),
     'location': location,
-    'religion': apiProfile.religion,
-    'caste': apiProfile.caste,
-    'occupation': apiProfile.occupation,
-    'income': apiProfile.income,
-    'qualification': apiProfile.qualification,
-    'imageUrl': getProfileImageUrl(apiProfile),
+    'religion':
+        _getLabelFromLookup(lookupData, 'religion', apiProfile.religion) ??
+            (apiProfile.religion?.toString()),
+    'caste': _getLabelFromLookup(lookupData, 'casts', apiProfile.caste) ??
+        (apiProfile.caste?.toString()),
+    'occupation':
+        _getLabelFromLookup(lookupData, 'occupation', apiProfile.occupation) ??
+            (apiProfile.occupation?.toString()),
+    'income': formatIncome(apiProfile.income),
+    'qualification': _getLabelFromLookup(
+            lookupData, 'qualification', apiProfile.qualification) ??
+        (apiProfile.qualification?.toString()),
+    'imageUrl': imageUrl,
+    'heartsId': apiProfile.heartsId,
+    'gender': apiProfile.gender,
+    'dob': dob,
   };
 }
 
-/// Format height string
-String formatHeight(String? height) {
-  if (height == null || height.isEmpty) return '';
-  // Height might be in cm or feet'inches format
-  return height;
+String? _getLabelFromLookup(
+  Map<String, List<LookupOption>>? lookupData,
+  String key,
+  dynamic value,
+) {
+  if (lookupData == null || value == null) return null;
+  final options = lookupData[key];
+  if (options == null) return null;
+  try {
+    final option = options.firstWhere(
+      (opt) => opt.value.toString() == value.toString(),
+    );
+    return option.label;
+  } catch (_) {
+    return null;
+  }
 }
 
-/// Format income string
-String formatIncome(String? income) {
-  if (income == null || income.isEmpty) return '';
-  return income;
+/// Format height from inches to feet'inches format
+String formatHeight(dynamic height) {
+  if (height == null) return '';
+  if (height is String && height.isEmpty) return '';
+
+  int inches;
+  if (height is int) {
+    inches = height;
+  } else if (height is double) {
+    inches = height.toInt();
+  } else if (height is String) {
+    inches = int.tryParse(height) ?? 0;
+  } else {
+    return height.toString();
+  }
+
+  if (inches == 0) return '';
+
+  final feet = inches ~/ 12;
+  final remainingInches = inches % 12;
+  return "$feet' $remainingInches\"";
+}
+
+/// Format income from code to readable string
+String formatIncome(dynamic income) {
+  if (income == null) return '';
+  if (income is String && income.isEmpty) return '';
+
+  // Income codes: 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+  // Map to income ranges (this is a simplified mapping, adjust based on actual API)
+  final incomeMap = {
+    0.5: 'Not Working',
+    1: 'Rs. 0 - 1 Lakh',
+    2: 'Rs. 1 - 2.5 Lakh',
+    3: 'Rs. 2.5 - 5 Lakh',
+    4: 'Rs. 5 - 7.5 Lakh',
+    5: 'Rs. 7.5 - 10 Lakh',
+    6: 'Rs. 10 - 15 Lakh',
+    7: 'Rs. 15 - 20 Lakh',
+    8: 'Rs. 20 - 25 Lakh',
+    9: 'Rs. 25 - 30 Lakh',
+    10: 'Rs. 30 - 40 Lakh',
+    11: 'Rs. 40 - 50 Lakh',
+    12: 'Rs. 50 - 75 Lakh',
+    13: 'Rs. 75 Lakh - 1 Crore',
+    14: 'Rs. 1 - 2 Crore',
+    15: 'Rs. 2+ Crore',
+  };
+
+  if (income is num) {
+    return incomeMap[income] ?? income.toString();
+  }
+  if (income is String) {
+    final numValue = double.tryParse(income);
+    if (numValue != null) {
+      return incomeMap[numValue] ?? income;
+    }
+  }
+  return income.toString();
 }
 
 /// Calculate age from date of birth
 int calculateAge(DateTime dob) {
   final now = DateTime.now();
   int age = now.year - dob.year;
-  if (now.month < dob.month || 
-      (now.month == dob.month && now.day < dob.day)) {
+  if (now.month < dob.month || (now.month == dob.month && now.day < dob.day)) {
     age--;
   }
   return age;

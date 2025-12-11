@@ -338,6 +338,7 @@ class _ProfileListScreenState extends State<ProfileListScreen> {
                                     religion: profile['religion'],
                                     salary: profile['income'],
                                     imageUrl: profile['imageUrl'],
+                                    gender: profile['gender'],
                                     onSendInterest: _shouldShowSendInterest()
                                         ? () =>
                                             _handleSendInterest(profile['id'])

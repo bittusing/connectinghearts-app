@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../theme/colors.dart';
 
 class FeedbackScreen extends StatefulWidget {
@@ -41,7 +42,11 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           backgroundColor: AppColors.success,
         ),
       );
-      Navigator.pop(context);
+      if (Navigator.canPop(context)) {
+        context.pop();
+      } else {
+        context.go('/');
+      }
     }
   }
 
@@ -51,7 +56,27 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Feedback'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              context.pop();
+            } else {
+              context.go('/');
+            }
+          },
+        ),
+        title: const Text(
+          'Feedback',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -89,13 +114,10 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8),
                             child: Icon(
-                              index < _rating
-                                  ? Icons.star
-                                  : Icons.star_border,
+                              index < _rating ? Icons.star : Icons.star_border,
                               size: 40,
-                              color: index < _rating
-                                  ? Colors.amber
-                                  : Colors.grey,
+                              color:
+                                  index < _rating ? Colors.amber : Colors.grey,
                             ),
                           ),
                         );
@@ -119,7 +141,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     maxLines: 5,
                     decoration: const InputDecoration(
                       labelText: 'Your Feedback',
-                      hintText: 'Tell us what you liked or what we can improve...',
+                      hintText:
+                          'Tell us what you liked or what we can improve...',
                       alignLabelWithHint: true,
                     ),
                   ),
@@ -168,4 +191,3 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     }
   }
 }
-

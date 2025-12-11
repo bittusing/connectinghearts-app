@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../theme/colors.dart';
 import '../../services/profile_service.dart';
-import '../../widgets/common/confirm_modal.dart';
+import '../../providers/lookup_provider.dart';
+import '../../utils/profile_utils.dart';
+import '../../config/api_config.dart';
 
 class ProfileDetailScreen extends StatefulWidget {
   final String profileId;
@@ -21,6 +23,8 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
     with SingleTickerProviderStateMixin {
   final ProfileService _profileService = ProfileService();
   late TabController _tabController;
+  final ScrollController _scrollController = ScrollController();
+  final Map<int, GlobalKey<State<StatefulWidget>>> _sectionKeys = {};
 
   bool _isLoading = true;
   String? _error;
@@ -29,20 +33,69 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
 
   bool _hasSentInterest = false;
   bool _isShortlisted = false;
-  bool _isIgnored = false;
   bool _isActionLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 6, vsync: this);
+    // Create keys for each section
+    for (int i = 0; i < 6; i++) {
+      _sectionKeys[i] = GlobalKey<State<StatefulWidget>>();
+    }
     _loadProfile();
+    _setupScrollListener();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _setupScrollListener() {
+    _scrollController.addListener(() {
+      // Auto-change tabs based on scroll position
+      for (int i = 0; i < 6; i++) {
+        final key = _sectionKeys[i];
+        if (key?.currentContext != null) {
+          final RenderBox? box =
+              key?.currentContext?.findRenderObject() as RenderBox?;
+          if (box != null) {
+            final position = box.localToGlobal(Offset.zero);
+            // Check if section is in viewport (accounting for tab bar height ~50)
+            if (position.dy <= 150 && position.dy >= -50) {
+              if (_tabController.index != i &&
+                  !_tabController.indexIsChanging) {
+                _tabController.animateTo(i);
+              }
+              break;
+            }
+          }
+        }
+      }
+    });
+  }
+
+  void _scrollToSection(int index) {
+    final key = _sectionKeys[index];
+    if (key?.currentContext != null) {
+      Scrollable.ensureVisible(
+        key!.currentContext!,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        alignment: 0.1, // Scroll to show section just below tab bar
+      );
+    }
+  }
+
+  Widget _buildSection(
+      {required GlobalKey<State<StatefulWidget>> key, required Widget child}) {
+    return Container(
+      key: key,
+      child: child,
+    );
   }
 
   Future<void> _loadProfile() async {
@@ -52,11 +105,23 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
     });
 
     try {
-      final response = await _profileService.getProfileDetail(widget.profileId);
+      // Load lookup data first
+      final lookupProvider =
+          Provider.of<LookupProvider>(context, listen: false);
+      await lookupProvider.loadLookupData();
+
+      // Use getDetailView1 endpoint
+      final response = await _profileService.getDetailView1(widget.profileId);
+      // API returns { code, status, data: { ... } }
+      final profileData = response['data'] as Map<String, dynamic>? ?? response;
+
       setState(() {
-        _profile = response.data;
-        _isShortlisted = _profile?['isShortlisted'] ?? false;
-        _isIgnored = _profile?['isIgnored'] ?? false;
+        _profile = profileData;
+        final miscellaneous =
+            profileData['miscellaneous'] as Map<String, dynamic>? ?? {};
+        _isShortlisted = miscellaneous['isShortlisted'] ?? false;
+        _hasSentInterest =
+            false; // Not in API response, would need separate call
         _isLoading = false;
       });
     } catch (e) {
@@ -118,55 +183,25 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
     }
   }
 
-  Future<void> _handleIgnore() async {
+  void _handleChat() {
+    _showToast('Chat Coming Soon');
+  }
+
+  Future<void> _handleSuperInterest() async {
     if (_isActionLoading) return;
     setState(() => _isActionLoading = true);
 
     try {
-      if (_isIgnored) {
-        await _profileService.unignoreProfile(widget.profileId);
-        setState(() => _isIgnored = false);
-        _showToast('Profile restored');
-      } else {
-        await _profileService.ignoreProfile(widget.profileId);
-        setState(() => _isIgnored = true);
-        _showToast('Profile ignored');
-      }
+      // Super interest is typically the same as regular interest but with a premium feature
+      // For now, we'll use the regular interest endpoint
+      await _profileService.sendInterest(widget.profileId);
+      setState(() => _hasSentInterest = true);
+      _showToast('Super Interest sent successfully');
     } catch (e) {
       _showToast(e.toString(), isError: true);
     } finally {
       setState(() => _isActionLoading = false);
     }
-  }
-
-  Future<void> _handleUnlock() async {
-    final confirmed = await showConfirmDialog(
-      context,
-      title: 'Unlock Profile?',
-      description: 'This will cost you 1 heart coin!',
-      confirmLabel: 'Unlock',
-    );
-
-    if (confirmed != true) return;
-
-    try {
-      final response = await _profileService.unlockProfile(widget.profileId);
-      if (response.success) {
-        _showToast('Profile unlocked successfully');
-        _loadProfile();
-      } else {
-        if (response.redirectToMembership) {
-          context.push('/membership');
-        }
-        _showToast(response.message ?? 'Failed to unlock', isError: true);
-      }
-    } catch (e) {
-      _showToast(e.toString(), isError: true);
-    }
-  }
-
-  void _handleChat() {
-    _showToast('Chat Coming Soon');
   }
 
   @override
@@ -203,17 +238,59 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
       );
     }
 
-    final name = _profile!['name'] ?? 'Unknown';
-    final age = _profile!['age'] ?? '';
-    final profileId = _profile!['profileId'] ?? '';
-    final profilePics = _profile!['allProfilePics'] as List<dynamic>? ?? [];
-    final currentImage =
-        profilePics.isNotEmpty && _currentImageIndex < profilePics.length
-            ? profilePics[_currentImageIndex]['url']
-            : _profile!['avatar'];
+    final miscellaneous =
+        _profile!['miscellaneous'] as Map<String, dynamic>? ?? {};
+    final critical = _profile!['critical'] as Map<String, dynamic>? ?? {};
+
+    // Calculate age from DOB
+    int? age;
+    if (critical['dob'] != null) {
+      try {
+        final dobStr = critical['dob'].toString();
+        // Format: "05/10/1997"
+        final parts = dobStr.split('/');
+        if (parts.length == 3) {
+          final dob = DateTime(
+            int.parse(parts[2]),
+            int.parse(parts[1]),
+            int.parse(parts[0]),
+          );
+          age = calculateAge(dob);
+        }
+      } catch (_) {}
+    }
+
+    final heartsId = miscellaneous['heartsId']?.toString() ?? '';
+    final profileId = heartsId.isNotEmpty ? 'HEARTS-$heartsId' : '';
+
+    // Get profile images
+    final profilePics = miscellaneous['profilePic'] as List<dynamic>? ?? [];
+    final clientId = miscellaneous['clientID'] ?? widget.profileId;
+    final gender = miscellaneous['gender']?.toString();
+    String? currentImage;
+
+    if (profilePics.isNotEmpty && _currentImageIndex < profilePics.length) {
+      final pic = profilePics[_currentImageIndex] as Map<String, dynamic>;
+      final picId = pic['id']?.toString();
+      if (picId != null && clientId != null) {
+        currentImage = ApiConfig.buildImageUrl(clientId.toString(), picId);
+      }
+    }
+
+    if (currentImage == null && profilePics.isNotEmpty) {
+      final firstPic = profilePics[0] as Map<String, dynamic>;
+      final picId = firstPic['id']?.toString();
+      if (picId != null && clientId != null) {
+        currentImage = ApiConfig.buildImageUrl(clientId.toString(), picId);
+      }
+    }
+
+    // Use gender-based placeholder if no image
+    final placeholderImage = getGenderPlaceholder(gender);
 
     return Scaffold(
       body: CustomScrollView(
+        controller: _scrollController,
         slivers: [
           // Image Header
           SliverAppBar(
@@ -230,18 +307,25 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
                           fit: BoxFit.cover,
                           placeholder: (_, __) => Container(
                             color: theme.dividerColor,
-                            child: const Center(
-                              child: CircularProgressIndicator(),
+                            child: Image.asset(
+                              placeholderImage,
+                              fit: BoxFit.cover,
                             ),
                           ),
                           errorWidget: (_, __, ___) => Container(
                             color: theme.dividerColor,
-                            child: const Icon(Icons.person, size: 100),
+                            child: Image.asset(
+                              placeholderImage,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         )
                       : Container(
                           color: theme.dividerColor,
-                          child: const Icon(Icons.person, size: 100),
+                          child: Image.asset(
+                            placeholderImage,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                   // Gradient Overlay
                   Positioned(
@@ -274,7 +358,11 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
                               ),
                             ),
                           Text(
-                            '$name, $age',
+                            age != null
+                                ? '$profileId, $age years'
+                                : (profileId.isNotEmpty
+                                    ? profileId
+                                    : 'Unknown'),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 24,
@@ -392,11 +480,18 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
             delegate: _SliverTabBarDelegate(
               TabBar(
                 controller: _tabController,
+                isScrollable: true,
+                onTap: (index) {
+                  // Scroll to section when tab is clicked
+                  _scrollToSection(index);
+                },
                 tabs: const [
-                  Tab(text: 'Basic'),
+                  Tab(text: 'About'),
+                  Tab(text: 'Career'),
+                  Tab(text: 'Education'),
                   Tab(text: 'Family'),
-                  Tab(text: 'Kundali'),
-                  Tab(text: 'Match'),
+                  Tab(text: 'Horoscope'),
+                  Tab(text: 'Looking For'),
                 ],
                 labelColor: AppColors.primary,
                 indicatorColor: AppColors.primary,
@@ -404,17 +499,17 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
               theme.cardColor,
             ),
           ),
-          // Tab Content
-          SliverFillRemaining(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildBasicTab(),
-                _buildFamilyTab(),
-                _buildKundaliTab(),
-                _buildMatchTab(),
-              ],
-            ),
+          // Tab Content - Single scrollable list with sections
+          SliverList(
+            delegate: SliverChildListDelegate([
+              _buildSection(key: _sectionKeys[0]!, child: _buildAboutTab()),
+              _buildSection(key: _sectionKeys[1]!, child: _buildCareerTab()),
+              _buildSection(key: _sectionKeys[2]!, child: _buildEducationTab()),
+              _buildSection(key: _sectionKeys[3]!, child: _buildFamilyTab()),
+              _buildSection(key: _sectionKeys[4]!, child: _buildHoroscopeTab()),
+              _buildSection(
+                  key: _sectionKeys[5]!, child: _buildLookingForTab()),
+            ]),
           ),
         ],
       ),
@@ -433,31 +528,30 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
         ),
         child: SafeArea(
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _buildActionButton(
-                icon: _hasSentInterest ? Icons.send : Icons.send_outlined,
-                label: _hasSentInterest ? 'Withdraw' : 'Interest',
-                color: _hasSentInterest ? Colors.grey : AppColors.primary,
+                icon: _hasSentInterest ? Icons.favorite : Icons.favorite_border,
+                label: 'Interest',
+                color: _hasSentInterest ? AppColors.primary : Colors.grey,
                 onTap: _handleSendInterest,
               ),
               _buildActionButton(
-                icon: Icons.phone_outlined,
-                label: 'Contact',
-                onTap: _handleUnlock,
+                icon: Icons.star,
+                label: 'Super Interest',
+                color: Colors.amber,
+                onTap: _handleSuperInterest,
               ),
               _buildActionButton(
                 icon: _isShortlisted ? Icons.bookmark : Icons.bookmark_border,
-                label: _isShortlisted ? 'Saved' : 'Shortlist',
+                label: 'Shortlist',
+                color: _isShortlisted ? AppColors.primary : Colors.grey,
                 onTap: _handleShortlist,
-              ),
-              _buildActionButton(
-                icon: _isIgnored ? Icons.visibility_off : Icons.block,
-                label: _isIgnored ? 'Restore' : 'Ignore',
-                onTap: _handleIgnore,
               ),
               _buildActionButton(
                 icon: Icons.chat_bubble_outline,
                 label: 'Chat',
+                color: Colors.grey,
                 onTap: _handleChat,
               ),
             ],
@@ -494,59 +588,168 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
     );
   }
 
-  Widget _buildBasicTab() {
-    return SingleChildScrollView(
+  Widget _buildAboutTab() {
+    final basic = _profile!['basic'] as Map<String, dynamic>? ?? {};
+    final critical = _profile!['critical'] as Map<String, dynamic>? ?? {};
+    final about = _profile!['about'] as Map<String, dynamic>? ?? {};
+
+    return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildInfoGrid([
-            {'label': 'Height', 'value': _profile!['height']},
-            {'label': 'Location', 'value': _profile!['location']},
-            {'label': 'Caste', 'value': _profile!['caste']},
-            {'label': 'Income', 'value': _profile!['income']},
-            {'label': 'Marital Status', 'value': _profile!['maritalStatus']},
-            {'label': 'Body Type', 'value': _profile!['bodyType']},
+            {'label': 'Height', 'value': basic['height']?.toString() ?? ''},
+            {
+              'label': 'Location',
+              'value':
+                  '${basic['city'] ?? ''}, ${basic['state'] ?? ''}, ${basic['country'] ?? ''}'
+                      .replaceAll(RegExp(r'^,\s*|,\s*$'), '')
+                      .replaceAll(RegExp(r',\s*,+'), ', ')
+            },
+            {'label': 'Caste', 'value': basic['cast']?.toString() ?? ''},
+            {
+              'label': 'Marital Status',
+              'value': critical['maritalStatus']?.toString() ?? ''
+            },
+            {
+              'label': 'Body Type',
+              'value': about['bodyType']?.toString() ?? ''
+            },
+            {'label': 'Religion', 'value': basic['religion']?.toString() ?? ''},
+            {
+              'label': 'Mother Tongue',
+              'value': basic['motherTongue']?.toString() ?? ''
+            },
+            {
+              'label': 'Residential Status',
+              'value': basic['residentialStatus']?.toString() ?? ''
+            },
+            {
+              'label': 'Thalassemia',
+              'value': about['thalassemia']?.toString() ?? ''
+            },
+            {
+              'label': 'HIV Positive',
+              'value': about['hivPositive']?.toString() ?? ''
+            },
+            {
+              'label': 'Disability',
+              'value': about['disability']?.toString() ?? ''
+            },
           ]),
           const SizedBox(height: 24),
-          if (_profile!['aboutMe'] != null) ...[
-            _buildSection('About Me', _profile!['aboutMe']),
+          if (about['description'] != null &&
+              about['description'].toString().isNotEmpty) ...[
+            _buildContentSection('About Me', about['description'].toString()),
             const SizedBox(height: 24),
           ],
-          if (_profile!['occupation'] != null ||
-              _profile!['employedIn'] != null) ...[
-            _buildSectionTitle('Career'),
+          if (about['managedBy'] != null) ...[
             _buildInfoGrid([
-              {'label': 'Occupation', 'value': _profile!['occupation']},
-              {'label': 'Employed In', 'value': _profile!['employedIn']},
-              {'label': 'Organisation', 'value': _profile!['organisationName']},
-            ]),
-            if (_profile!['aboutCareer'] != null) ...[
-              const SizedBox(height: 8),
-              Text(_profile!['aboutCareer']),
-            ],
-            const SizedBox(height: 24),
-          ],
-          if (_profile!['qualification'] != null) ...[
-            _buildSectionTitle('Education'),
-            _buildInfoGrid([
-              {'label': 'Qualification', 'value': _profile!['qualification']},
-              {'label': 'School', 'value': _profile!['school']},
-            ]),
-            const SizedBox(height: 24),
-          ],
-          // Contact Details (if unlocked)
-          if (_profile!['isUnlocked'] == true &&
-              _profile!['contactDetails'] != null) ...[
-            _buildSectionTitle('Contact Details'),
-            _buildInfoGrid([
-              {'label': 'Name', 'value': _profile!['contactDetails']['name']},
               {
-                'label': 'Phone',
-                'value': _profile!['contactDetails']['phoneNumber']
+                'label': 'Managed By',
+                'value': about['managedBy']?.toString() ?? ''
               },
-              {'label': 'Email', 'value': _profile!['contactDetails']['email']},
             ]),
+            const SizedBox(height: 24),
+          ],
+          // Lifestyle Data Section
+          if (_profile!['lifeStyleData'] != null) ...[
+            _buildLifestyleSection(
+                _profile!['lifeStyleData'] as Map<String, dynamic>),
+            const SizedBox(height: 24),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCareerTab() {
+    final career = _profile!['career'] as Map<String, dynamic>? ?? {};
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section Heading
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Text(
+              'Career',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
+            ),
+          ),
+          _buildInfoGrid([
+            {
+              'label': 'Occupation',
+              'value': career['occupation']?.toString() ?? ''
+            },
+            {
+              'label': 'Employed In',
+              'value': career['employed_in']?.toString() ?? ''
+            },
+            {
+              'label': 'Organisation',
+              'value': career['organisationName']?.toString() ?? ''
+            },
+            {'label': 'Income', 'value': career['income']?.toString() ?? ''},
+            {
+              'label': 'Interested in Settling Abroad',
+              'value': career['interestedInSettlingAbroad']?.toString() == 'Y'
+                  ? 'Yes'
+                  : 'No'
+            },
+          ]),
+          if (career['aboutMyCareer'] != null &&
+              career['aboutMyCareer'].toString().isNotEmpty) ...[
+            const SizedBox(height: 16),
+            _buildContentSection(
+                'About Career', career['aboutMyCareer'].toString()),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEducationTab() {
+    final education = _profile!['education'] as Map<String, dynamic>? ?? {};
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section Heading
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Text(
+              'Education',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
+            ),
+          ),
+          _buildInfoGrid([
+            {
+              'label': 'Qualification',
+              'value': education['qualification']?.toString() ?? ''
+            },
+            {'label': 'School', 'value': education['school']?.toString() ?? ''},
+            {
+              'label': 'Other UG Degree',
+              'value': education['otherUGDegree']?.toString() ?? ''
+            },
+          ]),
+          if (education['aboutEducation'] != null &&
+              education['aboutEducation'].toString().isNotEmpty) ...[
+            const SizedBox(height: 16),
+            _buildContentSection(
+                'About Education', education['aboutEducation'].toString()),
           ],
           const SizedBox(height: 100),
         ],
@@ -555,99 +758,157 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
   }
 
   Widget _buildFamilyTab() {
-    final family = _profile!['familyDetails'] as Map<String, dynamic>?;
-    if (family == null) {
-      return const Center(child: Text('No family details available'));
-    }
+    final family = _profile!['family'] as Map<String, dynamic>? ?? {};
 
-    return SingleChildScrollView(
+    return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Section Heading
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Text(
+              'Family',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
+            ),
+          ),
           _buildInfoGrid([
-            {'label': 'Family Type', 'value': family['familyType']},
-            {'label': 'Family Status', 'value': family['familyStatus']},
-            {'label': 'Family Values', 'value': family['familyValues']},
-            {'label': 'Father Occupation', 'value': family['fatherOccupation']},
-            {'label': 'Mother Occupation', 'value': family['motherOccupation']},
-            {'label': 'Brothers', 'value': family['brothers']?.toString()},
-            {'label': 'Sisters', 'value': family['sisters']?.toString()},
-            {'label': 'Gothra', 'value': family['gothra']},
+            {
+              'label': 'Family Type',
+              'value': family['familyType']?.toString() ?? ''
+            },
+            {
+              'label': 'Family Status',
+              'value': family['familyStatus']?.toString() ?? ''
+            },
+            {
+              'label': 'Family Values',
+              'value': family['familyValues']?.toString() ?? ''
+            },
+            {
+              'label': 'Family Income',
+              'value': family['familyIncome']?.toString() ?? ''
+            },
+            {
+              'label': 'Father Occupation',
+              'value': family['fatherOccupation']?.toString() ?? ''
+            },
+            {
+              'label': 'Mother Occupation',
+              'value': family['motherOccupation']?.toString() ?? ''
+            },
+            {
+              'label': 'Brothers',
+              'value': family['brothers'] != null
+                  ? '${family['brothers']} (${family['marriedBrothers'] ?? 0} Married)'
+                  : ''
+            },
+            {
+              'label': 'Sisters',
+              'value': family['sisters'] != null
+                  ? '${family['sisters']} (${family['marriedSisters'] ?? 0} Married)'
+                  : ''
+            },
+            {'label': 'Gothra', 'value': family['gothra']?.toString() ?? ''},
             {
               'label': 'Living with Parents',
-              'value': family['livingWithParents']
+              'value': family['livingWithParents']?.toString() ?? ''
+            },
+            {
+              'label': 'Family Based Out Of',
+              'value': family['familyBasedOutOf']?.toString() ?? ''
             },
           ]),
-          if (family['aboutMyFamily'] != null) ...[
+          if (family['aboutMyFamily'] != null &&
+              family['aboutMyFamily'].toString().isNotEmpty) ...[
             const SizedBox(height: 16),
-            _buildSection('About Family', family['aboutMyFamily']),
+            _buildContentSection(
+                'About Family', family['aboutMyFamily'].toString()),
           ],
-          const SizedBox(height: 100),
         ],
       ),
     );
   }
 
-  Widget _buildKundaliTab() {
-    final kundali = _profile!['kundaliDetails'] as Map<String, dynamic>?;
-    final lifestyle = _profile!['lifestyleData'] as Map<String, dynamic>?;
+  Widget _buildHoroscopeTab() {
+    final kundali = _profile!['kundali'] as Map<String, dynamic>? ?? {};
 
-    return SingleChildScrollView(
+    return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (kundali != null) ...[
-            _buildSectionTitle('Kundali & Astro'),
-            _buildInfoGrid([
-              {'label': 'Rashi', 'value': kundali['rashi']},
-              {'label': 'Nakshatra', 'value': kundali['nakshatra']},
-              {'label': 'Manglik', 'value': kundali['manglik']},
-              {'label': 'Time of Birth', 'value': kundali['timeOfBirth']},
-              {'label': 'Place of Birth', 'value': kundali['placeOfBirth']},
-            ]),
-            const SizedBox(height: 24),
-          ],
-          if (lifestyle != null) ...[
-            _buildSectionTitle('Lifestyle'),
-            _buildHabitsRow(lifestyle),
-            const SizedBox(height: 16),
-            _buildInfoGrid([
-              {
-                'label': 'Hobbies',
-                'value': (lifestyle['hobbies'] as List?)?.join(', ')
-              },
-              {
-                'label': 'Interests',
-                'value': (lifestyle['interest'] as List?)?.join(', ')
-              },
-              {
-                'label': 'Languages',
-                'value': (lifestyle['languages'] as List?)?.join(', ')
-              },
-              {
-                'label': 'Sports',
-                'value': (lifestyle['sports'] as List?)?.join(', ')
-              },
-            ]),
-          ],
+          // Section Heading
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Text(
+              'Horoscope',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
+            ),
+          ),
+          _buildInfoGrid([
+            {
+              'label': 'Horoscope',
+              'value': kundali['horoscope']?.toString() ?? ''
+            },
+            {'label': 'Rashi', 'value': kundali['rashi']?.toString() ?? ''},
+            {
+              'label': 'Nakshatra',
+              'value': kundali['nakshatra']?.toString() ?? ''
+            },
+            {'label': 'Manglik', 'value': kundali['manglik']?.toString() ?? ''},
+            {
+              'label': 'Time of Birth',
+              'value': kundali['tob']?.toString() ?? ''
+            },
+            {
+              'label': 'Place of Birth',
+              'value': _buildKundaliLocation(kundali)
+            },
+          ]),
           const SizedBox(height: 100),
         ],
       ),
     );
   }
 
-  Widget _buildMatchTab() {
-    final matchDetails = _profile!['matchDetails'] as Map<String, dynamic>?;
-    final matchData = matchDetails?['matchData'] as List<dynamic>? ?? [];
-    final matchPercentage = matchDetails?['matchPercentage'];
+  String? _buildKundaliLocation(Map<String, dynamic> kundali) {
+    final city = kundali['city']?.toString();
+    final state = kundali['state']?.toString();
+    final country = kundali['country']?.toString();
+    return [city, state, country]
+        .where((s) => s != null && s.isNotEmpty)
+        .join(', ');
+  }
 
-    return SingleChildScrollView(
+  Widget _buildLookingForTab() {
+    final matchData = _profile!['matchData'] as List<dynamic>? ?? [];
+    final matchPercentage = _profile!['matchPercentage']?.toString() ?? '0';
+
+    return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (matchPercentage != null)
+          // Section Heading
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Text(
+              'Looking For',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
+            ),
+          ),
+          if (matchPercentage.isNotEmpty && matchPercentage != '0') ...[
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
@@ -676,7 +937,8 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
                 ],
               ),
             ),
-          const SizedBox(height: 24),
+            const SizedBox(height: 24),
+          ],
           ...matchData.map((match) {
             final isMatched = match['isMatched'] ?? false;
             return Container(
@@ -696,11 +958,12 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          match['label'] ?? '',
+                          match['label']?.toString() ?? '',
                           style: const TextStyle(fontWeight: FontWeight.w500),
                         ),
+                        const SizedBox(height: 4),
                         Text(
-                          match['value'] ?? '',
+                          match['value']?.toString() ?? '',
                           style: TextStyle(
                             color: Theme.of(context).textTheme.bodySmall?.color,
                           ),
@@ -716,7 +979,187 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
               ),
             );
           }),
-          const SizedBox(height: 100),
+        ],
+      ),
+    );
+  }
+
+  String? _getLabelOrValue(String lookupKey, dynamic value) {
+    if (value == null) return null;
+    final lookupProvider = Provider.of<LookupProvider>(context, listen: false);
+    return lookupProvider.getLabelFromValue(lookupKey, value) ??
+        value.toString();
+  }
+
+  String? _buildLocation(
+      Map<String, dynamic> data, LookupProvider lookupProvider) {
+    final city = _getLabelOrValue('city', data['city']);
+    final state = _getLabelOrValue('state', data['state']);
+    final countryValue = data['country'];
+    final country = countryValue != null
+        ? lookupProvider.getCountryLabel(countryValue)
+        : null;
+    return [city, state, country]
+        .where((s) => s != null && s.isNotEmpty)
+        .join(', ');
+  }
+
+  Widget _buildLifestyleSection(Map<String, dynamic> lifestyle) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle('Lifestyle & Interests'),
+        const SizedBox(height: 16),
+        // Habits Row (horizontal, max 3)
+        if (lifestyle['dietaryHabits'] != null ||
+            lifestyle['drinkingHabits'] != null ||
+            lifestyle['smokingHabits'] != null)
+          SizedBox(
+            height: 120,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                if (lifestyle['dietaryHabits'] != null)
+                  _buildHabitCard(
+                    Icons.restaurant,
+                    'Dietary Habits',
+                    lifestyle['dietaryHabits'].toString(),
+                  ),
+                if (lifestyle['drinkingHabits'] != null)
+                  _buildHabitCard(
+                    Icons.local_bar,
+                    'Drinking',
+                    lifestyle['drinkingHabits'].toString(),
+                  ),
+                if (lifestyle['smokingHabits'] != null)
+                  _buildHabitCard(
+                    Icons.smoking_rooms,
+                    'Smoking',
+                    lifestyle['smokingHabits'].toString(),
+                  ),
+              ].take(3).toList(),
+            ),
+          ),
+        const SizedBox(height: 16),
+        // Other lifestyle fields
+        _buildInfoGrid([
+          if (lifestyle['hobbies'] != null)
+            {
+              'label': 'Hobbies',
+              'value': lifestyle['hobbies']?.toString() ?? ''
+            },
+          if (lifestyle['interest'] != null)
+            {
+              'label': 'Interests',
+              'value': lifestyle['interest']?.toString() ?? ''
+            },
+          if (lifestyle['languages'] != null)
+            {
+              'label': 'Languages',
+              'value': lifestyle['languages']?.toString() ?? ''
+            },
+          if (lifestyle['sports'] != null)
+            {'label': 'Sports', 'value': lifestyle['sports']?.toString() ?? ''},
+          if (lifestyle['cuisine'] != null)
+            {
+              'label': 'Favourite Cuisine',
+              'value': lifestyle['cuisine']?.toString() ?? ''
+            },
+          if (lifestyle['movies'] != null)
+            {
+              'label': 'Favourite Movies',
+              'value': lifestyle['movies']?.toString() ?? ''
+            },
+          if (lifestyle['favTVShow'] != null)
+            {
+              'label': 'Favourite TV Show',
+              'value': lifestyle['favTVShow']?.toString() ?? ''
+            },
+          if (lifestyle['favRead'] != null)
+            {
+              'label': 'Favourite Read',
+              'value': lifestyle['favRead']?.toString() ?? ''
+            },
+          if (lifestyle['books'] != null)
+            {
+              'label': 'Favourite Books',
+              'value': lifestyle['books']?.toString() ?? ''
+            },
+          if (lifestyle['favMusic'] != null)
+            {
+              'label': 'Favourite Music',
+              'value': lifestyle['favMusic']?.toString() ?? ''
+            },
+          if (lifestyle['dress'] != null)
+            {
+              'label': 'Dress Style',
+              'value': lifestyle['dress']?.toString() ?? ''
+            },
+          if (lifestyle['vacayDestination'] != null)
+            {
+              'label': 'Vacation Destination',
+              'value': lifestyle['vacayDestination']?.toString() ?? ''
+            },
+          if (lifestyle['foodICook'] != null)
+            {
+              'label': 'Food I Cook',
+              'value':
+                  lifestyle['foodICook']?.toString() == 'yes' ? 'Yes' : 'No'
+            },
+          if (lifestyle['openToPets'] != null)
+            {
+              'label': 'Open to Pets',
+              'value': lifestyle['openToPets']?.toString() ?? ''
+            },
+          if (lifestyle['ownAHouse'] != null)
+            {
+              'label': 'Owns a House',
+              'value': lifestyle['ownAHouse']?.toString() ?? ''
+            },
+          if (lifestyle['ownACar'] != null)
+            {
+              'label': 'Owns a Car',
+              'value': lifestyle['ownACar']?.toString() ?? ''
+            },
+        ]),
+      ],
+    );
+  }
+
+  Widget _buildHabitCard(IconData icon, String label, String value) {
+    return Container(
+      width: 140,
+      margin: const EdgeInsets.only(right: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Theme.of(context).dividerColor),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 32, color: AppColors.primary),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 11,
+              color: Theme.of(context).textTheme.bodySmall?.color,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
       ),
     );
@@ -735,7 +1178,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
     );
   }
 
-  Widget _buildSection(String title, String content) {
+  Widget _buildContentSection(String title, String content) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -755,9 +1198,10 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
   }
 
   Widget _buildInfoGrid(List<Map<String, String?>> items) {
-    final validItems = items
-        .where((item) => item['value'] != null && item['value']!.isNotEmpty)
-        .toList();
+    final validItems = items.where((item) {
+      final value = item['value'];
+      return value != null && value.isNotEmpty && value != 'null';
+    }).toList();
 
     return Wrap(
       spacing: 16,
@@ -790,57 +1234,6 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
           ),
         );
       }).toList(),
-    );
-  }
-
-  Widget _buildHabitsRow(Map<String, dynamic> lifestyle) {
-    return Row(
-      children: [
-        if (lifestyle['dietaryHabits'] != null)
-          Expanded(
-            child: _buildHabitCard(
-              Icons.restaurant,
-              lifestyle['dietaryHabits'],
-            ),
-          ),
-        if (lifestyle['drinkingHabits'] != null)
-          Expanded(
-            child: _buildHabitCard(
-              Icons.local_bar,
-              lifestyle['drinkingHabits'],
-            ),
-          ),
-        if (lifestyle['smokingHabits'] != null)
-          Expanded(
-            child: _buildHabitCard(
-              Icons.smoking_rooms,
-              lifestyle['smokingHabits'],
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildHabitCard(IconData icon, String value) {
-    return Container(
-      margin: const EdgeInsets.only(right: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Theme.of(context).dividerColor),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, size: 32, color: Colors.grey),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 12),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
     );
   }
 }

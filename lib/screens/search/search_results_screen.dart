@@ -168,6 +168,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                                     religion: profile['religion'],
                                     salary: profile['income'],
                                     imageUrl: profile['imageUrl'],
+                                    gender: profile['gender'],
                                     onSendInterest: () =>
                                         _handleSendInterest(profile['id']),
                                     onShortlist: () =>

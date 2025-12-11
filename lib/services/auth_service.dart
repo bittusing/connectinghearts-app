@@ -15,7 +15,8 @@ class AuthService {
     return LoginResponse.fromJson(response);
   }
 
-  Future<ApiResponse> generateOtp(String phoneNumber, String countryCode) async {
+  Future<ApiResponse> generateOtp(
+      String phoneNumber, String countryCode) async {
     final response = await _apiClient.post<Map<String, dynamic>>(
       '/auth/generateOTP',
       body: {
@@ -37,13 +38,21 @@ class AuthService {
     return VerifyOtpResponse.fromJson(response);
   }
 
-  Future<ApiResponse<ValidateTokenResponse>> validateToken() async {
+  Future<ApiResponse<ValidateTokenResponse?>> validateToken() async {
     final response = await _apiClient.get<Map<String, dynamic>>(
       '/auth/validateToken',
     );
-    return ApiResponse<ValidateTokenResponse>.fromJson(
+    // Handle response - validateToken may return success without data field
+    // If data exists and is not null, parse it; otherwise return null
+    ValidateTokenResponse? Function(dynamic)? fromJson = (data) {
+      if (data != null && data is Map<String, dynamic>) {
+        return ValidateTokenResponse.fromJson(data);
+      }
+      return null;
+    };
+    return ApiResponse<ValidateTokenResponse?>.fromJson(
       response,
-      (data) => ValidateTokenResponse.fromJson(data),
+      fromJson,
     );
   }
 
@@ -57,7 +66,8 @@ class AuthService {
     );
   }
 
-  Future<ApiResponse> changePassword(String oldPassword, String newPassword) async {
+  Future<ApiResponse> changePassword(
+      String oldPassword, String newPassword) async {
     final response = await _apiClient.post<Map<String, dynamic>>(
       '/auth/changePassword',
       body: {

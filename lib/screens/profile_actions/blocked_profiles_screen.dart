@@ -124,7 +124,8 @@ class _BlockedProfilesScreenState extends State<BlockedProfilesScreen> {
                                   const SizedBox(height: 8),
                                   Text(
                                     'Blocked Profiles',
-                                    style: theme.textTheme.headlineSmall?.copyWith(
+                                    style:
+                                        theme.textTheme.headlineSmall?.copyWith(
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -161,7 +162,9 @@ class _BlockedProfilesScreenState extends State<BlockedProfilesScreen> {
                                     religion: profile['religion'],
                                     salary: profile['income'],
                                     imageUrl: profile['imageUrl'],
-                                    onIgnore: () => _handleUnblock(profile['id']),
+                                    gender: profile['gender'],
+                                    onIgnore: () =>
+                                        _handleUnblock(profile['id']),
                                   ),
                                 );
                               },

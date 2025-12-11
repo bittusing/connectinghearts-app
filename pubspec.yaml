@@ -20,6 +20,7 @@ dependencies:
 
   # HTTP & API
   http: ^1.1.2
+  http_parser: ^4.0.2
   
   # Storage
   flutter_secure_storage: ^9.0.0
@@ -51,3 +52,10 @@ flutter:
 
   assets:
     - assets/images/
+
+  # App icon configuration
+  # To generate app icons, use: flutter pub run flutter_launcher_icons
+  # flutter_launcher_icons:
+  #   android: true
+  #   ios: true
+  #   image_path: "assets/images/logo.png"

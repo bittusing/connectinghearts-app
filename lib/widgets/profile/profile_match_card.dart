@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../theme/colors.dart';
+import '../../utils/profile_utils.dart';
 
 class ProfileMatchCard extends StatelessWidget {
   final String id;
@@ -11,6 +12,7 @@ class ProfileMatchCard extends StatelessWidget {
   final String? religion;
   final String? salary;
   final String? imageUrl;
+  final String? gender;
   final VoidCallback? onSendInterest;
   final VoidCallback? onShortlist;
   final VoidCallback? onIgnore;
@@ -29,6 +31,7 @@ class ProfileMatchCard extends StatelessWidget {
     this.religion,
     this.salary,
     this.imageUrl,
+    this.gender,
     this.onSendInterest,
     this.onShortlist,
     this.onIgnore,
@@ -40,7 +43,6 @@ class ProfileMatchCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Container(
@@ -65,13 +67,19 @@ class ProfileMatchCard extends StatelessWidget {
                 ? CachedNetworkImage(
                     imageUrl: imageUrl!,
                     fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
-                      color: AppColors.primary.withOpacity(0.1),
-                      child: const Center(child: CircularProgressIndicator()),
+                    placeholder: (context, url) => Image.asset(
+                      getGenderPlaceholder(gender),
+                      fit: BoxFit.cover,
                     ),
-                    errorWidget: (context, url, error) => _buildPlaceholder(),
+                    errorWidget: (context, url, error) => Image.asset(
+                      getGenderPlaceholder(gender),
+                      fit: BoxFit.cover,
+                    ),
                   )
-                : _buildPlaceholder(),
+                : Image.asset(
+                    getGenderPlaceholder(gender),
+                    fit: BoxFit.cover,
+                  ),
             // Gradient Overlay
             Container(
               decoration: BoxDecoration(
@@ -161,57 +169,47 @@ class ProfileMatchCard extends StatelessWidget {
               left: 20,
               right: 20,
               bottom: 20,
-              child: customActions ?? Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  if (onIgnore != null)
-                    _buildActionButton(
-                      icon: Icons.close,
-                      color: Colors.red,
-                      onTap: onIgnore!,
-                    ),
-                  if (onDeclineInterest != null)
-                    _buildActionButton(
-                      icon: Icons.close,
-                      color: Colors.red,
-                      onTap: onDeclineInterest!,
-                    ),
-                  if (onShortlist != null)
-                    _buildActionButton(
-                      icon: Icons.star,
-                      color: Colors.amber,
-                      onTap: onShortlist!,
-                    ),
-                  if (onSendInterest != null)
-                    _buildActionButton(
-                      icon: Icons.favorite,
-                      color: AppColors.primary,
-                      onTap: onSendInterest!,
-                      isLarge: true,
-                    ),
-                  if (onAcceptInterest != null)
-                    _buildActionButton(
-                      icon: Icons.check,
-                      color: AppColors.success,
-                      onTap: onAcceptInterest!,
-                      isLarge: true,
-                    ),
-                ],
-              ),
+              child: customActions ??
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      if (onIgnore != null)
+                        _buildActionButton(
+                          icon: Icons.close,
+                          color: Colors.red,
+                          onTap: onIgnore!,
+                        ),
+                      if (onDeclineInterest != null)
+                        _buildActionButton(
+                          icon: Icons.close,
+                          color: Colors.red,
+                          onTap: onDeclineInterest!,
+                        ),
+                      if (onShortlist != null)
+                        _buildActionButton(
+                          icon: Icons.star,
+                          color: Colors.amber,
+                          onTap: onShortlist!,
+                        ),
+                      if (onSendInterest != null)
+                        _buildActionButton(
+                          icon: Icons.favorite,
+                          color: AppColors.primary,
+                          onTap: onSendInterest!,
+                          isLarge: true,
+                        ),
+                      if (onAcceptInterest != null)
+                        _buildActionButton(
+                          icon: Icons.check,
+                          color: AppColors.success,
+                          onTap: onAcceptInterest!,
+                          isLarge: true,
+                        ),
+                    ],
+                  ),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildPlaceholder() {
-    return Container(
-      color: AppColors.primary.withOpacity(0.1),
-      child: const Icon(
-        Icons.person,
-        size: 100,
-        color: AppColors.primary,
       ),
     );
   }
@@ -250,4 +248,3 @@ class ProfileMatchCard extends StatelessWidget {
     );
   }
 }
-

@@ -162,6 +162,7 @@ class _IgnoredProfilesScreenState extends State<IgnoredProfilesScreen> {
                                     religion: profile['religion'],
                                     salary: profile['income'],
                                     imageUrl: profile['imageUrl'],
+                                    gender: profile['gender'],
                                     onIgnore: () =>
                                         _handleUnignore(profile['id']),
                                   ),

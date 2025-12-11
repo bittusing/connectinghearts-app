@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../theme/colors.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
@@ -40,7 +41,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             backgroundColor: AppColors.success,
           ),
         );
-        Navigator.pop(context);
+        if (Navigator.canPop(context)) {
+          context.pop();
+        } else {
+          context.go('/');
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -62,7 +67,27 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Change Password'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              context.pop();
+            } else {
+              context.go('/');
+            }
+          },
+        ),
+        title: const Text(
+          'Change Password',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -105,8 +130,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                   ? Icons.visibility_off
                                   : Icons.visibility,
                             ),
-                            onPressed: () => setState(
-                                () => _showCurrentPassword = !_showCurrentPassword),
+                            onPressed: () => setState(() =>
+                                _showCurrentPassword = !_showCurrentPassword),
                           ),
                         ),
                         validator: (value) {
@@ -129,8 +154,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                   ? Icons.visibility_off
                                   : Icons.visibility,
                             ),
-                            onPressed: () =>
-                                setState(() => _showNewPassword = !_showNewPassword),
+                            onPressed: () => setState(
+                                () => _showNewPassword = !_showNewPassword),
                           ),
                         ),
                         validator: (value) {
@@ -156,8 +181,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                   ? Icons.visibility_off
                                   : Icons.visibility,
                             ),
-                            onPressed: () => setState(
-                                () => _showConfirmPassword = !_showConfirmPassword),
+                            onPressed: () => setState(() =>
+                                _showConfirmPassword = !_showConfirmPassword),
                           ),
                         ),
                         validator: (value) {
@@ -179,8 +204,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                   width: 20,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    valueColor:
-                                        AlwaysStoppedAnimation<Color>(Colors.white),
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
                                   ),
                                 )
                               : const Text('Change Password'),
@@ -197,4 +222,3 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     );
   }
 }
-
