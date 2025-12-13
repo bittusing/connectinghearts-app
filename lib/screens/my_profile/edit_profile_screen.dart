@@ -68,8 +68,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     // Basic fields
     final basic = _profileData!['basic'] ?? {};
     totalFields += 8;
-    if (basic['name'] != null && basic['name'].toString().isNotEmpty)
+    if (basic['name'] != null && basic['name'].toString().isNotEmpty) {
       filledFields++;
+    }
     if (basic['height'] != null) filledFields++;
     if (basic['income'] != null) filledFields++;
     // Add more basic field checks...
@@ -77,25 +78,34 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     // Critical fields
     final critical = _profileData!['critical'] ?? {};
     totalFields += 2;
-    if (critical['dob'] != null && critical['dob'].toString().isNotEmpty)
+    if (critical['dob'] != null && critical['dob'].toString().isNotEmpty) {
       filledFields++;
+    }
     if (critical['maritalStatus'] != null &&
-        critical['maritalStatus'].toString().isNotEmpty) filledFields++;
+        critical['maritalStatus'].toString().isNotEmpty) {
+      filledFields++;
+    }
 
     // About fields
     final about = _profileData!['about'] ?? {};
     totalFields += 3;
     if (about['description'] != null &&
-        about['description'].toString().isNotEmpty) filledFields++;
+        about['description'].toString().isNotEmpty) {
+      filledFields++;
+    }
     if (about['aboutYourself'] != null &&
-        about['aboutYourself'].toString().isNotEmpty) filledFields++;
+        about['aboutYourself'].toString().isNotEmpty) {
+      filledFields++;
+    }
     if (about['bodyType'] != null) filledFields++;
 
     // Family fields
     final family = _profileData!['family'] ?? {};
     totalFields += 5;
     if (family['aboutMyFamily'] != null &&
-        family['aboutMyFamily'].toString().isNotEmpty) filledFields++;
+        family['aboutMyFamily'].toString().isNotEmpty) {
+      filledFields++;
+    }
     if (family['familyStatus'] != null) filledFields++;
     if (family['familyIncome'] != null) filledFields++;
     if (family['fatherOccupation'] != null) filledFields++;
@@ -105,9 +115,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final contact = _profileData!['contact'] ?? {};
     totalFields += 2;
     if (contact['phoneNumber'] != null &&
-        contact['phoneNumber'].toString().isNotEmpty) filledFields++;
-    if (contact['email'] != null && contact['email'].toString().isNotEmpty)
+        contact['phoneNumber'].toString().isNotEmpty) {
       filledFields++;
+    }
+    if (contact['email'] != null && contact['email'].toString().isNotEmpty) {
+      filledFields++;
+    }
 
     // Horoscope fields
     final horoscope = _profileData!['horoscope'] ?? {};
@@ -370,7 +383,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       elevation: 0,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back, color: Colors.black),
-        onPressed: () => context.pop(),
+        onPressed: () {
+          if (Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
+          } else {
+            context.go('/');
+          }
+        },
       ),
       title: Text(
         profileId,
@@ -404,8 +423,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border(
-          left: BorderSide(color: const Color(0xFFEC4899), width: 4),
+        border: const Border(
+          left: BorderSide(color: Color(0xFFEC4899), width: 4),
         ),
         boxShadow: [
           BoxShadow(
@@ -418,8 +437,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
       child: Row(
         children: [
-          Expanded(
-            child: const Text(
+          const Expanded(
+            child: Text(
               'Verify your profile using selfie to assure others you are genuine and get a badge',
               style: TextStyle(
                 color: Colors.black87,
@@ -475,8 +494,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     value: percentage / 100,
                     strokeWidth: 6,
                     backgroundColor: Colors.grey[200],
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      const Color(0xFFEC4899),
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      Color(0xFFEC4899),
                     ),
                   ),
                 ),

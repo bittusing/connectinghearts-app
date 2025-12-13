@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../../providers/auth_provider.dart';
 import '../../theme/colors.dart';
+import '../../providers/notification_count_provider.dart';
 
 class HeaderWidget extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onMenuTap;
-  final int? notificationCount;
+  final int? notificationCount; // Optional override, otherwise uses provider
 
   const HeaderWidget({
     super.key,
@@ -19,6 +19,18 @@ class HeaderWidget extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get notification count from provider if not overridden
+    int? displayCount = notificationCount;
+    if (displayCount == null) {
+      try {
+        final provider =
+            Provider.of<NotificationCountProvider>(context, listen: true);
+        displayCount = provider.counts.total;
+      } catch (_) {
+        // Provider not available, use null
+      }
+    }
+
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -70,7 +82,7 @@ class HeaderWidget extends StatelessWidget implements PreferredSizeWidget {
                         color: Colors.white),
                     onPressed: () => context.push('/notifications'),
                   ),
-                  if (notificationCount != null && notificationCount! > 0)
+                  if (displayCount != null && displayCount > 0)
                     Positioned(
                       right: 8,
                       top: 8,
@@ -85,7 +97,7 @@ class HeaderWidget extends StatelessWidget implements PreferredSizeWidget {
                           minHeight: 16,
                         ),
                         child: Text(
-                          notificationCount! > 9 ? '9+' : '$notificationCount',
+                          displayCount > 9 ? '9+' : '$displayCount',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 10,

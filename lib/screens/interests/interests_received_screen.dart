@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import '../../theme/colors.dart';
 import '../../widgets/profile/profile_match_card.dart';
 import '../../widgets/common/empty_state_widget.dart';
+import '../../widgets/common/bottom_navigation_widget.dart';
 import '../../services/profile_service.dart';
-import '../../models/profile_models.dart';
 import '../../utils/profile_utils.dart';
 
 class InterestsReceivedScreen extends StatefulWidget {
   const InterestsReceivedScreen({super.key});
 
   @override
-  State<InterestsReceivedScreen> createState() => _InterestsReceivedScreenState();
+  State<InterestsReceivedScreen> createState() =>
+      _InterestsReceivedScreenState();
 }
 
 class _InterestsReceivedScreenState extends State<InterestsReceivedScreen> {
@@ -83,6 +83,7 @@ class _InterestsReceivedScreenState extends State<InterestsReceivedScreen> {
       appBar: AppBar(
         title: const Text('Interests Received'),
       ),
+      bottomNavigationBar: const BottomNavigationWidget(),
       body: RefreshIndicator(
         onRefresh: _loadProfiles,
         child: _isLoading
@@ -134,7 +135,8 @@ class _InterestsReceivedScreenState extends State<InterestsReceivedScreen> {
                                   const SizedBox(height: 8),
                                   Text(
                                     'Interests Received',
-                                    style: theme.textTheme.headlineSmall?.copyWith(
+                                    style:
+                                        theme.textTheme.headlineSmall?.copyWith(
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -172,8 +174,10 @@ class _InterestsReceivedScreenState extends State<InterestsReceivedScreen> {
                                     salary: profile['income'],
                                     imageUrl: profile['imageUrl'],
                                     gender: profile['gender'],
-                                    onAcceptInterest: () => _handleAccept(profile['id']),
-                                    onDeclineInterest: () => _handleDecline(profile['id']),
+                                    onAcceptInterest: () =>
+                                        _handleAccept(profile['id']),
+                                    onDeclineInterest: () =>
+                                        _handleDecline(profile['id']),
                                   ),
                                 );
                               },

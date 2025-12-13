@@ -65,8 +65,9 @@ class ProfileService {
 
   Future<ApiProfileResponse> searchProfiles(
       ProfileSearchPayload payload) async {
+    // Match webapp endpoint: POST /dashboard/searchProfile
     final response = await _apiClient.post<Map<String, dynamic>>(
-      '/profile/searchProfiles',
+      '/dashboard/searchProfile',
       body: payload.toJson(),
     );
     return ApiProfileResponse.fromJson(response);
@@ -108,17 +109,17 @@ class ProfileService {
     );
   }
 
-  Future<void> acceptInterest(String interestId) async {
+  Future<void> acceptInterest(String profileId) async {
     await _apiClient.post<Map<String, dynamic>>(
       '/interest/updateInterest',
-      body: {'_id': interestId, 'status': 'accept'},
+      body: {'_id': profileId, 'status': 'accept'},
     );
   }
 
-  Future<void> declineInterest(String interestId) async {
+  Future<void> declineInterest(String profileId) async {
     await _apiClient.post<Map<String, dynamic>>(
       '/interest/updateInterest',
-      body: {'_id': interestId, 'status': 'reject'},
+      body: {'_id': profileId, 'status': 'reject'},
     );
   }
 
@@ -280,13 +281,41 @@ class ProfileService {
     return response;
   }
 
-  // Upload SRCM ID image
+  // Upload SRCM ID image (field name matches webapp: srcmPhoto)
   Future<Map<String, dynamic>> uploadSrcmIdImage(String filePath) async {
     final file = File(filePath);
     final response = await _apiClient.uploadFile<Map<String, dynamic>>(
       path: '/srcmDetails/uploadSrcmId',
       file: file,
-      fieldName: 'srcmIdImage',
+      fieldName: 'srcmPhoto',
+    );
+    return response;
+  }
+
+  // Update family details
+  Future<Map<String, dynamic>> updateFamilyDetails(
+      Map<String, dynamic> payload) async {
+    final response = await _apiClient.patch<Map<String, dynamic>>(
+      '/family',
+      body: payload,
+    );
+    return response;
+  }
+
+  // Get partner preferences
+  Future<Map<String, dynamic>> getPartnerPreferences() async {
+    final response = await _apiClient.get<Map<String, dynamic>>(
+      '/preference',
+    );
+    return response;
+  }
+
+  // Update partner preferences
+  Future<Map<String, dynamic>> updatePartnerPreferences(
+      Map<String, dynamic> payload) async {
+    final response = await _apiClient.patch<Map<String, dynamic>>(
+      '/preference',
+      body: payload,
     );
     return response;
   }

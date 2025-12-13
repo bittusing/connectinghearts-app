@@ -11,6 +11,7 @@ class UserData {
   final String? planName;
   final int? heartCoins;
   final String? avatarUrl;
+  final String? screenName;
 
   UserData({
     this.id,
@@ -21,6 +22,7 @@ class UserData {
     this.planName,
     this.heartCoins,
     this.avatarUrl,
+    this.screenName,
   });
 
   factory UserData.fromJson(Map<String, dynamic> json) {
@@ -33,6 +35,7 @@ class UserData {
       planName: json['planName'],
       heartCoins: json['heartCoins'],
       avatarUrl: json['avatarUrl'],
+      screenName: json['screenName'],
     );
   }
 }
@@ -116,7 +119,12 @@ class AuthProvider extends ChangeNotifier {
         }
         _isAuthenticated = true;
 
-        // Fetch user profile
+        // Store screenName from login response if available
+        if (response.screenName != null) {
+          _user = UserData(screenName: response.screenName);
+        }
+
+        // Fetch user profile (this will update _user with full profile data)
         await _fetchUserProfile();
 
         _isLoading = false;
@@ -186,6 +194,30 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> _fetchUserProfile() async {
     try {
+      // First try to get screenName from getUser API (like webapp)
+      try {
+        final userData = await _authService.getUser();
+        final screenName = userData['screenName'] as String?;
+        if (screenName != null && _user != null) {
+          _user = UserData(
+            id: _user!.id,
+            name: _user!.name,
+            email: _user!.email,
+            phoneNumber: _user!.phoneNumber,
+            heartsId: _user!.heartsId,
+            planName: _user!.planName,
+            heartCoins: _user!.heartCoins,
+            avatarUrl: _user!.avatarUrl,
+            screenName: screenName,
+          );
+        } else if (screenName != null) {
+          _user = UserData(screenName: screenName);
+        }
+      } catch (e) {
+        // Silently fail, continue to get profile
+      }
+
+      // Then fetch full profile
       final response = await _authService.getUserProfile();
       if (response.success && response.data != null) {
         _user = UserData(
@@ -197,6 +229,7 @@ class AuthProvider extends ChangeNotifier {
           planName: response.data!.planName,
           heartCoins: response.data!.heartCoins,
           avatarUrl: response.data!.avatarUrl,
+          screenName: _user?.screenName, // Preserve screenName
         );
       }
     } catch (e) {

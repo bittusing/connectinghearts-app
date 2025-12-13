@@ -166,6 +166,16 @@ lib/
    
    # Release mode
    flutter run --release
+   
+   # Watch mode (auto-restart on file changes, like nodemon)
+   # Windows PowerShell:
+   .\watch.ps1
+   # Or using npm script:
+   npm run watch
+   
+   # Linux/macOS:
+   chmod +x watch.sh
+   ./watch.sh
    ```
 
 ### Build

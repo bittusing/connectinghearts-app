@@ -6,14 +6,14 @@ import '../../widgets/common/bottom_navigation_widget.dart';
 import '../../services/profile_service.dart';
 import '../../utils/profile_utils.dart';
 
-class IgnoredProfilesScreen extends StatefulWidget {
-  const IgnoredProfilesScreen({super.key});
+class IDeclinedScreen extends StatefulWidget {
+  const IDeclinedScreen({super.key});
 
   @override
-  State<IgnoredProfilesScreen> createState() => _IgnoredProfilesScreenState();
+  State<IDeclinedScreen> createState() => _IDeclinedScreenState();
 }
 
-class _IgnoredProfilesScreenState extends State<IgnoredProfilesScreen> {
+class _IDeclinedScreenState extends State<IDeclinedScreen> {
   final ProfileService _profileService = ProfileService();
   bool _isLoading = true;
   String? _error;
@@ -32,7 +32,7 @@ class _IgnoredProfilesScreenState extends State<IgnoredProfilesScreen> {
     });
 
     try {
-      final response = await _profileService.getIgnoredProfiles();
+      final response = await _profileService.getMyDeclinedProfiles();
       setState(() {
         _profiles = response.data.map((p) => transformProfile(p)).toList();
         _isLoading = false;
@@ -54,10 +54,10 @@ class _IgnoredProfilesScreenState extends State<IgnoredProfilesScreen> {
     );
   }
 
-  Future<void> _handleUnignore(String profileId) async {
+  Future<void> _handleAcceptAgain(String profileId) async {
     try {
-      await _profileService.unignoreProfile(profileId);
-      _showToast('Profile restored');
+      await _profileService.acceptInterest(profileId);
+      _showToast('Interest accepted successfully');
       _loadProfiles();
     } catch (e) {
       _showToast(e.toString(), isError: true);
@@ -70,7 +70,7 @@ class _IgnoredProfilesScreenState extends State<IgnoredProfilesScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ignored Profiles'),
+        title: const Text('I Declined'),
       ),
       bottomNavigationBar: const BottomNavigationWidget(),
       body: RefreshIndicator(
@@ -97,8 +97,8 @@ class _IgnoredProfilesScreenState extends State<IgnoredProfilesScreen> {
                   )
                 : _profiles.isEmpty
                     ? const EmptyStateWidget(
-                        message: 'No ignored profiles.',
-                        icon: Icons.visibility_off_outlined,
+                        message: 'No declined profiles.',
+                        icon: Icons.cancel_outlined,
                       )
                     : CustomScrollView(
                         slivers: [
@@ -123,7 +123,7 @@ class _IgnoredProfilesScreenState extends State<IgnoredProfilesScreen> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'Ignored Profiles',
+                                    'I Declined',
                                     style:
                                         theme.textTheme.headlineSmall?.copyWith(
                                       fontWeight: FontWeight.w600,
@@ -131,7 +131,7 @@ class _IgnoredProfilesScreenState extends State<IgnoredProfilesScreen> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'Profiles you have chosen to ignore.',
+                                    'Profiles whose interest you have declined.',
                                     style: theme.textTheme.bodyMedium,
                                   ),
                                   const SizedBox(height: 8),
@@ -168,11 +168,11 @@ class _IgnoredProfilesScreenState extends State<IgnoredProfilesScreen> {
                                           MainAxisAlignment.center,
                                       children: [
                                         _buildCustomButton(
-                                          icon: Icons.restore,
-                                          label: 'Remove',
-                                          color: Colors.blue,
+                                          icon: Icons.check_circle_outline,
+                                          label: 'Accept Again',
+                                          color: Colors.green,
                                           onTap: () =>
-                                        _handleUnignore(profile['id']),
+                                              _handleAcceptAgain(profile['id']),
                                         ),
                                       ],
                                     ),
@@ -224,10 +224,11 @@ class _IgnoredProfilesScreenState extends State<IgnoredProfilesScreen> {
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
-                          ),
-                        ],
-                      ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
+

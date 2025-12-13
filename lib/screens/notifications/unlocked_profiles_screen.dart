@@ -6,14 +6,14 @@ import '../../widgets/common/bottom_navigation_widget.dart';
 import '../../services/profile_service.dart';
 import '../../utils/profile_utils.dart';
 
-class IgnoredProfilesScreen extends StatefulWidget {
-  const IgnoredProfilesScreen({super.key});
+class UnlockedProfilesScreen extends StatefulWidget {
+  const UnlockedProfilesScreen({super.key});
 
   @override
-  State<IgnoredProfilesScreen> createState() => _IgnoredProfilesScreenState();
+  State<UnlockedProfilesScreen> createState() => _UnlockedProfilesScreenState();
 }
 
-class _IgnoredProfilesScreenState extends State<IgnoredProfilesScreen> {
+class _UnlockedProfilesScreenState extends State<UnlockedProfilesScreen> {
   final ProfileService _profileService = ProfileService();
   bool _isLoading = true;
   String? _error;
@@ -32,7 +32,7 @@ class _IgnoredProfilesScreenState extends State<IgnoredProfilesScreen> {
     });
 
     try {
-      final response = await _profileService.getIgnoredProfiles();
+      final response = await _profileService.getUnlockedProfiles();
       setState(() {
         _profiles = response.data.map((p) => transformProfile(p)).toList();
         _isLoading = false;
@@ -45,32 +45,13 @@ class _IgnoredProfilesScreenState extends State<IgnoredProfilesScreen> {
     }
   }
 
-  void _showToast(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? AppColors.error : AppColors.success,
-      ),
-    );
-  }
-
-  Future<void> _handleUnignore(String profileId) async {
-    try {
-      await _profileService.unignoreProfile(profileId);
-      _showToast('Profile restored');
-      _loadProfiles();
-    } catch (e) {
-      _showToast(e.toString(), isError: true);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ignored Profiles'),
+        title: const Text('Unlocked Profiles'),
       ),
       bottomNavigationBar: const BottomNavigationWidget(),
       body: RefreshIndicator(
@@ -97,8 +78,8 @@ class _IgnoredProfilesScreenState extends State<IgnoredProfilesScreen> {
                   )
                 : _profiles.isEmpty
                     ? const EmptyStateWidget(
-                        message: 'No ignored profiles.',
-                        icon: Icons.visibility_off_outlined,
+                        message: 'No unlocked profiles yet.',
+                        icon: Icons.lock_open_outlined,
                       )
                     : CustomScrollView(
                         slivers: [
@@ -123,7 +104,7 @@ class _IgnoredProfilesScreenState extends State<IgnoredProfilesScreen> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'Ignored Profiles',
+                                    'Unlocked Profiles',
                                     style:
                                         theme.textTheme.headlineSmall?.copyWith(
                                       fontWeight: FontWeight.w600,
@@ -131,7 +112,7 @@ class _IgnoredProfilesScreenState extends State<IgnoredProfilesScreen> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'Profiles you have chosen to ignore.',
+                                    'Profiles you have unlocked to view contact details.',
                                     style: theme.textTheme.bodyMedium,
                                   ),
                                   const SizedBox(height: 8),
@@ -163,19 +144,6 @@ class _IgnoredProfilesScreenState extends State<IgnoredProfilesScreen> {
                                     salary: profile['income'],
                                     imageUrl: profile['imageUrl'],
                                     gender: profile['gender'],
-                                    customActions: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        _buildCustomButton(
-                                          icon: Icons.restore,
-                                          label: 'Remove',
-                                          color: Colors.blue,
-                                          onTap: () =>
-                                        _handleUnignore(profile['id']),
-                                        ),
-                                      ],
-                                    ),
                                   ),
                                 );
                               },
@@ -190,44 +158,5 @@ class _IgnoredProfilesScreenState extends State<IgnoredProfilesScreen> {
       ),
     );
   }
-
-  Widget _buildCustomButton({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(25),
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(0.3),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: Colors.white, size: 20),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-                          ),
-                        ],
-                      ),
-      ),
-    );
-  }
 }
+

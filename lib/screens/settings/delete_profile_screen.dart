@@ -14,15 +14,25 @@ class DeleteProfileScreen extends StatefulWidget {
 
 class _DeleteProfileScreenState extends State<DeleteProfileScreen> {
   final _reasonController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _commentController = TextEditingController();
   bool _isDeleting = false;
-  bool _showPassword = false;
+  int? _selectedReason;
   bool _confirmed = false;
+
+  final List<Map<String, dynamic>> _reasons = [
+    {'id': 1, 'label': 'I found my match on Connecting Hearts'},
+    {'id': 2, 'label': 'I found my match elsewhere'},
+    {'id': 3, 'label': 'I am unhappy with services'},
+    {'id': 4, 'label': 'Marry later / create profile later'},
+    {'id': 5, 'label': 'I have to do some changes in my profile'},
+    {'id': 6, 'label': 'Privacy issues'},
+    {'id': 7, 'label': 'Other reasons'},
+  ];
 
   @override
   void dispose() {
     _reasonController.dispose();
-    _passwordController.dispose();
+    _commentController.dispose();
     super.dispose();
   }
 
@@ -41,8 +51,8 @@ class _DeleteProfileScreenState extends State<DeleteProfileScreen> {
       return;
     }
 
-    if (_passwordController.text.isEmpty) {
-      _showError('Please enter your password');
+    if (_selectedReason == null) {
+      _showError('Please select a reason before continuing');
       return;
     }
 
@@ -51,11 +61,19 @@ class _DeleteProfileScreenState extends State<DeleteProfileScreen> {
     try {
       final authService = AuthService();
       await authService.deleteProfile(
-        password: _passwordController.text,
-        reason: _reasonController.text,
+        reasonForDeletion: _selectedReason!,
+        deletionComment: _commentController.text.trim().isNotEmpty
+            ? _commentController.text.trim()
+            : 'No additional details provided.',
       );
 
       if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Profile deleted successfully!'),
+            backgroundColor: AppColors.success,
+          ),
+        );
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
         await authProvider.logout();
         context.go('/login');
@@ -63,7 +81,9 @@ class _DeleteProfileScreenState extends State<DeleteProfileScreen> {
     } catch (e) {
       _showError(e.toString());
     } finally {
-      setState(() => _isDeleting = false);
+      if (mounted) {
+        setState(() => _isDeleting = false);
+      }
     }
   }
 
@@ -77,7 +97,13 @@ class _DeleteProfileScreenState extends State<DeleteProfileScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => context.pop(),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              context.go('/');
+            }
+          },
         ),
         title: const Text(
           'Delete Profile',
@@ -138,47 +164,67 @@ class _DeleteProfileScreenState extends State<DeleteProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Why are you leaving?',
+                    'Why are you deleting your profile?',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Your feedback helps us improve (optional)',
-                    style: theme.textTheme.bodySmall,
                   ),
                   const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _reasonController,
-                    maxLines: 3,
-                    decoration: const InputDecoration(
-                      hintText: 'Tell us why you\'re leaving...',
-                      alignLabelWithHint: true,
-                    ),
-                  ),
+                  ..._reasons.map((reason) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: InkWell(
+                        onTap: () =>
+                            setState(() => _selectedReason = reason['id']),
+                        borderRadius: BorderRadius.circular(16),
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: _selectedReason == reason['id']
+                                  ? AppColors.primary
+                                  : theme.dividerColor,
+                              width: _selectedReason == reason['id'] ? 2 : 1,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Row(
+                            children: [
+                              Radio<int>(
+                                value: reason['id'],
+                                groupValue: _selectedReason,
+                                onChanged: (value) =>
+                                    setState(() => _selectedReason = value),
+                                activeColor: AppColors.primary,
+                              ),
+                              Expanded(
+                                child: Text(
+                                  reason['label'],
+                                  style: theme.textTheme.bodyMedium,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
                   const SizedBox(height: 24),
                   Text(
-                    'Confirm with Password',
+                    'Additional comments (optional)',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 8),
                   TextFormField(
-                    controller: _passwordController,
-                    obscureText: !_showPassword,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _showPassword
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                        ),
-                        onPressed: () =>
-                            setState(() => _showPassword = !_showPassword),
-                      ),
+                    controller: _commentController,
+                    maxLines: 3,
+                    maxLength: 300,
+                    decoration: const InputDecoration(
+                      hintText:
+                          'Share any feedback that could help us improve.',
+                      alignLabelWithHint: true,
                     ),
                   ),
                   const SizedBox(height: 24),

@@ -44,12 +44,13 @@ class AuthService {
     );
     // Handle response - validateToken may return success without data field
     // If data exists and is not null, parse it; otherwise return null
-    ValidateTokenResponse? Function(dynamic)? fromJson = (data) {
+    ValidateTokenResponse? fromJson(data) {
       if (data != null && data is Map<String, dynamic>) {
         return ValidateTokenResponse.fromJson(data);
       }
       return null;
-    };
+    }
+
     return ApiResponse<ValidateTokenResponse?>.fromJson(
       response,
       fromJson,
@@ -67,12 +68,12 @@ class AuthService {
   }
 
   Future<ApiResponse> changePassword(
-      String oldPassword, String newPassword) async {
-    final response = await _apiClient.post<Map<String, dynamic>>(
+      String currentPassword, String newPassword) async {
+    final response = await _apiClient.patch<Map<String, dynamic>>(
       '/auth/changePassword',
       body: {
-        'oldPassword': oldPassword,
-        'newPassword': newPassword,
+        'current_password': currentPassword,
+        'new_password': newPassword,
       },
     );
     return ApiResponse.fromJson(response);
@@ -99,14 +100,14 @@ class AuthService {
   }
 
   Future<ApiResponse> deleteProfile({
-    required String password,
-    String? reason,
+    required int reasonForDeletion,
+    required String deletionComment,
   }) async {
-    final response = await _apiClient.post<Map<String, dynamic>>(
-      '/profile/deleteProfile',
+    final response = await _apiClient.delete<Map<String, dynamic>>(
+      '/auth/deleteProfile',
       body: {
-        'password': password,
-        if (reason != null && reason.isNotEmpty) 'reason': reason,
+        'reasonForDeletion': reasonForDeletion,
+        'deletionComment': deletionComment,
       },
     );
     return ApiResponse.fromJson(response);

@@ -3,7 +3,7 @@ import '../models/profile_models.dart';
 
 class LookupService {
   final ApiClient _apiClient = ApiClient();
-  
+
   // Cache for lookup data
   Map<String, List<LookupOption>>? _lookupCache;
   List<LookupOption>? _countriesCache;
@@ -15,18 +15,35 @@ class LookupService {
       return _lookupCache!;
     }
 
-    final response = await _apiClient.get<Map<String, dynamic>>(
-      '/lookup/getLookup',
+    // Match webapp endpoint: GET /lookup (returns { lookupData: {...} } or array)
+    final response = await _apiClient.get<dynamic>(
+      '/lookup',
     );
-    
+
     final Map<String, List<LookupOption>> result = {};
-    
-    response.forEach((key, value) {
-      if (value is List) {
-        result[key] = value.map((item) => LookupOption.fromJson(item)).toList();
+
+    // Handle response structure: { lookupData: {...} } or array or direct object
+    dynamic lookupData;
+    if (response is Map<String, dynamic>) {
+      lookupData = response['lookupData'] ?? response;
+      if (lookupData is List) {
+        lookupData = lookupData.isNotEmpty ? lookupData[0] : {};
       }
-    });
-    
+    } else if (response is List) {
+      lookupData = response.isNotEmpty ? response[0] : {};
+    } else {
+      lookupData = response;
+    }
+
+    if (lookupData is Map<String, dynamic>) {
+      lookupData.forEach((key, value) {
+        if (value is List) {
+          result[key] =
+              value.map((item) => LookupOption.fromJson(item)).toList();
+        }
+      });
+    }
+
     _lookupCache = result;
     return result;
   }
@@ -36,38 +53,73 @@ class LookupService {
       return _countriesCache!;
     }
 
-    final response = await _apiClient.get<List<dynamic>>(
-      '/lookup/getCountries',
+    // Match webapp endpoint: GET /lookup/getCountryLookup
+    final response = await _apiClient.get<dynamic>(
+      '/lookup/getCountryLookup',
     );
-    
-    _countriesCache = response.map((item) => LookupOption.fromJson(item)).toList();
+
+    // Handle response: array or { data: [...] } or { countryLookup: [...] }
+    List<dynamic> countriesList = [];
+    if (response is List) {
+      countriesList = response;
+    } else if (response is Map<String, dynamic>) {
+      countriesList = response['data'] ??
+          response['countryLookup'] ??
+          response['countries'] ??
+          [];
+    }
+
+    _countriesCache =
+        countriesList.map((item) => LookupOption.fromJson(item)).toList();
     return _countriesCache!;
   }
 
   Future<List<LookupOption>> fetchStates(String countryId) async {
+    if (countryId.isEmpty) return [];
     if (_statesCache.containsKey(countryId)) {
       return _statesCache[countryId]!;
     }
 
-    final response = await _apiClient.get<List<dynamic>>(
-      '/lookup/getStates/$countryId',
+    // Match webapp endpoint: GET /lookup/getStateLookup/{countryId}
+    final response = await _apiClient.get<dynamic>(
+      '/lookup/getStateLookup/$countryId',
     );
-    
-    final states = response.map((item) => LookupOption.fromJson(item)).toList();
+
+    // Handle response: array or { data: [...] }
+    List<dynamic> statesList = [];
+    if (response is List) {
+      statesList = response;
+    } else if (response is Map<String, dynamic>) {
+      statesList = response['data'] ?? [];
+    }
+
+    final states =
+        statesList.map((item) => LookupOption.fromJson(item)).toList();
     _statesCache[countryId] = states;
     return states;
   }
 
   Future<List<LookupOption>> fetchCities(String stateId) async {
+    if (stateId.isEmpty) return [];
     if (_citiesCache.containsKey(stateId)) {
       return _citiesCache[stateId]!;
     }
 
-    final response = await _apiClient.get<List<dynamic>>(
-      '/lookup/getCities/$stateId',
+    // Match webapp endpoint: GET /lookup/getCityLookup/{stateId}
+    final response = await _apiClient.get<dynamic>(
+      '/lookup/getCityLookup/$stateId',
     );
-    
-    final cities = response.map((item) => LookupOption.fromJson(item)).toList();
+
+    // Handle response: array or { data: [...] }
+    List<dynamic> citiesList = [];
+    if (response is List) {
+      citiesList = response;
+    } else if (response is Map<String, dynamic>) {
+      citiesList = response['data'] ?? [];
+    }
+
+    final cities =
+        citiesList.map((item) => LookupOption.fromJson(item)).toList();
     _citiesCache[stateId] = cities;
     return cities;
   }
@@ -140,4 +192,3 @@ class LookupService {
     }
   }
 }
-

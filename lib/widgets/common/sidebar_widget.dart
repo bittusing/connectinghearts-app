@@ -120,9 +120,9 @@ class SidebarWidget extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             // Promotional Text
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: const Text(
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
                 'UPTO 65% OFF ALL MEMBERSHIP PLANS',
                 style: TextStyle(
                   color: Colors.black54,

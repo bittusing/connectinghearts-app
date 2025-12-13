@@ -1,0 +1,16 @@
+{
+  "name": "connectingheart-mobile-flutter",
+  "version": "1.0.0",
+  "description": "Connecting Hearts Mobile Flutter App",
+  "scripts": {
+    "dev": "flutter run",
+    "watch": "powershell -ExecutionPolicy Bypass -File ./watch.ps1",
+    "build:apk": "flutter build apk",
+    "build:apk:release": "flutter build apk --release",
+    "build:appbundle": "flutter build appbundle --release",
+    "clean": "flutter clean",
+    "get": "flutter pub get",
+    "doctor": "flutter doctor"
+  }
+}
+

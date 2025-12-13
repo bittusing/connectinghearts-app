@@ -91,8 +91,8 @@ class ApiClient {
           errorMessage = errorData['error'];
         }
       } catch (_) {
-        errorMessage = response.body.isNotEmpty 
-            ? response.body 
+        errorMessage = response.body.isNotEmpty
+            ? response.body
             : 'Request failed with status ${response.statusCode}';
       }
       throw Exception(errorMessage);
@@ -103,20 +103,28 @@ class ApiClient {
     return request<T>(path: path, method: 'GET', fromJson: fromJson);
   }
 
-  Future<T> post<T>(String path, {Map<String, dynamic>? body, T Function(dynamic json)? fromJson}) {
-    return request<T>(path: path, method: 'POST', body: body, fromJson: fromJson);
+  Future<T> post<T>(String path,
+      {Map<String, dynamic>? body, T Function(dynamic json)? fromJson}) {
+    return request<T>(
+        path: path, method: 'POST', body: body, fromJson: fromJson);
   }
 
-  Future<T> put<T>(String path, {Map<String, dynamic>? body, T Function(dynamic json)? fromJson}) {
-    return request<T>(path: path, method: 'PUT', body: body, fromJson: fromJson);
+  Future<T> put<T>(String path,
+      {Map<String, dynamic>? body, T Function(dynamic json)? fromJson}) {
+    return request<T>(
+        path: path, method: 'PUT', body: body, fromJson: fromJson);
   }
 
-  Future<T> patch<T>(String path, {Map<String, dynamic>? body, T Function(dynamic json)? fromJson}) {
-    return request<T>(path: path, method: 'PATCH', body: body, fromJson: fromJson);
+  Future<T> patch<T>(String path,
+      {Map<String, dynamic>? body, T Function(dynamic json)? fromJson}) {
+    return request<T>(
+        path: path, method: 'PATCH', body: body, fromJson: fromJson);
   }
 
-  Future<T> delete<T>(String path, {T Function(dynamic json)? fromJson}) {
-    return request<T>(path: path, method: 'DELETE', fromJson: fromJson);
+  Future<T> delete<T>(String path,
+      {Map<String, dynamic>? body, T Function(dynamic json)? fromJson}) {
+    return request<T>(
+        path: path, method: 'DELETE', body: body, fromJson: fromJson);
   }
 
   // Multipart upload for images
@@ -129,13 +137,13 @@ class ApiClient {
   }) async {
     final url = Uri.parse(_normalizeUrl(path));
     final token = await _storageService.getToken();
-    
+
     final request = http.MultipartRequest('POST', url);
-    
+
     if (token != null) {
       request.headers['Authorization'] = 'Bearer $token';
     }
-    
+
     // Add file
     final fileStream = file.openRead();
     final fileLength = await file.length();
@@ -147,15 +155,15 @@ class ApiClient {
       contentType: MediaType('image', 'jpeg'),
     );
     request.files.add(multipartFile);
-    
+
     // Add additional fields
     if (additionalFields != null) {
       request.fields.addAll(additionalFields);
     }
-    
+
     final streamedResponse = await request.send();
     final response = await http.Response.fromStream(streamedResponse);
-    
+
     if (response.statusCode >= 200 && response.statusCode < 300) {
       if (response.statusCode == 204 || response.body.isEmpty) {
         return null as T;
@@ -179,8 +187,8 @@ class ApiClient {
           errorMessage = errorData['error'];
         }
       } catch (_) {
-        errorMessage = response.body.isNotEmpty 
-            ? response.body 
+        errorMessage = response.body.isNotEmpty
+            ? response.body
             : 'Request failed with status ${response.statusCode}';
       }
       throw Exception(errorMessage);

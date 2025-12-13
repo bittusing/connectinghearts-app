@@ -30,9 +30,13 @@ import '../screens/my_profile/my_profile_screen.dart';
 import '../screens/profile_lists/profile_list_screen.dart';
 import '../screens/acceptance/acceptance_screen.dart';
 import '../screens/notifications/notifications_screen.dart';
+import '../screens/notifications/unlocked_profiles_screen.dart';
+import '../screens/notifications/i_declined_screen.dart';
+import '../screens/notifications/they_declined_screen.dart';
 import '../screens/feedback/feedback_screen.dart';
 import '../screens/legal/terms_screen.dart';
 import '../screens/legal/privacy_policy_screen.dart';
+import '../screens/legal/policy_screen.dart';
 import '../screens/settings/partner_preference_screen.dart';
 import '../screens/splash/splash_screen.dart';
 import '../models/profile_models.dart';
@@ -100,6 +104,10 @@ GoRouter createAppRouter(AuthProvider authProvider) {
         builder: (context, state) => const ForgotPasswordScreen(),
       ),
       GoRoute(
+        path: '/policy',
+        builder: (context, state) => const PolicyScreen(),
+      ),
+      GoRoute(
         path: '/verification-pending',
         builder: (context, state) => const VerificationPendingScreen(),
       ),
@@ -153,11 +161,12 @@ GoRouter createAppRouter(AuthProvider authProvider) {
             path: '/profiles',
             builder: (context, state) => const ProfilesScreen(),
           ),
+        ],
+      ),
+      // Membership route outside ShellRoute to avoid duplicate bottom nav
           GoRoute(
             path: '/membership',
             builder: (context, state) => const MembershipScreen(),
-          ),
-        ],
       ),
       // Profile Detail
       GoRoute(
@@ -246,6 +255,18 @@ GoRouter createAppRouter(AuthProvider authProvider) {
       GoRoute(
         path: '/notifications',
         builder: (context, state) => const NotificationsScreen(),
+      ),
+      GoRoute(
+        path: '/unlocked-profiles',
+        builder: (context, state) => const UnlockedProfilesScreen(),
+      ),
+      GoRoute(
+        path: '/i-declined',
+        builder: (context, state) => const IDeclinedScreen(),
+      ),
+      GoRoute(
+        path: '/they-declined',
+        builder: (context, state) => const TheyDeclinedScreen(),
       ),
       // Feedback
       GoRoute(

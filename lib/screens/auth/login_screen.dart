@@ -36,7 +36,26 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     if (success && mounted) {
-      context.go('/');
+      // Navigate based on screenName (like webapp)
+      final screenName = authProvider.user?.screenName
+              ?.toLowerCase()
+              .replaceAll(RegExp(r'\s+'), '') ??
+          '';
+      final routeMap = {
+        'personaldetails': '/personal-details',
+        'careerdetails': '/career-details',
+        'socialdetails': '/social-details',
+        'srcmdetails': '/srcm-details',
+        'familydetails': '/family-details',
+        'partnerpreferences': '/partner-preference',
+        'aboutyou': '/about-you',
+        'underverification': '/verification-pending',
+        'dashboard': '/',
+      };
+
+      final redirectPath = routeMap[screenName] ??
+          (screenName.isNotEmpty ? '/personal-details' : '/');
+      context.go(redirectPath);
     } else if (mounted && authProvider.error != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

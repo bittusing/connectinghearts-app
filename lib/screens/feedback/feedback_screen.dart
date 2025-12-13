@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../theme/colors.dart';
+import '../../services/api_client.dart';
 
 class FeedbackScreen extends StatefulWidget {
   const FeedbackScreen({super.key});
@@ -32,20 +33,52 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     }
 
     setState(() => _isSubmitting = true);
-    await Future.delayed(const Duration(seconds: 1));
-    setState(() => _isSubmitting = false);
+
+    try {
+      final apiClient = ApiClient();
+      final response = await apiClient.post<Map<String, dynamic>>(
+        '/dashboard/submitReview',
+        body: {
+          'rating': _rating,
+          'comment': _feedbackController.text.trim().isNotEmpty
+              ? _feedbackController.text.trim()
+              : '',
+        },
+      );
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Thank you for your feedback!'),
+          SnackBar(
+            content: Text(
+              response['message'] ?? 'Thank you for your feedback!',
+            ),
           backgroundColor: AppColors.success,
         ),
       );
+        _feedbackController.clear();
+        setState(() => _rating = 0);
+        // Redirect to dashboard after a brief delay
+        await Future.delayed(const Duration(milliseconds: 1500));
+        if (mounted) {
       if (Navigator.canPop(context)) {
         context.pop();
       } else {
         context.go('/');
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll('API ', '')),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
       }
     }
   }
