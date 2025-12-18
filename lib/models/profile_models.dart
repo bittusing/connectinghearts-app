@@ -451,8 +451,10 @@ class PaymentVerificationResponse {
   });
 
   factory PaymentVerificationResponse.fromJson(Map<String, dynamic> json) {
+    // Handle both 'success' and 'status' fields (webapp uses 'status')
+    final success = json['success'] ?? (json['status'] == 'success') ?? false;
     return PaymentVerificationResponse(
-      success: json['success'] ?? false,
+      success: success,
       message: json['message'],
     );
   }
