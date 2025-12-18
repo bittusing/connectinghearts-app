@@ -4,6 +4,7 @@ class ApiProfile {
   final String? heartsId;
   final String? name;
   final int? age;
+  final String? dob;
   final String? height;
   final String? religion;
   final String? caste;
@@ -22,6 +23,7 @@ class ApiProfile {
     this.heartsId,
     this.name,
     this.age,
+    this.dob,
     this.height,
     this.religion,
     this.caste,
@@ -61,7 +63,11 @@ class ApiProfile {
           : (json['age'] is String
               ? int.tryParse(json['age'])
               : (json['age'] is num ? json['age'].toInt() : null)),
-      height: json['height']?.toString(), // Can be int or String
+      dob: toString(json['dob']),
+      // Try to get height from basic.height if available, otherwise from top level
+      height: (json['basic'] is Map && json['basic']['height'] != null)
+          ? json['basic']['height'].toString()
+          : json['height']?.toString(), // Can be int or String
       religion: toString(json['religion']),
       caste: toString(json['caste'] ?? json['cast']),
       city: toString(json['city']),

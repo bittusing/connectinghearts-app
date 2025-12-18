@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import '../../widgets/common/header_widget.dart';
+import '../../widgets/common/sidebar_widget.dart';
+import '../../widgets/common/bottom_navigation_widget.dart';
 
 class TermsScreen extends StatelessWidget {
   const TermsScreen({super.key});
@@ -9,126 +11,370 @@ class TermsScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            if (Navigator.canPop(context)) {
-              context.pop();
-            } else {
-              context.go('/');
-            }
-          },
-        ),
-        title: const Text(
-          'Terms & Conditions',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: true,
-      ),
+      appBar: const HeaderWidget(),
+      drawer: const SidebarWidget(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: theme.cardColor,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: theme.dividerColor),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Terms and Conditions',
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: theme.cardColor,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: theme.dividerColor),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Last updated: December 2024',
-                style: theme.textTheme.bodySmall,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Terms & Conditions',
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: theme.textTheme.titleLarge?.color,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Review the legally binding terms that govern your use of Connecting Hearts.',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.textTheme.bodySmall?.color,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 24),
-              _buildSection(
-                theme,
-                title: '1. Acceptance of Terms',
-                content:
-                    'By accessing and using Connecting Hearts, you accept and agree to be bound by the terms and provision of this agreement.',
-              ),
-              _buildSection(
-                theme,
-                title: '2. User Registration',
-                content:
-                    'To use certain features of the Service, you must register for an account. You must provide accurate and complete information and keep your account information updated.',
-              ),
-              _buildSection(
-                theme,
-                title: '3. Privacy Policy',
-                content:
-                    'Your privacy is important to us. Please review our Privacy Policy, which also governs your use of the Service.',
-              ),
-              _buildSection(
-                theme,
-                title: '4. User Conduct',
-                content:
-                    'You agree not to use the Service for any unlawful purpose or in any way that interrupts, damages, or impairs the service.',
-              ),
-              _buildSection(
-                theme,
-                title: '5. Content',
-                content:
-                    'You are responsible for all content you post on the Service. You must not post any content that is illegal, harmful, or violates the rights of others.',
-              ),
-              _buildSection(
-                theme,
-                title: '6. Membership',
-                content:
-                    'Certain features require a paid membership. Membership fees are non-refundable except as required by law.',
-              ),
-              _buildSection(
-                theme,
-                title: '7. Termination',
-                content:
-                    'We may terminate or suspend your account at any time for violations of these terms.',
-              ),
-              _buildSection(
-                theme,
-                title: '8. Contact Us',
-                content:
-                    'If you have any questions about these Terms, please contact us at support@connectingheart.co.in',
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 16),
+
+            // Acceptance of Terms
+            _buildSection(
+              theme,
+              title: 'Acceptance of Terms',
+              paragraphs: const [
+                'This document is an electronic record in terms of the Information Technology Act, 2000 and rules there under pertaining to electronic records as applicable and amended. This electronic record is generated by a computer system and does not require any physical or digital signatures.',
+                'This document is published in accordance with the provisions of Rule 3 (1) of the Information Technology (Intermediaries Guidelines) Rules, 2011 that require publishing the rules and regulations, privacy policy and the terms and conditions for access or usage of CONNECTING HEARTS.',
+                'PLEASE READ THE FOLLOWING TERMS AND CONDITIONS VERY CAREFULLY BEFORE USING CONNECTING HEARTS. ACCESSING, BROWSING OR OTHERWISE USING THE APPLICATION IMPLIES YOUR AGREEMENT TO BE BOUND BY ALL THESE TERMS AND CONDITIONS ("Agreement"). If you do not want to be bound by the Terms and Conditions, you must not use Connecting hearts Services. The Terms and Conditions also include the applicable policies which are incorporated herein by way of reference and as amended from time to time (the "Terms and conditions").',
+                'In these Terms, references to "Connecting hearts member" shall mean the end user accessing Connecting hearts services its contents or using the Connecting hearts Services offered. Connecting hearts member also includes persons such as father, mother, brother, sister, relative or a friend ("Registrant") of the prospective bride/bridegroom. The terms "You" and "User" shall be interchangeably used for member. Connecting hearts operated by Heartfulness/srcm volunteers.',
+              ],
+            ),
+
+            // Scope
+            _buildSection(
+              theme,
+              title: 'Scope',
+              paragraphs: const [
+                'You understand and acknowledge that Connecting hearts acts as an "Intermediary" as defined under clause (1) sub-clause (w) of Section 2 of the Information Technology Act, 2000.',
+                'Connecting hearts acts as a platform to enable any user to themselves register on it (by filling the mandatory fields and optional fields, if any) to voluntarily search for profile(s) from the database of Connecting hearts already registered users, for seeking prospective lawful matrimonial alliances for themselves. However, you must have a valid/ operational mobile phone number and an email id. The profiles in the database of Connecting hearts are classified broadly on the basis of language and region for the ease and convenience of its member/customer.',
+                'Connecting hearts Members are provided with free/paid access for searching profiles from the database of Connecting hearts, as per the partner preference set by you (on the Applications/Website - (App/website) and you can shortlist the profiles in which you are interested.',
+              ],
+            ),
+
+            // Eligibility
+            _buildBulletSection(
+              theme,
+              title: 'Eligibility',
+              bullets: const [
+                'Connecting hearts membership are rights of admission are reserved solely for Members Globally',
+                'Further in capacity as Connecting hearts member you confirm that you are: 18 years or above (if you are a woman) or 21 years or above (if you are a man);',
+                'If you have applied for Divorce, you may register or our App/Website (connecting hearts) by stating "Awaiting Divorce".',
+                'If you are a resident of any other Country, you are legally competent to marry as per the local rules applicable to your country and you shall comply with the Indian laws for marrying a person of Indian Origin',
+                'In case you are a registrant of the prospective bride / groom and has created profile in Connecting hearts App/Website on behalf of them or is accessing the Connecting hearts App on behalf of them implies that you have taken their consent for their profile creation in Connecting hearts and for accessing the Connecting hearts App/Website.',
+              ],
+            ),
+
+            // Registration
+            _buildSection(
+              theme,
+              title: 'Registration',
+              paragraphs: const [
+                'We expect that you would complete the online registration process with fairness and honesty in furnishing true, accurate, current, complete information and with providing recent photos of you which will help you to meet your parameters. We expect you to read the relevant column before keying in the details or selecting the option available or uploading the photo. You are requested not to key in details of the profile in field other than the applicable field (including mentioning ID\'s) of other platforms / App or repeating your details in another fields, after filling them once in the relevant fields or others photographs. In order to serve you better if Connecting hearts requires additional details you agree to provide it.',
+                'If at any point of time Connecting hearts comes to know, or is so informed by third party or has reason to believe that any information provided by you for registration (including photos) or otherwise, is found to be untrue, inaccurate, or incomplete, connecting hearts shall have full right to suspend or terminate (without any notice) your Connecting hearts membership and forfeit any amount paid by you towards Connecting hearts membership fee and refuse to provide Connecting hearts service to you thereafter.',
+                'Connecting hearts also reserves the right to block the registration of your profile on App/Website, if any, in the case of your contact details/links being entered in irrelevant fields or if there are errors in any data entered by the Connecting hearts members in their profile.',
+                'Registration of duplicate profiles of the same person is not allowed in Connecting hearts App/Website. Connecting hearts shall have full right to suspend or terminate (without any notice) such duplicate profile.',
+                'You acknowledge and confirm that your registration with Connecting hearts and the usage of Connecting hearts services is with the Bonafide intention of marriage and not otherwise. Connecting hearts Membership is restricted strictly to the registered Connecting hearts individual member only. Organizations, companies, businesses and/ or individuals carrying on similar or competitive business cannot become Members of Connecting hearts and nor use the Connecting hearts Service or Connecting hearts members data for any commercial purpose, and Connecting hearts reserves its right to initiate appropriate legal action for breach of this obligation.',
+              ],
+            ),
+
+            // Account Security
+            _buildSection(
+              theme,
+              title: 'Account Security',
+              paragraphs: const [
+                'You are responsible for safeguarding the confidentiality of your Connecting hearts login credentials such as your user id, password, OTP, etc., and for restricting access to your mobile to prevent unauthorized access to your account. We, as a Company do not ask for Password and you are cautioned not to share your password to any persons. You agree to accept responsibility for all activities that occur in your account.',
+              ],
+            ),
+
+            // Role & Responsibility of Connecting Hearts
+            _buildBulletSection(
+              theme,
+              title: 'Role & Responsibility of Connecting Hearts',
+              description:
+                  'Our obligations focus on platform facilitation, data security practices, and transparent communication with members.',
+              bullets: const [
+                'Connecting hearts reproduces your details once you register on our App/Website on "as is as available" basis and also share your profile with other registered Connecting hearts members within app/Website',
+                'The profile search conducted by any Connecting hearts member and the matches shown thereof are automatically generated by Connecting hearts, and based on the partner preference set by you. In the event of Connecting hearts member changing their partner preference on the App/Website, then the automated system generated prospect results of the App/Website may also undergo corresponding change.',
+                'Connecting hearts does not prohibit any Connecting hearts member from sending interest to your profile or communicating to you based on their partner preference. But you are at the liberty to deny their interest or proceed further if you are interested.',
+                'Connecting hearts cannot guarantee or assume responsibility for any specific results from the use of the data available from the Connecting hearts service or from other matrimonial app/Website.',
+                'Connecting hearts shall safeguard sensitive user information using security standards, authentication mechanisms, access controls and encryption techniques.',
+                'Connecting hearts cannot guarantee the complete protection of user data while it is in transit, or prevent any tampering of the data by a third party with malicious intent before the data reaches the Connecting hearts servers.',
+                'Connecting hearts do not authenticate/ endorse any information of any profile and hence you as a user need to verify the credentials and information provided by other users.',
+              ],
+            ),
+
+            // Role & Responsibility of Connecting Hearts Members
+            _buildBulletSection(
+              theme,
+              title: 'Role & Responsibility of Connecting Hearts Members',
+              description:
+                  'Members must uphold safe usage practices and comply fully with these Terms.',
+              bullets: const [
+                'You, shall safeguard your profile information by creating a strong password during profile creation with combination of alphabets, both upper and lower case and numbers.',
+                'Any information / data required by Connecting hearts for using its services shall be provided by the Connecting hearts Member, as and when so sought by connecting hearts.',
+                'You are requested to verify the credentials of the prospect, exercise due care and caution regarding their profile information which includes marital status, educational qualifications, financial status, occupation, character, health status, etc. and satisfy yourself before making a choice of your match. Connecting hearts shall not be liable for short coming due to any misrepresentations made by any of its Connecting hearts members.',
+                'To get better search results, connecting hearts Members are expected to provide latest photograph which should not be more than 3 (three) months old. Providing old photographs/ photographs of others, inaccurate / false information shall be treated as violation of terms and conditions and Connecting hearts shall retain their right under clause 2 (b) of this terms and conditions.',
+                'Connecting hearts members are expected to disclose their health records during profile enrolment which includes any pre-existing illness, physical disability etc. Non - disclosure at the time of enrolment shall be treated as violation of the terms and conditions and Connecting hearts shall retain their right under clause 2 (b) of this terms and conditions.',
+                'Connecting hearts Members are advised to refrain from: Entering into any financial transactions with prospects Connecting hearts Members shall not seek financial help or provide financial help from / to the other Connecting hearts Members.',
+                'Using abusive language when they communicate with the other Connecting hearts Members.',
+                'Being discriminative or using racial, religious, or offensive language.',
+                'Sharing confidential information such as banking details, passwords, or personal identification numbers.',
+                'Entering into physical relationships prior to marriage or violating applicable laws.',
+                'Staying vigilant against suspicious behavior (multiple numbers, refusal to meet, etc.) and reporting concerns to connectinghearts.helpdesk@gmail.com.',
+                'Regularly logging in, managing interests, and deleting your profile once a match is finalized.',
+                'Using secure devices and networks, and never deploying bots, scripts, or vulnerability scans on the application.',
+                'Making payments only to official Connecting Hearts accounts; staff will never request direct transfers.',
+              ],
+            ),
+
+            // Communication & Notifications
+            _buildSection(
+              theme,
+              title: 'Communication & Notifications',
+              paragraphs: const [
+                'By registering, you consent to receive communications via email, calls, SMS, or WhatsApp, including promotional updates.',
+                'Connecting hearts Member confirms that the mobile number provided by them for verification or alternative number if any provided, is not registered with the Do Not Disturb / National Customer Preference Register and they shall not initiate any complaint. Connecting hearts Member further confirms that even if Connecting hearts Member is registered with the telecom service provider under the category Do Not Disturb / National Customer Preference Register the calls from Connecting hearts either to the verified mobile number or alternative number if any provided shall not be treated as promotional calls.',
+              ],
+            ),
+
+            // Confidentiality
+            _buildSection(
+              theme,
+              title: 'Confidentiality',
+              paragraphs: const [
+                'Any feedback you provide to Connecting hearts shall be deemed to be non-confidential. Connecting hearts shall be free to use such feedback/information on an unrestricted basis. Further, by submitting the feedback, you represent and warrant that (i) your feedback does not contain confidential or proprietary information of yourself or third parties; (ii) Connecting hearts member is not under any obligation of confidentiality, express or implied, with respect to the feedback; (iii) you are not entitled to any compensation or reimbursement of any kind from Connecting hearts for the feedback under any circumstances.',
+              ],
+            ),
+
+            // Privacy of Membership
+            _buildSection(
+              theme,
+              title: 'Privacy of Membership',
+              paragraphs: const [
+                'To protect your privacy and understand our practices as amended from time to time, please read and follow our Privacy Policy which also governs your visit to connecting hearts, the personal information / data provided to us by you during the course of usage of Connecting hearts will be treated as confidential and in accordance with the Privacy policy and applicable laws and regulations. If you object to your information being transferred or used, please do not use the app/Website.',
+              ],
+            ),
+
+            // Disputes Between Members
+            _buildSection(
+              theme,
+              title: 'Disputes Between Members',
+              paragraphs: const [
+                'Connecting hearts Members are solely responsible for the communications (through any medium) with prospect or vice versa. Connecting hearts expressly disclaims any responsibility or liability for any monetary transaction(s) or exchange(s) or interaction(s) or passing of information(s) etc. between any Connecting hearts members inter se via e-mail, chat, interaction, WhatsApp or any other medium of communication between Connecting hearts members App/Website',
+                'Connecting hearts has no obligation, to monitor any such disputes arising between the Connecting hearts members, and Connecting hearts shall not be party to any such dispute/litigation etc.',
+                'Connecting hearts is not a broker or the agent of any Connecting hearts member, and Connecting hearts does not partake in the exchange of any kind of discussion between the Connecting hearts members and prospects or the results of their discussion.',
+              ],
+            ),
+
+            // Limitation of Liability
+            _buildSection(
+              theme,
+              title: 'Limitation of Liability',
+              paragraphs: const [
+                'SRCM/Heartfulness, connecting hearts or its Office bearers shall under no circumstances be liable or responsible to the Connecting hearts member or his/her authorized Representative or Registrant or any third party for any direct, indirect special, exemplary, incidental, or consequential damages of any character including, without limitation, damages resulting from the use of our App/Website / Third Party Website / Connecting hearts services.',
+                'Connecting hearts informs you that the exchange of profile(s) through or by Connecting hearts should not in any way be construed as a matrimonial offer and/or recommendation and / or advice or guarantee given to the Connecting heart member, from/ or by connecting hearts SRCM/ Heartfulness.',
+                'Notwithstanding anything to the contrary contained herein, connecting heart\'s liability to you for any cause whatsoever, and regardless of the form of the action, will at all times be limited to the amount paid, if any, by you to connecting hearts, for any specific Connecting hearts paid package, and no further.',
+                'Connecting hearts SRCM/Heartfulness will not be liable in case of any wrong/improper match made due to any reason.',
+                'SRCM/Heartfulness, connecting hearts or its office bearers shall under no circumstances be liable, if any, for the Connecting hearts member entering into financial transaction with any other Connecting hearts Member or any third party.',
+                'Connecting hearts or its office bearers shall under no circumstances be liable, if any, for any Connecting hearts members not responding/ reciprocating when you approach them for matrimonial alliance',
+              ],
+            ),
+
+            // Class Action Suits
+            _buildSection(
+              theme,
+              title: 'Class Action Suits',
+              paragraphs: const [
+                'You acknowledge and confirm that you will not bring or participate in any class action or other class proceeding in connection with any dispute with connecting hearts or SRCM/Heartfulness. Further neither you nor Connecting hearts or SRCM/Heartfulness agrees to class arbitration.',
+              ],
+            ),
+
+            // General
+            _buildSection(
+              theme,
+              title: 'General',
+              paragraphs: const [
+                'In the event you file a false complaint against another prospect on our App/Website and consequently we have suspended/deleted that prospects profile based on your complaint, then we reserve our right to initiate appropriate legal (Civil/Criminal) action against you and claim any and all costs expenses from you, for such irresponsible/ misrepresentation/illegal/unlawful action. We also reserve our right to suspend your profile and forfeit any and all amounts paid by you for the Connecting hearts services as per clause 2 (b) of these terms and conditions.',
+                'Notwithstanding anything contained herein, Connecting hearts reserves the absolute right to delete, in any manner as it deems fit, any content c any profile listing placed on connecting heart app/Website (once such instance come to Connecting hearts notice) in order to ensure, that proper consent has been obtained by you, prima facie accuracy and the prevailing laws in force for the time being, especially those relating to providing any obscene, libelous, blasphemous, slanderous, defamatory or invasive of another person\'s (deceased or alive) right of privacy or publicity, or that may reasonably be deemed to be harmful, vulgar, pornographic, abusive, harassing, threatening, hateful, objectionable with respect to race, religion creed, nationality, gender or otherwise unfit for reproduction; or suggests or encourages unfair or illegal/indecent, unlawful activity.',
+                'Connecting hearts also reserves the right to block/delete / suspend the profile which might be offensive, illegal or that might violate the rights, harm or threaten the safety of our office bearers/ employees (including undue communication with any employee) and/or other registered prospects or using our Connecting hearts App/Website as a means of communication.',
+                'Once your paid membership expires, you cannot avail the unexpired balance phone call count/ unexpired SMS. Similarly, you cannot access the already viewed Connecting hearts member(s) contact information unless you renew your account within 30 days. However, on renewal, the unexpired phone call / SMS shall be carried forward to your account from the last day of expiry.',
+                'In case of conflict between the terms and condition of App and terms and conditions of any other website including other websites, the terms and condition of Connecting hearts App/Website shall prevail for the service provided through this App/Website.',
+              ],
+            ),
+
+            // Disclaimer
+            _buildSection(
+              theme,
+              title: 'Disclaimer',
+              paragraphs: const [
+                'YOU UNDERSTAND AND AGREE THAT THE CONNECTING HEARTS SERVICES ARE PROVIDED TO YOU ON AN "AS IS" AND "AS AVAILABLE" BASIS. WITHOUT LIMITING THE FOREGOING, TO THE FULL EXTENT PERMITTED BY LAW, CONNECTINGHEARTS DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT.',
+                'Connecting hearts does not warrant that the App/Website, its servers, or e-mail sent from Connecting hearts are free of viruses or other harmful components. Connecting hearts will not be liable for any damages of any kind arising from the use of this App/Website, including, but not limited to direct, indirect, incidental, punitive, and consequential damages.',
+                'Connecting hearts does not give any implied or explicit guarantee or warranty of marriage or alliance by you choosing to register on our App/Website an using Connecting hearts services (both paid and free).',
+                'Notwithstanding anything contrary contained anywhere, under no circumstance Connecting hearts shall be held responsible or liable whatsoever or howsoever, arising out of, relating to or connected with: (i) Any act or Omission done by Connecting hearts payment gateway/alliance partner etc.; (ii) Any untrue or incorrect information submitted by you or on your behalf; (iii) Any decision taken by you or on your behalf or any consequences thereof, based on any information provided by any other user (including suspension/ deletion of the profile from connecting hearts); (iv) Any unauthorized or illegal act done by any third party relating to or connected with any information submitted by you or on your behalf; (v) Any cybercrime attempted or committed by anyone and (vi) Any incident of force-majeure or "Act of God". (vii) Any issue already stated in these terms and conditions including limitation of liability clause of these terms and conditions.',
+                'Connecting hearts or SRCM/Heartfulness shall not be liable for the outcome of during any interaction in a meeting, call, SMS, chat, email or social media posts at any point of time',
+                'Any issues relating to any technical malfunction of any telecommunication network, software, hardware failures, network congestion, denial of service, failure due to spamming or any combination of the above.',
+                'You expressly agree that your use of this App/Website is at your sole risk.',
+                'We are not liable to you for any damage or alteration to your equipment including but not limited to computer equipment, hand-held device or mobile telephones as a result of the installation or use of the app/Website.',
+                'We suggest Connecting hearts Member to register with your mobile number which is not being used by other Finance or Banking application or Service in any such case Connecting hearts is not liable if anything happens.',
+              ],
+            ),
+
+            // Indemnity
+            _buildSection(
+              theme,
+              title: 'Indemnity',
+              paragraphs: const [
+                'By using our Connecting hearts services, you agree to defend, indemnify, and hold harmless connecting hearts, its subsidiaries, affiliates, Directors, officers, agents, and other partners and Employees, fully indemnified and harmless from any loss, damage, liability, claim, or demand, including reasonable attorney\'s fees, made by any person through improper use of the service provided by connecting hearts. This defense and indemnification obligation will survive in perpetuity.',
+              ],
+            ),
+
+            const SizedBox(height: 24),
+          ],
         ),
       ),
+      bottomNavigationBar: const BottomNavigationWidget(),
     );
   }
 
-  Widget _buildSection(ThemeData theme,
-      {required String title, required String content}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+  Widget _buildSection(
+    ThemeData theme, {
+    required String title,
+    required List<String> paragraphs,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: theme.dividerColor),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: theme.textTheme.titleMedium?.copyWith(
+            style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w600,
+              color: theme.textTheme.titleLarge?.color,
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            content,
-            style: theme.textTheme.bodyMedium,
+          const SizedBox(height: 16),
+          ...paragraphs.map((paragraph) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Text(
+                  paragraph,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    height: 1.6,
+                    color: theme.textTheme.bodySmall?.color,
+                  ),
+                ),
+              )),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBulletSection(
+    ThemeData theme, {
+    required String title,
+    String? description,
+    required List<String> bullets,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: theme.dividerColor),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: theme.textTheme.titleLarge?.color,
+            ),
+          ),
+          if (description != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              description,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                height: 1.6,
+                color: theme.textTheme.bodySmall?.color,
+              ),
+            ),
+          ],
+          const SizedBox(height: 16),
+          ...bullets.map((bullet) => Padding(
+                padding: const EdgeInsets.only(bottom: 8, left: 16),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '• ',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.textTheme.bodySmall?.color,
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        bullet,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          height: 1.6,
+                          color: theme.textTheme.bodySmall?.color,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
         ],
       ),
     );

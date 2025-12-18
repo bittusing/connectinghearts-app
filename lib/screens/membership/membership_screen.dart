@@ -3,6 +3,7 @@ import '../../theme/colors.dart';
 import '../../services/membership_service.dart';
 import '../../widgets/common/bottom_navigation_widget.dart';
 import '../../widgets/common/header_widget.dart';
+import '../../widgets/common/sidebar_widget.dart';
 import '../../models/profile_models.dart';
 
 class MembershipScreen extends StatefulWidget {
@@ -56,15 +57,24 @@ class _MembershipScreenState extends State<MembershipScreen> {
             });
           }
 
-          // Only set active plan if planName is not null (has active membership)
-          if (membershipResponse.membershipData != null &&
-              membershipResponse.membershipData!.planName != null) {
+          // Set active plan if membershipData exists and has valid data (like webapp)
+          // Check if any field is not null to determine if membership exists
+          if (membershipResponse.membershipData != null) {
             final membership = membershipResponse.membershipData!;
-            _activePlan = {
-              'name': membership.planName,
-              'expiryDate': membership.memberShipExpiryDate,
-            };
-            _heartCoins = membership.heartCoins;
+            // Check if membership has valid data (planName, expiryDate, or membership_id)
+            if (membership.planName != null ||
+                membership.memberShipExpiryDate != null ||
+                membership.membership_id != null) {
+              _activePlan = {
+                'name': membership.planName ?? 'Active Plan',
+                'expiryDate': membership.memberShipExpiryDate,
+                'membership_id': membership.membership_id,
+              };
+              _heartCoins = membership.heartCoins;
+            } else {
+              _activePlan = null;
+              _heartCoins = 0;
+            }
           } else {
             _activePlan = null;
             _heartCoins = 0;
@@ -118,6 +128,7 @@ class _MembershipScreenState extends State<MembershipScreen> {
 
     return Scaffold(
       appBar: const HeaderWidget(),
+      drawer: const SidebarWidget(),
       bottomNavigationBar: const BottomNavigationWidget(),
       body: SafeArea(
         child: _isLoading
@@ -198,36 +209,46 @@ class _MembershipScreenState extends State<MembershipScreen> {
                                             ? AppColors.success
                                             : AppColors.primary,
                                         fontWeight: FontWeight.w600,
+                                        fontSize: 14,
                                       ),
                                     ),
-                                    if (_activePlan != null &&
-                                        _activePlan!['expiryDate'] != null)
-                                      Text(
-                                        'Expires on ${_formatDate(_activePlan!['expiryDate'])}',
-                                        style: TextStyle(
-                                          color: AppColors.success
-                                              .withOpacity(0.8),
-                                          fontSize: 12,
+                                    if (_activePlan != null) ...[
+                                      if (_activePlan!['expiryDate'] !=
+                                          null) ...[
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'Expires on ${_formatDate(_activePlan!['expiryDate'])}',
+                                          style: TextStyle(
+                                            color: AppColors.success
+                                                .withOpacity(0.8),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.normal,
+                                          ),
                                         ),
-                                      ),
-                                    if (_activePlan != null)
+                                      ],
+                                      const SizedBox(height: 4),
                                       Text(
                                         '$_heartCoins Heart Coins remaining',
                                         style: TextStyle(
                                           color: AppColors.success
                                               .withOpacity(0.8),
                                           fontSize: 12,
+                                          fontWeight: FontWeight.normal,
                                         ),
                                       ),
-                                    if (_activePlan == null)
+                                    ],
+                                    if (_activePlan == null) ...[
+                                      const SizedBox(height: 4),
                                       Text(
                                         'Unlock premium filters, heart coins, and faster matches.',
                                         style: TextStyle(
                                           color: AppColors.primary
                                               .withOpacity(0.8),
                                           fontSize: 12,
+                                          fontWeight: FontWeight.normal,
                                         ),
                                       ),
+                                    ],
                                   ],
                                 ),
                               ),
@@ -249,8 +270,6 @@ class _MembershipScreenState extends State<MembershipScreen> {
     final theme = Theme.of(context);
     final planName = (plan['name'] as String? ?? '').toLowerCase();
     final isPlatinum = planName.contains('platinum');
-    final isGold = planName.contains('gold');
-    final isSilver = planName.contains('silver');
 
     // Determine card colors based on plan
     final cardColor = theme.cardColor;
@@ -301,7 +320,7 @@ class _MembershipScreenState extends State<MembershipScreen> {
                 ],
               ),
               Text(
-                '${_getCurrencySymbol(plan['currency'] ?? 'INR')}${plan['price']} / ${plan['duration']} ${plan['duration'] == 1 ? 'month' : 'months'}',
+                '${_getCurrencySymbol(plan['currency'] ?? 'INR')}${_formatPrice(plan['price'])} / ${plan['duration']} ${plan['duration'] == 1 ? 'month' : 'months'}',
                 style: const TextStyle(
                   color: AppColors.primary,
                   fontSize: 18,
@@ -394,5 +413,18 @@ class _MembershipScreenState extends State<MembershipScreen> {
     } catch (_) {
       return dateString;
     }
+  }
+
+  String _formatPrice(dynamic price) {
+    if (price == null) return '0';
+    if (price is int) {
+      return price.toString().replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+    }
+    if (price is num) {
+      return price.toInt().toString().replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+    }
+    return price.toString();
   }
 }

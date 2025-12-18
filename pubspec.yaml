@@ -52,6 +52,10 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/data/connectinghearts.cities.json
+    - assets/data/connectinghearts.states.json
+    - assets/data/connectinghearts.countries.json
+    - assets/data/connectinghearts.lookups.json
 
   # App icon configuration
   # To generate app icons, use: flutter pub run flutter_launcher_icons

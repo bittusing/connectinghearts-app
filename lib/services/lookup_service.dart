@@ -1,8 +1,10 @@
 import 'api_client.dart';
 import '../models/profile_models.dart';
+import 'static_data_service.dart';
 
 class LookupService {
   final ApiClient _apiClient = ApiClient();
+  final StaticDataService _staticDataService = StaticDataService.instance;
 
   // Cache for lookup data
   Map<String, List<LookupOption>>? _lookupCache;
@@ -76,52 +78,104 @@ class LookupService {
 
   Future<List<LookupOption>> fetchStates(String countryId) async {
     if (countryId.isEmpty) return [];
+
+    // First check cache
     if (_statesCache.containsKey(countryId)) {
       return _statesCache[countryId]!;
     }
 
-    // Match webapp endpoint: GET /lookup/getStateLookup/{countryId}
-    final response = await _apiClient.get<dynamic>(
-      '/lookup/getStateLookup/$countryId',
-    );
-
-    // Handle response: array or { data: [...] }
-    List<dynamic> statesList = [];
-    if (response is List) {
-      statesList = response;
-    } else if (response is Map<String, dynamic>) {
-      statesList = response['data'] ?? [];
+    // Try to load from static data first (no API call)
+    await _staticDataService.loadStatesData();
+    if (_staticDataService.isStatesLoaded) {
+      final staticStates = _staticDataService.getStatesByCountry(countryId);
+      if (staticStates.isNotEmpty) {
+        _statesCache[countryId] = staticStates;
+        return staticStates;
+      }
     }
 
-    final states =
-        statesList.map((item) => LookupOption.fromJson(item)).toList();
-    _statesCache[countryId] = states;
-    return states;
+    // Fallback to API if static data doesn't have this country
+    // Match webapp endpoint: GET /lookup/getStateLookup/{countryId}
+    // Response structure: [{ country_id: "...", states: [{ label, value }, ...] }]
+    try {
+      final response = await _apiClient.get<dynamic>(
+        '/lookup/getStateLookup/$countryId',
+      );
+
+      // Handle response structure: [{ country_id: "...", states: [...] }]
+      List<dynamic> statesList = [];
+      if (response is List && response.isNotEmpty) {
+        final firstItem = response[0];
+        if (firstItem is Map<String, dynamic> && firstItem['states'] != null) {
+          statesList = firstItem['states'] as List<dynamic>;
+        }
+      } else if (response is Map<String, dynamic>) {
+        if (response['states'] != null) {
+          statesList = response['states'] as List<dynamic>;
+        } else if (response['data'] != null) {
+          statesList = response['data'] as List<dynamic>;
+        }
+      }
+
+      final states =
+          statesList.map((item) => LookupOption.fromJson(item)).toList();
+      _statesCache[countryId] = states;
+      return states;
+    } catch (e) {
+      // Return empty list on error
+      return [];
+    }
   }
 
   Future<List<LookupOption>> fetchCities(String stateId) async {
     if (stateId.isEmpty) return [];
+
+    // First check cache
     if (_citiesCache.containsKey(stateId)) {
       return _citiesCache[stateId]!;
     }
 
-    // Match webapp endpoint: GET /lookup/getCityLookup/{stateId}
-    final response = await _apiClient.get<dynamic>(
-      '/lookup/getCityLookup/$stateId',
-    );
-
-    // Handle response: array or { data: [...] }
-    List<dynamic> citiesList = [];
-    if (response is List) {
-      citiesList = response;
-    } else if (response is Map<String, dynamic>) {
-      citiesList = response['data'] ?? [];
+    // Try to load from static data first (no API call)
+    await _staticDataService.loadCitiesData();
+    if (_staticDataService.isCitiesLoaded) {
+      final staticCities = _staticDataService.getCitiesByState(stateId);
+      if (staticCities.isNotEmpty) {
+        _citiesCache[stateId] = staticCities;
+        return staticCities;
+      }
     }
 
-    final cities =
-        citiesList.map((item) => LookupOption.fromJson(item)).toList();
-    _citiesCache[stateId] = cities;
-    return cities;
+    // Fallback to API if static data doesn't have this state
+    // Match webapp endpoint: GET /lookup/getCityLookup/{stateId}
+    // Response structure: [{ state_id: "...", cities: [{ label, value, _id }, ...] }]
+    try {
+      final response = await _apiClient.get<dynamic>(
+        '/lookup/getCityLookup/$stateId',
+      );
+
+      // Handle response structure: [{ state_id: "...", cities: [...] }]
+      List<dynamic> citiesList = [];
+      if (response is List && response.isNotEmpty) {
+        final firstItem = response[0];
+        if (firstItem is Map<String, dynamic> && firstItem['cities'] != null) {
+          citiesList = firstItem['cities'] as List<dynamic>;
+        }
+      } else if (response is Map<String, dynamic>) {
+        if (response['cities'] != null) {
+          citiesList = response['cities'] as List<dynamic>;
+        } else if (response['data'] != null) {
+          citiesList = response['data'] as List<dynamic>;
+        }
+      }
+
+      final cities =
+          citiesList.map((item) => LookupOption.fromJson(item)).toList();
+      _citiesCache[stateId] = cities;
+      return cities;
+    } catch (e) {
+      // Return empty list on error
+      return [];
+    }
   }
 
   // Get specific lookup options
@@ -190,5 +244,27 @@ class LookupService {
     } catch (_) {
       return null;
     }
+  }
+
+  /// Get city label from value using static data (fast, no API call)
+  Future<String?> getCityLabelFromValue(String? cityValue) async {
+    if (cityValue == null || cityValue.isEmpty) return null;
+
+    // Load static data if not loaded
+    await _staticDataService.loadCitiesData();
+
+    // Get from static data
+    return _staticDataService.getCityLabel(cityValue);
+  }
+
+  /// Get city value from label using static data (fast, no API call)
+  Future<String?> getCityValueFromLabel(String? cityLabel) async {
+    if (cityLabel == null || cityLabel.isEmpty) return null;
+
+    // Load static data if not loaded
+    await _staticDataService.loadCitiesData();
+
+    // Get from static data
+    return _staticDataService.getCityValue(cityLabel);
   }
 }

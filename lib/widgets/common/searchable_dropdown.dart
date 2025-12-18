@@ -25,186 +25,27 @@ class SearchableDropdown extends StatefulWidget {
 }
 
 class _SearchableDropdownState extends State<SearchableDropdown> {
-  final TextEditingController _searchController = TextEditingController();
-  bool _isOpen = false;
-  List<LookupOption> _filteredOptions = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _filteredOptions = widget.options;
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  @override
-  void didUpdateWidget(SearchableDropdown oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.options != widget.options) {
-      _filteredOptions = widget.options;
-      _searchController.clear();
-    }
-    if (!widget.enabled && _isOpen) {
-      setState(() {
-        _isOpen = false;
-        _searchController.clear();
-        _filteredOptions = widget.options;
-      });
-    }
-  }
-
-  void _filterOptions(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        _filteredOptions = widget.options;
-      } else {
-        _filteredOptions = widget.options
-            .where((option) =>
-                option.label.toLowerCase().contains(query.toLowerCase()))
-            .toList();
-      }
-    });
-  }
-
-  void _selectOption(LookupOption option) {
-    widget.onChanged(option.value?.toString());
-    Navigator.of(context).pop();
-    setState(() {
-      _isOpen = false;
-      _searchController.clear();
-      _filteredOptions = widget.options;
-    });
-  }
-
   void _showModal() {
     if (!widget.enabled) return;
-
-    setState(() {
-      _isOpen = true;
-      _filteredOptions = widget.options;
-      _searchController.clear();
-    });
 
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (context) => _buildModalContent(),
-    ).then((_) {
-      setState(() {
-        _isOpen = false;
-        _searchController.clear();
-        _filteredOptions = widget.options;
-      });
-    });
+    );
   }
 
   Widget _buildModalContent() {
-    final theme = Theme.of(context);
-    return Container(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.7,
-      ),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Handle bar
-          Container(
-            margin: const EdgeInsets.only(top: 12),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: theme.dividerColor,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          // Title
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              'Select ${widget.label}',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          // Search bar
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: TextField(
-              controller: _searchController,
-              autofocus: true,
-              decoration: InputDecoration(
-                hintText: 'Search',
-                prefixIcon: const Icon(Icons.search, size: 20),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: theme.dividerColor),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 12,
-                ),
-              ),
-              style: const TextStyle(fontSize: 14),
-              onChanged: _filterOptions,
-            ),
-          ),
-          const SizedBox(height: 8),
-          // Options list
-          Flexible(
-            child: _filteredOptions.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Text(
-                      'No matches found',
-                      style: theme.textTheme.bodySmall,
-                    ),
-                  )
-                : ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: _filteredOptions.length,
-                    itemBuilder: (context, index) {
-                      final option = _filteredOptions[index];
-                      return RadioListTile<String?>(
-                        title: Text(option.label),
-                        value: option.value?.toString(),
-                        groupValue: widget.value,
-                        onChanged: (value) => _selectOption(option),
-                        activeColor: AppColors.primary,
-                      );
-                    },
-                  ),
-          ),
-          // OK Button
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text('OK'),
-              ),
-            ),
-          ),
-        ],
-      ),
+    final initialOptions = widget.options.isNotEmpty
+        ? List<LookupOption>.from(widget.options)
+        : <LookupOption>[];
+
+    return _SearchableDropdownModal(
+      initialOptions: initialOptions,
+      currentValue: widget.value,
+      label: widget.label,
+      onChanged: widget.onChanged,
     );
   }
 
@@ -293,3 +134,185 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
   }
 }
 
+// Separate StatefulWidget for the modal to properly manage state
+class _SearchableDropdownModal extends StatefulWidget {
+  final List<LookupOption> initialOptions;
+  final String? currentValue;
+  final String label;
+  final ValueChanged<String?> onChanged;
+
+  const _SearchableDropdownModal({
+    required this.initialOptions,
+    required this.currentValue,
+    required this.label,
+    required this.onChanged,
+  });
+
+  @override
+  State<_SearchableDropdownModal> createState() =>
+      _SearchableDropdownModalState();
+}
+
+class _SearchableDropdownModalState extends State<_SearchableDropdownModal> {
+  late TextEditingController _searchController;
+  late List<LookupOption> _filteredOptions;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+    _filteredOptions = List<LookupOption>.from(widget.initialOptions);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _updateFilteredOptions(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredOptions = List<LookupOption>.from(widget.initialOptions);
+      } else {
+        _filteredOptions = widget.initialOptions
+            .where((option) =>
+                option.label.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.7,
+      ),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Handle bar
+          Container(
+            margin: const EdgeInsets.only(top: 12),
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: theme.dividerColor,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          // Title
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              'Select ${widget.label}',
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          // Search bar
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: TextField(
+              controller: _searchController,
+              autofocus: true,
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.search,
+              enableInteractiveSelection: true,
+              enableSuggestions: false,
+              autocorrect: false,
+              decoration: InputDecoration(
+                hintText: 'Search ${widget.label.toLowerCase()}...',
+                hintStyle: TextStyle(
+                    color: theme.textTheme.bodySmall?.color?.withOpacity(0.5)),
+                prefixIcon: const Icon(Icons.search, size: 20),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: theme.dividerColor),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: theme.dividerColor),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: AppColors.primary, width: 2),
+                ),
+                filled: true,
+                fillColor: theme.cardColor,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 12,
+                ),
+              ),
+              style: TextStyle(
+                fontSize: 14,
+                color: theme.textTheme.bodyLarge?.color ?? Colors.black87,
+              ),
+              onChanged: _updateFilteredOptions,
+            ),
+          ),
+          const SizedBox(height: 8),
+          // Options list
+          Flexible(
+            child: _filteredOptions.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text(
+                      'No matches found',
+                      style: theme.textTheme.bodySmall,
+                    ),
+                  )
+                : ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: _filteredOptions.length,
+                    itemBuilder: (context, index) {
+                      if (index >= _filteredOptions.length) {
+                        return const SizedBox.shrink();
+                      }
+                      final option = _filteredOptions[index];
+                      return RadioListTile<String?>(
+                        title: Text(option.label),
+                        value: option.value?.toString(),
+                        groupValue: widget.currentValue,
+                        onChanged: (value) {
+                          widget.onChanged(option.value?.toString());
+                          Navigator.of(context).pop();
+                        },
+                        activeColor: AppColors.primary,
+                      );
+                    },
+                  ),
+          ),
+          // OK Button
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text('OK'),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

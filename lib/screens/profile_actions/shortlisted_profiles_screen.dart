@@ -182,7 +182,7 @@ class _ShortlistedProfilesScreenState extends State<ShortlistedProfilesScreen> {
                                           label: 'Remove from Shortlist',
                                           color: Colors.orange,
                                           onTap: () =>
-                                        _handleUnshortlist(profile['id']),
+                                              _handleUnshortlist(profile['id']),
                                         ),
                                       ],
                                     ),
@@ -234,9 +234,9 @@ class _ShortlistedProfilesScreenState extends State<ShortlistedProfilesScreen> {
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
-                          ),
-                        ],
-                      ),
+            ),
+          ],
+        ),
       ),
     );
   }

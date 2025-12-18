@@ -6,6 +6,7 @@ import '../../providers/lookup_provider.dart';
 import '../../services/profile_service.dart';
 import '../../models/profile_models.dart';
 import '../../widgets/common/searchable_dropdown.dart';
+import '../../widgets/common/searchable_multi_select.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -323,6 +324,11 @@ class _SearchScreenState extends State<SearchScreen> {
                         child: TextField(
                           controller: _profileIdController,
                           keyboardType: TextInputType.number,
+                          style: TextStyle(
+                            color: theme.textTheme.bodyLarge?.color ??
+                                Colors.black87,
+                            fontSize: 16,
+                          ),
                           decoration: InputDecoration(
                             hintText: '123456',
                             border: OutlineInputBorder(
@@ -406,8 +412,18 @@ class _SearchScreenState extends State<SearchScreen> {
                       options: lookupProvider.countries,
                       hint: 'Select country',
                       onChanged: (value) {
-                        setState(() => _selectedCountry = value);
-                        if (value != null) _loadStates(value);
+                        setState(() {
+                          _selectedCountry = value;
+                          // Reset state and city when country changes
+                          if (value != null) {
+                            _loadStates(value);
+                          } else {
+                            _selectedState = null;
+                            _selectedCities = [];
+                            _states = [];
+                            _cities = [];
+                          }
+                        });
                       },
                     ),
                     const SizedBox(height: 16),
@@ -423,8 +439,31 @@ class _SearchScreenState extends State<SearchScreen> {
                               ? 'Loading...'
                               : 'Select state',
                       onChanged: (value) {
-                        setState(() => _selectedState = value);
-                        if (value != null) _loadCities(value);
+                        setState(() {
+                          _selectedState = value;
+                          if (value != null) {
+                            _loadCities(value);
+                          } else {
+                            _selectedCities = [];
+                            _cities = [];
+                          }
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    // City (Multi-select)
+                    SearchableMultiSelect(
+                      label: 'City',
+                      values: _selectedCities,
+                      options: _cities,
+                      enabled: _selectedState != null && !_loadingCities,
+                      hint: _selectedState == null
+                          ? 'Select state first'
+                          : _loadingCities
+                              ? 'Loading...'
+                              : 'Select cities',
+                      onChanged: (values) {
+                        setState(() => _selectedCities = values);
                       },
                     ),
                     const SizedBox(height: 16),

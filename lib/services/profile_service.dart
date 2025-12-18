@@ -103,9 +103,10 @@ class ProfileService {
 
   Future<void> unsendInterest(String targetId,
       {bool useReceiverId = false}) async {
+    // Match webapp: always use receiver_id in body
     await _apiClient.post<Map<String, dynamic>>(
       '/interest/unsendInterest',
-      body: useReceiverId ? {'receiver_id': targetId} : {'targetId': targetId},
+      body: {'receiver_id': targetId},
     );
   }
 
@@ -160,9 +161,9 @@ class ProfileService {
   }
 
   Future<UnlockProfileResponse> unlockProfile(String profileId) async {
-    final response = await _apiClient.post<Map<String, dynamic>>(
-      '/profile/unlockProfile',
-      body: {'profileId': profileId},
+    // Match webapp: GET method, not POST
+    final response = await _apiClient.get<Map<String, dynamic>>(
+      '/dashboard/unlockProfile/$profileId',
     );
     return UnlockProfileResponse.fromJson(response);
   }
@@ -320,13 +321,23 @@ class ProfileService {
     return response;
   }
 
-  // Upload profile image
-  Future<Map<String, dynamic>> uploadProfileImage(String filePath) async {
+  // Upload profile image (field name matches webapp: profilePhoto, primary: true)
+  Future<Map<String, dynamic>> uploadProfileImage(String filePath,
+      {bool primary = true}) async {
     final file = File(filePath);
     final response = await _apiClient.uploadFile<Map<String, dynamic>>(
-      path: '/personalDetails/uploadProfilePic',
+      path: '/profile/uploadProfilePic',
       file: file,
-      fieldName: 'profilePic',
+      fieldName: 'profilePhoto',
+      additionalFields: {'primary': primary.toString()},
+    );
+    return response;
+  }
+
+  // Delete profile picture
+  Future<Map<String, dynamic>> deleteProfilePic(String photoId) async {
+    final response = await _apiClient.delete<Map<String, dynamic>>(
+      '/profile/deleteProfilePic/$photoId',
     );
     return response;
   }

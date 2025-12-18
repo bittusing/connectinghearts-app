@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../theme/colors.dart';
 import '../../widgets/profile/profile_match_card.dart';
 import '../../widgets/common/empty_state_widget.dart';
@@ -160,7 +161,9 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                                     vertical: 10,
                                   ),
                                   child: ProfileMatchCard(
-                                    id: profile['id'] ?? '',
+                                    id: profile['id'] ??
+                                        profile['clientID'] ??
+                                        '',
                                     name: profile['name'] ?? '',
                                     age: profile['age'] ?? 0,
                                     height: profile['height'] ?? '',
@@ -169,12 +172,26 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                                     salary: profile['income'],
                                     imageUrl: profile['imageUrl'],
                                     gender: profile['gender'],
-                                    onSendInterest: () =>
-                                        _handleSendInterest(profile['id']),
-                                    onShortlist: () =>
-                                        _handleShortlist(profile['id']),
-                                    onIgnore: () =>
-                                        _handleIgnore(profile['id']),
+                                    onTap: () {
+                                      final profileId =
+                                          profile['clientID'] ?? profile['id'];
+                                      if (profileId != null &&
+                                          profileId.toString().isNotEmpty) {
+                                        context.push('/profile/$profileId');
+                                      }
+                                    },
+                                    onSendInterest: () => _handleSendInterest(
+                                        profile['clientID'] ??
+                                            profile['id'] ??
+                                            ''),
+                                    onShortlist: () => _handleShortlist(
+                                        profile['clientID'] ??
+                                            profile['id'] ??
+                                            ''),
+                                    onIgnore: () => _handleIgnore(
+                                        profile['clientID'] ??
+                                            profile['id'] ??
+                                            ''),
                                   ),
                                 );
                               },

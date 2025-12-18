@@ -160,4 +160,3 @@ class _TheyDeclinedScreenState extends State<TheyDeclinedScreen> {
     );
   }
 }
-

@@ -18,7 +18,7 @@ class ProfileVisitorsScreen extends StatefulWidget {
 class _ProfileVisitorsScreenState extends State<ProfileVisitorsScreen> {
   final ProfileService _profileService = ProfileService();
   bool _isLoading = true;
-  bool _isRefreshing = false;
+  final bool _isRefreshing = false;
   String? _error;
   final List<Map<String, dynamic>> _profiles = [];
 

@@ -35,7 +35,25 @@ class _SplashScreenState extends State<SplashScreen> {
 
       if (mounted) {
         if (authProvider.isAuthenticated) {
-          context.go('/');
+          // Navigate based on screenName (only go to dashboard if screenName is "dashboard")
+          final screenName = authProvider.user?.screenName
+                  ?.toLowerCase()
+                  .replaceAll(RegExp(r'\s+'), '') ??
+              '';
+          final routeMap = {
+            'personaldetails': '/personal-details',
+            'careerdetails': '/career-details',
+            'socialdetails': '/social-details',
+            'srcmdetails': '/srcm-details',
+            'familydetails': '/family-details',
+            'partnerpreferences': '/partner-preference',
+            'aboutyou': '/about-you',
+            'underverification': '/verification-pending',
+            'dashboard': '/',
+          };
+          // Only go to dashboard if screenName is explicitly "dashboard"
+          final redirectPath = routeMap[screenName] ?? '/personal-details';
+          context.go(redirectPath);
         } else {
           context.go('/login');
         }
@@ -54,12 +72,15 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
         child: Stack(
           children: [
-            // Background image
+            // Background image - responsive and perfectly sized
             Positioned.fill(
               child: Image.asset(
-                'assets/images/splace.png',
+                'assets/images/splash.jpg',
                 fit: BoxFit.cover,
+                width: double.infinity,
+                height: double.infinity,
                 errorBuilder: (context, error, stackTrace) {
+                  // Fallback to white container if image fails
                   return Container(
                     color: Colors.white,
                     child: const Center(
@@ -92,4 +113,3 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
-

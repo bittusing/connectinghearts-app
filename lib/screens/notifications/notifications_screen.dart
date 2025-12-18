@@ -108,16 +108,16 @@ class NotificationsScreen extends StatelessWidget {
             onRefresh: () => provider.fetchCounts(),
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
-              child: Column(
+                  child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+                    children: [
                   // Categories
                   ...categories.map((category) => _buildCategoryCard(
                         context,
                         category,
                       )),
-                ],
-              ),
+                    ],
+                  ),
             ),
           );
         },
@@ -132,8 +132,8 @@ class NotificationsScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final hasCount = category.count > 0;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 12),
       child: Material(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(20),
@@ -142,30 +142,30 @@ class NotificationsScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           child: Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
+                        decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
+                          border: Border.all(
                 color: theme.dividerColor,
-              ),
-            ),
+                          ),
+                        ),
             child: Row(
               children: [
                 // Icon
                 Stack(
                   children: [
                     Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
                         color: category.iconColor.withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
                         category.icon,
                         color: category.iconColor,
                         size: 24,
-                      ),
-                    ),
+                            ),
+                          ),
                     if (category.badgeIcon != null)
                       Positioned(
                         right: -2,
@@ -176,16 +176,16 @@ class NotificationsScreen extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: category.badgeColor,
                             shape: BoxShape.circle,
-                          ),
+                              ),
                           child: Icon(
                             category.badgeIcon,
                             size: 12,
                             color: category.iconColor,
                           ),
                         ),
-                      ),
-                  ],
-                ),
+                              ),
+                            ],
+                          ),
                 const SizedBox(width: 16),
                 // Label
                 Expanded(
@@ -201,10 +201,10 @@ class NotificationsScreen extends StatelessWidget {
                   Container(
                     width: 24,
                     height: 24,
-                    decoration: const BoxDecoration(
+                                  decoration: const BoxDecoration(
                       color: Colors.green,
-                      shape: BoxShape.circle,
-                    ),
+                                    shape: BoxShape.circle,
+                                  ),
                     child: Center(
                       child: Text(
                         category.count > 9 ? '9+' : '${category.count}',
@@ -223,10 +223,10 @@ class NotificationsScreen extends StatelessWidget {
                   color: theme.textTheme.bodySmall?.color,
                 ),
               ],
-            ),
+                        ),
           ),
-        ),
-      ),
+                  ),
+                ),
     );
   }
 }

@@ -172,7 +172,7 @@ class _BlockedProfilesScreenState extends State<BlockedProfilesScreen> {
                                           label: 'Unblock',
                                           color: Colors.green,
                                           onTap: () =>
-                                        _handleUnblock(profile['id']),
+                                              _handleUnblock(profile['id']),
                                         ),
                                       ],
                                     ),
@@ -224,9 +224,9 @@ class _BlockedProfilesScreenState extends State<BlockedProfilesScreen> {
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
-                          ),
-                        ],
-                      ),
+            ),
+          ],
+        ),
       ),
     );
   }

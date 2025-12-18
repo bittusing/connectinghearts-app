@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/auth_service.dart';
 import '../../theme/colors.dart';
 
 class CountryCode {
@@ -16,12 +17,70 @@ class CountryCode {
   });
 }
 
+// Match webapp country codes list
 final List<CountryCode> countryCodes = [
   CountryCode(code: 'IN', dialCode: '+91', name: 'India'),
   CountryCode(code: 'US', dialCode: '+1', name: 'United States'),
   CountryCode(code: 'GB', dialCode: '+44', name: 'United Kingdom'),
   CountryCode(code: 'CA', dialCode: '+1', name: 'Canada'),
   CountryCode(code: 'AU', dialCode: '+61', name: 'Australia'),
+  CountryCode(code: 'DE', dialCode: '+49', name: 'Germany'),
+  CountryCode(code: 'FR', dialCode: '+33', name: 'France'),
+  CountryCode(code: 'IT', dialCode: '+39', name: 'Italy'),
+  CountryCode(code: 'ES', dialCode: '+34', name: 'Spain'),
+  CountryCode(code: 'NL', dialCode: '+31', name: 'Netherlands'),
+  CountryCode(code: 'BE', dialCode: '+32', name: 'Belgium'),
+  CountryCode(code: 'CH', dialCode: '+41', name: 'Switzerland'),
+  CountryCode(code: 'AT', dialCode: '+43', name: 'Austria'),
+  CountryCode(code: 'SE', dialCode: '+46', name: 'Sweden'),
+  CountryCode(code: 'NO', dialCode: '+47', name: 'Norway'),
+  CountryCode(code: 'DK', dialCode: '+45', name: 'Denmark'),
+  CountryCode(code: 'FI', dialCode: '+358', name: 'Finland'),
+  CountryCode(code: 'PL', dialCode: '+48', name: 'Poland'),
+  CountryCode(code: 'PT', dialCode: '+351', name: 'Portugal'),
+  CountryCode(code: 'GR', dialCode: '+30', name: 'Greece'),
+  CountryCode(code: 'IE', dialCode: '+353', name: 'Ireland'),
+  CountryCode(code: 'NZ', dialCode: '+64', name: 'New Zealand'),
+  CountryCode(code: 'SG', dialCode: '+65', name: 'Singapore'),
+  CountryCode(code: 'MY', dialCode: '+60', name: 'Malaysia'),
+  CountryCode(code: 'AE', dialCode: '+971', name: 'UAE'),
+  CountryCode(code: 'SA', dialCode: '+966', name: 'Saudi Arabia'),
+  CountryCode(code: 'QA', dialCode: '+974', name: 'Qatar'),
+  CountryCode(code: 'KW', dialCode: '+965', name: 'Kuwait'),
+  CountryCode(code: 'BH', dialCode: '+973', name: 'Bahrain'),
+  CountryCode(code: 'OM', dialCode: '+968', name: 'Oman'),
+  CountryCode(code: 'JP', dialCode: '+81', name: 'Japan'),
+  CountryCode(code: 'KR', dialCode: '+82', name: 'South Korea'),
+  CountryCode(code: 'CN', dialCode: '+86', name: 'China'),
+  CountryCode(code: 'HK', dialCode: '+852', name: 'Hong Kong'),
+  CountryCode(code: 'TW', dialCode: '+886', name: 'Taiwan'),
+  CountryCode(code: 'TH', dialCode: '+66', name: 'Thailand'),
+  CountryCode(code: 'ID', dialCode: '+62', name: 'Indonesia'),
+  CountryCode(code: 'PH', dialCode: '+63', name: 'Philippines'),
+  CountryCode(code: 'VN', dialCode: '+84', name: 'Vietnam'),
+  CountryCode(code: 'BD', dialCode: '+880', name: 'Bangladesh'),
+  CountryCode(code: 'PK', dialCode: '+92', name: 'Pakistan'),
+  CountryCode(code: 'LK', dialCode: '+94', name: 'Sri Lanka'),
+  CountryCode(code: 'NP', dialCode: '+977', name: 'Nepal'),
+  CountryCode(code: 'BT', dialCode: '+975', name: 'Bhutan'),
+  CountryCode(code: 'MV', dialCode: '+960', name: 'Maldives'),
+  CountryCode(code: 'AF', dialCode: '+93', name: 'Afghanistan'),
+  CountryCode(code: 'MM', dialCode: '+95', name: 'Myanmar'),
+  CountryCode(code: 'KH', dialCode: '+855', name: 'Cambodia'),
+  CountryCode(code: 'LA', dialCode: '+856', name: 'Laos'),
+  CountryCode(code: 'MN', dialCode: '+976', name: 'Mongolia'),
+  CountryCode(code: 'RU', dialCode: '+7', name: 'Russia'),
+  CountryCode(code: 'TR', dialCode: '+90', name: 'Turkey'),
+  CountryCode(code: 'IL', dialCode: '+972', name: 'Israel'),
+  CountryCode(code: 'EG', dialCode: '+20', name: 'Egypt'),
+  CountryCode(code: 'ZA', dialCode: '+27', name: 'South Africa'),
+  CountryCode(code: 'BR', dialCode: '+55', name: 'Brazil'),
+  CountryCode(code: 'MX', dialCode: '+52', name: 'Mexico'),
+  CountryCode(code: 'AR', dialCode: '+54', name: 'Argentina'),
+  CountryCode(code: 'CL', dialCode: '+56', name: 'Chile'),
+  CountryCode(code: 'CO', dialCode: '+57', name: 'Colombia'),
+  CountryCode(code: 'PE', dialCode: '+51', name: 'Peru'),
+  CountryCode(code: 'VE', dialCode: '+58', name: 'Venezuela'),
 ];
 
 class RegisterScreen extends StatefulWidget {
@@ -47,6 +106,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _showOtpDialog = false;
   bool _isSubmitting = false;
   bool _isVerifying = false;
+  final AuthService _authService = AuthService();
 
   @override
   void dispose() {
@@ -101,23 +161,46 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> _handleRegister() async {
     if (!_validateForm()) return;
 
+    // Extract phone number (remove non-digits)
+    final phoneNumber =
+        _phoneController.text.trim().replaceAll(RegExp(r'\D'), '');
+    if (phoneNumber.length < 10) {
+      _showError('Please enter a valid mobile number');
+      return;
+    }
+
     setState(() => _isSubmitting = true);
 
     try {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final success = await authProvider.generateOtp(
-        _phoneController.text.trim(),
-        _selectedCountryCode,
-      );
+      // Match webapp: generateOtp with extension (not countryCode)
+      final response =
+          await _authService.generateOtp(phoneNumber, _selectedCountryCode);
 
-      if (success && mounted) {
-        setState(() => _showOtpDialog = true);
+      if (response.success && mounted) {
+        // Show alert with WhatsApp number (like webapp)
+        _showSuccess('OTP sent to your mobile number');
+        _showAlertDialog();
+      } else {
+        _showError(response.message ?? 'Failed to send OTP');
       }
     } catch (e) {
-      _showError(e.toString());
+      // Extract error message (remove "API 400: " prefix like webapp)
+      String errorMsg = e.toString().replaceAll(RegExp(r'^Exception:\s*'), '');
+      errorMsg = errorMsg.replaceAll(RegExp(r'^API\s+\d+:\s*'), '').trim();
+      if (errorMsg.isEmpty ||
+          errorMsg == 'Bad Request' ||
+          errorMsg == 'Unknown error') {
+        errorMsg = 'Failed to send OTP';
+      }
+      _showError(errorMsg);
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
+  }
+
+  void _handleAlertConfirm() {
+    // Open OTP modal after alert is confirmed (like webapp)
+    _displayOtpDialog();
   }
 
   Future<void> _handleVerifyOtp() async {
@@ -126,23 +209,163 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
+    final phoneNumber =
+        _phoneController.text.trim().replaceAll(RegExp(r'\D'), '');
     setState(() => _isVerifying = true);
 
     try {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final success = await authProvider.verifyOtp(
-        _phoneController.text.trim(),
-        _otpController.text,
-      );
+      // Match webapp: verifyOtp (stores token automatically)
+      final verifyResponse =
+          await _authService.verifyOtp(phoneNumber, _otpController.text);
 
-      if (success && mounted) {
-        context.go('/');
+      // Response structure: { status, token, message }
+      final status = verifyResponse.status ?? '';
+      final token = verifyResponse.token;
+
+      if ((status == 'success' || verifyResponse.success) &&
+          token != null &&
+          token.isNotEmpty &&
+          mounted) {
+        // Token is already stored by verifyOtp in AuthProvider
+        // But ensure it's stored in StorageService
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        await authProvider.verifyOtp(phoneNumber, _otpController.text);
+
+        _showSuccess('OTP verified successfully');
+
+        // Automatically call signup after OTP verification (like webapp)
+        try {
+          final signupResponse = await _authService.signup(
+            name: _fullNameController.text.trim(),
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+            confirmPassword: _confirmPasswordController.text,
+            source: 'MOBILE',
+          );
+
+          // Match webapp: check for success or CH200 code
+          if (signupResponse.success ||
+              signupResponse.message?.contains('success') == true ||
+              signupResponse.message?.contains('CH200') == true) {
+            // Immediately call getUser API to get screenName (like webapp)
+            try {
+              final userResponse = await _authService.getUser();
+              // Response structure: { code, status, message, data: { screenName, ... } }
+              final responseStatus = userResponse['status']?.toString() ?? '';
+              final userData = userResponse['data'] as Map<String, dynamic>?;
+              final screenName = userData?['screenName']
+                      ?.toString()
+                      .toLowerCase()
+                      .replaceAll(RegExp(r'\s+'), '') ??
+                  '';
+
+              if (responseStatus == 'success' && screenName.isNotEmpty) {
+                // Navigate based on screenName (like webapp)
+                final routeMap = {
+                  'personaldetails': '/personal-details',
+                  'careerdetails': '/career-details',
+                  'socialdetails': '/social-details',
+                  'srcmdetails': '/srcm-details',
+                  'familydetails': '/family-details',
+                  'partnerpreferences': '/partner-preference',
+                  'aboutyou': '/about-you',
+                  'underverification': '/verification-pending',
+                  'dashboard': '/',
+                };
+
+                final route = routeMap[screenName] ?? '/personal-details';
+                if (mounted) {
+                  context.go(route);
+                }
+              } else {
+                // Default to personal details if screenName not found
+                if (mounted) {
+                  context.go('/personal-details');
+                }
+              }
+            } catch (e) {
+              // If getUser fails, navigate to personal details
+              if (mounted) {
+                context.go('/personal-details');
+              }
+            }
+          } else {
+            // Extract error from signup response (check for err field like webapp)
+            final errorMsg = signupResponse.message ?? 'Registration failed';
+
+            // Check if error indicates profile already exists - navigate to login
+            if (errorMsg.toLowerCase().contains('profile already exists') ||
+                errorMsg.toLowerCase().contains('please login')) {
+              _showError(errorMsg);
+              // Navigate to login screen after showing error
+              if (mounted) {
+                Future.delayed(const Duration(seconds: 2), () {
+                  if (mounted) {
+                    context.go('/login');
+                  }
+                });
+              }
+            } else {
+              _showError(errorMsg);
+            }
+          }
+        } catch (e) {
+          // Extract error message (like webapp)
+          String errorMsg =
+              e.toString().replaceAll(RegExp(r'^Exception:\s*'), '');
+          errorMsg = errorMsg.replaceAll(RegExp(r'^API\s+\d+:\s*'), '').trim();
+          if (errorMsg.isEmpty ||
+              errorMsg == 'Bad Request' ||
+              errorMsg == 'Unknown error') {
+            errorMsg = 'Registration failed';
+          }
+
+          // Check if error indicates profile already exists - navigate to login
+          if (errorMsg.toLowerCase().contains('profile already exists') ||
+              errorMsg.toLowerCase().contains('please login')) {
+            _showError(errorMsg);
+            // Navigate to login screen after showing error
+            if (mounted) {
+              Future.delayed(const Duration(seconds: 2), () {
+                if (mounted) {
+                  context.go('/login');
+                }
+              });
+            }
+          } else {
+            _showError(errorMsg);
+          }
+        }
+      } else {
+        _showError(verifyResponse.message ?? 'OTP verification failed');
       }
     } catch (e) {
-      _showError(e.toString());
+      // Extract error message
+      String errorMsg = e.toString().replaceAll(RegExp(r'^Exception:\s*'), '');
+      errorMsg = errorMsg.replaceAll(RegExp(r'^API\s+\d+:\s*'), '').trim();
+      if (errorMsg.isEmpty ||
+          errorMsg == 'Bad Request' ||
+          errorMsg == 'Unknown error') {
+        errorMsg = 'OTP verification failed';
+      }
+      _showError(errorMsg);
     } finally {
-      if (mounted) setState(() => _isVerifying = false);
+      if (mounted) {
+        setState(() {
+          _isVerifying = false;
+          _showOtpDialog = false;
+        });
+      }
     }
+  }
+
+  void _showSuccess(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+      ),
+    );
   }
 
   void _showCountryCodePicker() {
@@ -425,6 +648,80 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  void _showAlertDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Assistance'),
+        content: const Text(
+            'For any assistance, please WhatsApp/Call: +91 9450312512'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _handleAlertConfirm();
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _displayOtpDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Enter OTP'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _otpController,
+              keyboardType: TextInputType.number,
+              maxLength: 6,
+              textAlign: TextAlign.center,
+              decoration: const InputDecoration(
+                hintText: 'Enter 6-digit OTP',
+                counterText: '',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              setState(() {
+                _showOtpDialog = false;
+                _otpController.clear();
+              });
+            },
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: _isVerifying
+                ? null
+                : () async {
+                    await _handleVerifyOtp();
+                    if (mounted) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+            child: _isVerifying
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text('Verify'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildLabel(String text, {bool isRequired = false}) {
     return Text.rich(
       TextSpan(
@@ -475,4 +772,3 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 }
-

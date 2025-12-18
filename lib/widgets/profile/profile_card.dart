@@ -8,6 +8,7 @@ class ProfileCard extends StatelessWidget {
   final int age;
   final String height;
   final String location;
+  final String? cast;
   final String? imageUrl;
   final String? gender;
   final VoidCallback? onTap;
@@ -19,6 +20,7 @@ class ProfileCard extends StatelessWidget {
     required this.age,
     required this.height,
     required this.location,
+    this.cast,
     this.imageUrl,
     this.gender,
     this.onTap,
@@ -55,7 +57,7 @@ class ProfileCard extends StatelessWidget {
                 bottomLeft: Radius.circular(20),
               ),
               child: Container(
-                width: 140,
+                width: 180,
                 height: double.infinity,
                 color: AppColors.primary.withOpacity(0.1),
                 child: imageUrl != null
@@ -91,25 +93,57 @@ class ProfileCard extends StatelessWidget {
                         Text(
                           name,
                           style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.bold,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
-                        Text(
-                          '$age years • $height',
-                          style: theme.textTheme.bodySmall,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        // Cast display (above location)
+                        if (cast != null && cast!.isNotEmpty) ...[
+                          Text(
+                            cast!,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              // color: theme.textTheme.bodySmall?.color,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                        ],
+                        // Age and Height
+                        if (height.isNotEmpty) ...[
+                          Text(
+                            '$age years • $height',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ] else ...[
+                          Text(
+                            '$age years',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                         const SizedBox(height: 4),
-                        Text(
-                          location,
-                          style: theme.textTheme.bodySmall,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        // Location (City, State, Country)
+                        if (location.isNotEmpty) ...[
+                          Text(
+                            location,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ],
                     ),
                     // Button

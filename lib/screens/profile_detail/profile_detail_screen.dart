@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../theme/colors.dart';
 import '../../services/profile_service.dart';
 import '../../widgets/common/confirm_modal.dart';
+import '../../utils/profile_utils.dart';
 
 class ProfileDetailScreen extends StatefulWidget {
   final String profileId;
@@ -483,14 +484,22 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
       );
     }
 
-    final name = _profile!['name'] ?? 'Unknown';
+    final name = _profile!['name'];
     final age = _profile!['age'] ?? '';
     final profileId = _profile!['profileId'] ?? '';
+    final gender = _profile!['gender']?.toString();
+    // Check if name is actually a real name (not just HEARTS ID fallback)
+    // Name is set to 'HEARTS-{id}' as fallback in transform, so check if it matches profileId
+    final hasRealName = name != null &&
+        name.toString().isNotEmpty &&
+        name.toString() != profileId &&
+        !name.toString().startsWith('HEARTS-');
     final profilePics = _profile!['allProfilePics'] as List<dynamic>? ?? [];
     final currentImage =
         profilePics.isNotEmpty && _currentImageIndex < profilePics.length
             ? profilePics[_currentImageIndex]['url']
             : _profile!['avatar'];
+    final placeholderImage = getGenderPlaceholder(gender);
 
     return Scaffold(
       body: CustomScrollView(
@@ -508,20 +517,18 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
                       ? CachedNetworkImage(
                           imageUrl: currentImage,
                           fit: BoxFit.cover,
-                          placeholder: (_, __) => Container(
-                            color: theme.dividerColor,
-                            child: const Center(
-                              child: CircularProgressIndicator(),
-                            ),
+                          placeholder: (_, __) => Image.asset(
+                            placeholderImage,
+                            fit: BoxFit.cover,
                           ),
-                          errorWidget: (_, __, ___) => Container(
-                            color: theme.dividerColor,
-                            child: const Icon(Icons.person, size: 100),
+                          errorWidget: (_, __, ___) => Image.asset(
+                            placeholderImage,
+                            fit: BoxFit.cover,
                           ),
                         )
-                      : Container(
-                          color: theme.dividerColor,
-                          child: const Icon(Icons.person, size: 100),
+                      : Image.asset(
+                          placeholderImage,
+                          fit: BoxFit.cover,
                         ),
                   // Gradient Overlay
                   Positioned(
@@ -545,7 +552,8 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
                         mainAxisAlignment: MainAxisAlignment.end,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (profileId.isNotEmpty)
+                          // If name exists, show HEARTS ID on top
+                          if (hasRealName && profileId.isNotEmpty)
                             Text(
                               profileId,
                               style: const TextStyle(
@@ -553,14 +561,29 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
                                 fontSize: 12,
                               ),
                             ),
+                          // Show name + age OR HEARTS ID + age
                           Text(
-                            '$name, $age',
+                            hasRealName
+                                ? '${name.toString()}, ${age.toString().isNotEmpty ? age : ''}'
+                                : '${profileId.isNotEmpty ? profileId : ''}, ${age.toString().isNotEmpty ? age : ''}',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
+                          if (_profile!['profileManagedBy'] != null &&
+                              _profile!['profileManagedBy']
+                                  .toString()
+                                  .isNotEmpty)
+                            Text(
+                              'Profile managed by ${_profile!['profileManagedBy'].toString()}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                         ],
                       ),
                     ),

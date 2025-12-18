@@ -159,4 +159,3 @@ class _UnlockedProfilesScreenState extends State<UnlockedProfilesScreen> {
     );
   }
 }
-

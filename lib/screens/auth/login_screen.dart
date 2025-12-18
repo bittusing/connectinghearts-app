@@ -30,17 +30,18 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final success = await authProvider.login(
+    final result = await authProvider.login(
       _phoneController.text.trim(),
       _passwordController.text,
     );
 
-    if (success && mounted) {
-      // Navigate based on screenName (like webapp)
-      final screenName = authProvider.user?.screenName
+    if (result['success'] == true && mounted) {
+      // Get screenName directly from login response (like webapp)
+      final screenName = (result['screenName'] as String?)
               ?.toLowerCase()
               .replaceAll(RegExp(r'\s+'), '') ??
           '';
+
       final routeMap = {
         'personaldetails': '/personal-details',
         'careerdetails': '/career-details',
@@ -53,9 +54,13 @@ class _LoginScreenState extends State<LoginScreen> {
         'dashboard': '/',
       };
 
-      final redirectPath = routeMap[screenName] ??
-          (screenName.isNotEmpty ? '/personal-details' : '/');
-      context.go(redirectPath);
+      // Only go to dashboard if screenName is explicitly "dashboard"
+      // Otherwise go to the screen based on screenName, or personal-details as default
+      final redirectPath = routeMap[screenName] ?? '/personal-details';
+
+      if (mounted) {
+        context.go(redirectPath);
+      }
     } else if (mounted && authProvider.error != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -93,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: const Text(
-                      'Secure & private',
+                      'Connecting Hearts',
                       style: TextStyle(
                         color: AppColors.primary,
                         fontWeight: FontWeight.w600,
@@ -242,6 +247,22 @@ class _LoginScreenState extends State<LoginScreen> {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Forgot Password Link
+                Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      context.push('/forgot-password');
+                    },
+                    child: Text(
+                      'Forgot Password',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),

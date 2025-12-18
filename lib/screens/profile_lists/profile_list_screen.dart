@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../theme/colors.dart';
 import '../../widgets/profile/profile_match_card.dart';
 import '../../widgets/common/empty_state_widget.dart';
+import '../../widgets/common/header_widget.dart';
+import '../../widgets/common/bottom_navigation_widget.dart';
+import '../../widgets/common/sidebar_widget.dart';
 import '../../services/profile_service.dart';
 import '../../models/profile_models.dart';
 import '../../utils/profile_utils.dart';
+import '../../providers/lookup_provider.dart';
+import '../../services/static_data_service.dart';
 
 enum ProfileListType {
   allProfiles,
@@ -110,6 +116,19 @@ class _ProfileListScreenState extends State<ProfileListScreen> {
     });
 
     try {
+      // Load static data first (cities, states, countries - fast, no API call)
+      final staticDataService = StaticDataService.instance;
+      await staticDataService.loadAllData();
+
+      // Load lookup data for fallback
+      final lookupProvider =
+          Provider.of<LookupProvider>(context, listen: false);
+      if (lookupProvider.lookupData.isEmpty) {
+        await lookupProvider.loadLookupData();
+      }
+      final lookupData = lookupProvider.lookupData;
+      final countries = lookupProvider.countries;
+
       ApiProfileResponse response;
 
       switch (widget.listType) {
@@ -145,7 +164,10 @@ class _ProfileListScreenState extends State<ProfileListScreen> {
       }
 
       setState(() {
-        _profiles = response.data.map((p) => transformProfile(p)).toList();
+        _profiles = response.data
+            .map((p) => transformProfile(p,
+                lookupData: lookupData, countries: countries))
+            .toList();
         _isLoading = false;
       });
     } catch (e) {
@@ -250,7 +272,9 @@ class _ProfileListScreenState extends State<ProfileListScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text(_title)),
+      appBar: const HeaderWidget(),
+      drawer: const SidebarWidget(),
+      bottomNavigationBar: const BottomNavigationWidget(),
       body: RefreshIndicator(
         onRefresh: _loadProfiles,
         child: _isLoading
@@ -333,7 +357,10 @@ class _ProfileListScreenState extends State<ProfileListScreen> {
                                     id: profile['id'] ?? '',
                                     name: profile['name'] ?? '',
                                     age: profile['age'] ?? 0,
-                                    height: profile['height'] ?? '',
+                                    //5'0" (1.52 mts)
+                                    height:
+                                        formatHeightInMeters(profile['height']),
+                                    // height: profile['height'] ?? '',
                                     location: profile['location'] ?? '',
                                     religion: profile['religion'],
                                     salary: profile['income'],

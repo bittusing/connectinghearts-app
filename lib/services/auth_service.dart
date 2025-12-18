@@ -15,21 +15,22 @@ class AuthService {
     return LoginResponse.fromJson(response);
   }
 
-  Future<ApiResponse> generateOtp(
-      String phoneNumber, String countryCode) async {
+  // Match webapp: POST /auth/generateOtp with extension (not countryCode)
+  Future<ApiResponse> generateOtp(String phoneNumber, String extension) async {
     final response = await _apiClient.post<Map<String, dynamic>>(
-      '/auth/generateOTP',
+      '/auth/generateOtp',
       body: {
         'phoneNumber': phoneNumber,
-        'countryCode': countryCode,
+        'extension': extension,
       },
     );
     return ApiResponse.fromJson(response);
   }
 
+  // Match webapp: POST /auth/verifyOtp
   Future<VerifyOtpResponse> verifyOtp(String phoneNumber, String otp) async {
     final response = await _apiClient.post<Map<String, dynamic>>(
-      '/auth/verifyOTP',
+      '/auth/verifyOtp',
       body: {
         'phoneNumber': phoneNumber,
         'otp': otp,
@@ -42,18 +43,25 @@ class AuthService {
     final response = await _apiClient.get<Map<String, dynamic>>(
       '/auth/validateToken',
     );
-    // Handle response - validateToken may return success without data field
-    // If data exists and is not null, parse it; otherwise return null
+    // validateToken response structure: { code, status, screenName, message }
+    // screenName is at root level, not in data field
     ValidateTokenResponse? fromJson(data) {
-      if (data != null && data is Map<String, dynamic>) {
-        return ValidateTokenResponse.fromJson(data);
+      // The response itself contains screenName at root level
+      // So we parse the entire response, not just data field
+      if (response != null && response is Map<String, dynamic>) {
+        return ValidateTokenResponse.fromJson(response);
       }
       return null;
     }
 
-    return ApiResponse<ValidateTokenResponse?>.fromJson(
-      response,
-      fromJson,
+    // Create ApiResponse manually since screenName is at root, not in data
+    final status = response['status']?.toString() ?? '';
+    final success = status == 'success' || response['code'] == 'CH200';
+
+    return ApiResponse<ValidateTokenResponse?>(
+      success: success,
+      message: response['message']?.toString(),
+      data: ValidateTokenResponse.fromJson(response),
     );
   }
 
@@ -79,24 +87,53 @@ class AuthService {
     return ApiResponse.fromJson(response);
   }
 
+  // Match webapp: POST /auth/signup with source field
   Future<ApiResponse> signup({
     required String name,
     required String email,
-    required String phoneNumber,
     required String password,
-    required String countryCode,
+    required String confirmPassword,
+    String source = 'MOBILE',
   }) async {
-    final response = await _apiClient.post<Map<String, dynamic>>(
-      '/auth/signup',
-      body: {
-        'name': name,
-        'email': email,
-        'phoneNumber': phoneNumber,
-        'password': password,
-        'countryCode': countryCode,
-      },
-    );
-    return ApiResponse.fromJson(response);
+    try {
+      final response = await _apiClient.post<Map<String, dynamic>>(
+        '/auth/signup',
+        body: {
+          'name': name,
+          'email': email,
+          'password': password,
+          'confirm_password': confirmPassword,
+          'source': source,
+        },
+      );
+
+      // Check if response indicates failure even with 200 status
+      // Handle case: {"code":"CH400","status":"failed","err":"Profile already exists. Please login."}
+      final status = response['status']?.toString() ?? '';
+      final code = response['code']?.toString() ?? '';
+
+      // If status is "failed" or code is error code, ensure ApiResponse reflects failure
+      if (status == 'failed' || (code.isNotEmpty && code != 'CH200')) {
+        // Extract err field if present
+        String? errorMessage =
+            response['err']?.toString() ?? response['message']?.toString();
+        return ApiResponse(
+          success: false,
+          message: errorMessage ?? 'Registration failed',
+        );
+      }
+
+      return ApiResponse.fromJson(response);
+    } catch (e) {
+      // If API throws exception (e.g., 400 status), extract error message
+      String errorMsg = e.toString().replaceAll(RegExp(r'^Exception:\s*'), '');
+      errorMsg = errorMsg.replaceAll(RegExp(r'^API\s+\d+:\s*'), '').trim();
+      // Return ApiResponse with error
+      return ApiResponse(
+        success: false,
+        message: errorMsg.isNotEmpty ? errorMsg : 'Registration failed',
+      );
+    }
   }
 
   Future<ApiResponse> deleteProfile({
@@ -113,27 +150,34 @@ class AuthService {
     return ApiResponse.fromJson(response);
   }
 
-  Future<ApiResponse> forgotPassword(String phoneNumber) async {
-    final response = await _apiClient.post<Map<String, dynamic>>(
-      '/auth/forgotPassword',
-      body: {
-        'phoneNumber': phoneNumber,
-      },
+  // Match webapp: GET /auth/forgetPassword/{phoneNumber}
+  Future<ApiResponse> forgetPassword(String phoneNumber) async {
+    final response = await _apiClient.get<Map<String, dynamic>>(
+      '/auth/forgetPassword/$phoneNumber',
     );
     return ApiResponse.fromJson(response);
   }
 
-  Future<ApiResponse> resetPassword({
-    required String phoneNumber,
-    required String otp,
-    required String newPassword,
-  }) async {
+  // Match webapp: POST /auth/verifyForgottenOTP
+  // Returns response with token field (not nested in data)
+  Future<Map<String, dynamic>> verifyForgottenOtp(
+      String phoneNumber, String otp) async {
     final response = await _apiClient.post<Map<String, dynamic>>(
-      '/auth/resetPassword',
+      '/auth/verifyForgottenOTP',
       body: {
         'phoneNumber': phoneNumber,
         'otp': otp,
-        'newPassword': newPassword,
+      },
+    );
+    return response;
+  }
+
+  // Match webapp: POST /auth/updateForgottenPassword
+  Future<ApiResponse> updateForgottenPassword(String password) async {
+    final response = await _apiClient.post<Map<String, dynamic>>(
+      '/auth/updateForgottenPassword',
+      body: {
+        'password': password,
       },
     );
     return ApiResponse.fromJson(response);

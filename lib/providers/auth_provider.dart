@@ -69,15 +69,16 @@ class AuthProvider extends ChangeNotifier {
       if (token != null && token.isNotEmpty) {
         final response = await _authService.validateToken();
         // Check if token is valid (status == 'success' && code == 'CH200')
+        // validateToken response: { code, status, screenName, message }
         if (response.success) {
           _isAuthenticated = true;
-          // If response has user data, use it; otherwise fetch profile
-          if (response.data != null) {
-            _user = UserData.fromJson(response.data!.toJson());
-          } else {
-            // Fetch user profile if validateToken doesn't return user data
-            await _fetchUserProfile();
+          // Extract screenName from validateToken response (at root level in data)
+          final screenName = response.data?.screenName;
+          if (screenName != null) {
+            _user = UserData(screenName: screenName);
           }
+          // Fetch full user profile (which will also get screenName from getUser)
+          await _fetchUserProfile();
         } else {
           // Token is invalid, clear it
           await _storageService.deleteToken();
@@ -104,7 +105,8 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> login(String phoneNumber, String password) async {
+  Future<Map<String, dynamic>> login(
+      String phoneNumber, String password) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
@@ -119,28 +121,33 @@ class AuthProvider extends ChangeNotifier {
         }
         _isAuthenticated = true;
 
-        // Store screenName from login response if available
+        // Store screenName from login response (like webapp - screenName comes directly in login response)
+        // Don't fetch user profile yet - use screenName from login response for navigation
         if (response.screenName != null) {
-          _user = UserData(screenName: response.screenName);
+          _user = UserData(
+            id: response.userId,
+            screenName: response.screenName,
+          );
         }
-
-        // Fetch user profile (this will update _user with full profile data)
-        await _fetchUserProfile();
 
         _isLoading = false;
         notifyListeners();
-        return true;
+        // Return success with screenName for immediate navigation
+        return {
+          'success': true,
+          'screenName': response.screenName,
+        };
       } else {
         _error = 'Login failed';
         _isLoading = false;
         notifyListeners();
-        return false;
+        return {'success': false};
       }
     } catch (e) {
       _error = e.toString().replaceAll('Exception: ', '');
       _isLoading = false;
       notifyListeners();
-      return false;
+      return {'success': false};
     }
   }
 
@@ -195,9 +202,11 @@ class AuthProvider extends ChangeNotifier {
   Future<void> _fetchUserProfile() async {
     try {
       // First try to get screenName from getUser API (like webapp)
+      // Response structure: { code, status, message, data: { screenName, ... } }
       try {
-        final userData = await _authService.getUser();
-        final screenName = userData['screenName'] as String?;
+        final userResponse = await _authService.getUser();
+        final userData = userResponse['data'] as Map<String, dynamic>?;
+        final screenName = userData?['screenName'] as String?;
         if (screenName != null && _user != null) {
           _user = UserData(
             id: _user!.id,
@@ -238,6 +247,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> logout() async {
+    // Clear all storage including profile data
     await _storageService.clearAll();
     _isAuthenticated = false;
     _user = null;

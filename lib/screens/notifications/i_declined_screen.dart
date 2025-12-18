@@ -231,4 +231,3 @@ class _IDeclinedScreenState extends State<IDeclinedScreen> {
     );
   }
 }
-
