@@ -9,6 +9,16 @@ import '../screens/onboarding/career_details_screen.dart';
 import '../screens/onboarding/social_details_screen.dart';
 import '../screens/onboarding/srcm_details_screen.dart';
 import '../screens/onboarding/family_details_screen.dart';
+import '../screens/onboarding/partner_preference_screen.dart';
+import '../screens/settings/partner_preference_screen.dart' as settings;
+import '../screens/edit_profile/edit_profile_basic_page.dart';
+import '../screens/edit_profile/edit_about_page.dart';
+import '../screens/edit_profile/edit_education_page.dart';
+import '../screens/edit_profile/edit_career_page.dart';
+import '../screens/edit_profile/edit_family_page.dart';
+import '../screens/edit_profile/edit_contact_page.dart';
+import '../screens/edit_profile/edit_horoscope_page.dart';
+import '../screens/edit_profile/edit_lifestyle_page.dart';
 import '../screens/onboarding/about_you_screen.dart';
 import '../screens/dashboard/dashboard_screen.dart';
 import '../screens/search/search_screen.dart';
@@ -30,10 +40,13 @@ import '../screens/my_profile/my_profile_screen.dart';
 import '../screens/profile_lists/profile_list_screen.dart';
 import '../screens/acceptance/acceptance_screen.dart';
 import '../screens/notifications/notifications_screen.dart';
+import '../screens/notifications/unlocked_profiles_screen.dart';
+import '../screens/notifications/i_declined_screen.dart';
+import '../screens/notifications/they_declined_screen.dart';
 import '../screens/feedback/feedback_screen.dart';
 import '../screens/legal/terms_screen.dart';
 import '../screens/legal/privacy_policy_screen.dart';
-import '../screens/settings/partner_preference_screen.dart';
+import '../screens/legal/policy_screen.dart';
 import '../screens/splash/splash_screen.dart';
 import '../models/profile_models.dart';
 import '../theme/colors.dart';
@@ -68,9 +81,26 @@ GoRouter createAppRouter(AuthProvider authProvider) {
           currentPath == '/login' || currentPath == '/register';
       final isGoingToForgotPassword = currentPath == '/forgot-password';
 
-      // If logged in and trying to access login/register, redirect to dashboard
+      // If logged in and trying to access login/register, redirect based on screenName
       if (isLoggedIn && isGoingToLogin) {
-        return '/';
+        final screenName = authProvider.user?.screenName
+                ?.toLowerCase()
+                .replaceAll(RegExp(r'\s+'), '') ??
+            '';
+        final routeMap = {
+          'personaldetails': '/personal-details',
+          'careerdetails': '/career-details',
+          'socialdetails': '/social-details',
+          'srcmdetails': '/srcm-details',
+          'familydetails': '/family-details',
+          'partnerpreferences': '/partner-preference',
+          'aboutyou': '/about-you',
+          'underverification': '/verification-pending',
+          'dashboard': '/',
+        };
+        // Only go to dashboard if screenName is explicitly "dashboard"
+        final redirectPath = routeMap[screenName] ?? '/personal-details';
+        return redirectPath;
       }
 
       // If not logged in and trying to access protected route, redirect to login
@@ -100,6 +130,10 @@ GoRouter createAppRouter(AuthProvider authProvider) {
         builder: (context, state) => const ForgotPasswordScreen(),
       ),
       GoRoute(
+        path: '/policy',
+        builder: (context, state) => const PolicyScreen(),
+      ),
+      GoRoute(
         path: '/verification-pending',
         builder: (context, state) => const VerificationPendingScreen(),
       ),
@@ -123,6 +157,10 @@ GoRouter createAppRouter(AuthProvider authProvider) {
       GoRoute(
         path: '/family-details',
         builder: (context, state) => const FamilyDetailsScreen(),
+      ),
+      GoRoute(
+        path: '/partner-preference',
+        builder: (context, state) => const PartnerPreferenceScreen(),
       ),
       GoRoute(
         path: '/about-you',
@@ -153,11 +191,12 @@ GoRouter createAppRouter(AuthProvider authProvider) {
             path: '/profiles',
             builder: (context, state) => const ProfilesScreen(),
           ),
+        ],
+      ),
+      // Membership route outside ShellRoute to avoid duplicate bottom nav
           GoRoute(
             path: '/membership',
             builder: (context, state) => const MembershipScreen(),
-          ),
-        ],
       ),
       // Profile Detail
       GoRoute(
@@ -224,12 +263,11 @@ GoRouter createAppRouter(AuthProvider authProvider) {
         path: '/my-profile',
         builder: (context, state) => const MyProfileScreen(),
       ),
-      // Partner Preference
-      GoRoute(
-        path: '/partner-preference',
-        builder: (context, state) => const PartnerPreferenceScreen(),
-      ),
       // Settings
+      GoRoute(
+        path: '/settings-partner-preference',
+        builder: (context, state) => const settings.PartnerPreferenceScreen(),
+      ),
       GoRoute(
         path: '/change-password',
         builder: (context, state) => const ChangePasswordScreen(),
@@ -247,6 +285,18 @@ GoRouter createAppRouter(AuthProvider authProvider) {
         path: '/notifications',
         builder: (context, state) => const NotificationsScreen(),
       ),
+      GoRoute(
+        path: '/unlocked-profiles',
+        builder: (context, state) => const UnlockedProfilesScreen(),
+      ),
+      GoRoute(
+        path: '/i-declined',
+        builder: (context, state) => const IDeclinedScreen(),
+      ),
+      GoRoute(
+        path: '/they-declined',
+        builder: (context, state) => const TheyDeclinedScreen(),
+      ),
       // Feedback
       GoRoute(
         path: '/feedback',
@@ -260,6 +310,39 @@ GoRouter createAppRouter(AuthProvider authProvider) {
       GoRoute(
         path: '/privacy',
         builder: (context, state) => const PrivacyPolicyScreen(),
+      ),
+      // Edit Profile Pages
+      GoRoute(
+        path: '/edit-profile-basic',
+        builder: (context, state) => const EditProfileBasicPage(),
+      ),
+      GoRoute(
+        path: '/edit-about',
+        builder: (context, state) => const EditAboutPage(),
+      ),
+      GoRoute(
+        path: '/edit-education',
+        builder: (context, state) => const EditEducationPage(),
+      ),
+      GoRoute(
+        path: '/edit-career',
+        builder: (context, state) => const EditCareerPage(),
+      ),
+      GoRoute(
+        path: '/edit-family',
+        builder: (context, state) => const EditFamilyPage(),
+      ),
+      GoRoute(
+        path: '/edit-contact',
+        builder: (context, state) => const EditContactPage(),
+      ),
+      GoRoute(
+        path: '/edit-horoscope',
+        builder: (context, state) => const EditHoroscopePage(),
+      ),
+      GoRoute(
+        path: '/edit-lifestyle',
+        builder: (context, state) => const EditLifestylePage(),
       ),
     ],
   );

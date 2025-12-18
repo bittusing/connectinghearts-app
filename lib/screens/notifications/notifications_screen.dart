@@ -1,208 +1,254 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../theme/colors.dart';
+import '../../providers/notification_count_provider.dart';
+import '../../widgets/common/bottom_navigation_widget.dart';
 
-class NotificationsScreen extends StatefulWidget {
+class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
 
   @override
-  State<NotificationsScreen> createState() => _NotificationsScreenState();
-}
-
-class _NotificationsScreenState extends State<NotificationsScreen> {
-  bool _isLoading = true;
-  final List<Map<String, dynamic>> _notifications = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _loadNotifications();
-  }
-
-  Future<void> _loadNotifications() async {
-    await Future.delayed(const Duration(seconds: 1));
-    setState(() {
-      _isLoading = false;
-      // Mock notifications
-      _notifications.addAll([
-        {
-          'id': '1',
-          'type': 'interest_received',
-          'title': 'New Interest Received',
-          'message': 'HEARTS-1001 has shown interest in your profile',
-          'time': '2 hours ago',
-          'isRead': false,
-        },
-        {
-          'id': '2',
-          'type': 'profile_visitor',
-          'title': 'Profile Visitor',
-          'message': 'HEARTS-1002 viewed your profile',
-          'time': '5 hours ago',
-          'isRead': false,
-        },
-        {
-          'id': '3',
-          'type': 'interest_accepted',
-          'title': 'Interest Accepted',
-          'message': 'HEARTS-1003 accepted your interest',
-          'time': '1 day ago',
-          'isRead': true,
-        },
-      ]);
-    });
-  }
-
-  IconData _getNotificationIcon(String type) {
-    switch (type) {
-      case 'interest_received':
-        return Icons.favorite;
-      case 'profile_visitor':
-        return Icons.visibility;
-      case 'interest_accepted':
-        return Icons.check_circle;
-      case 'interest_declined':
-        return Icons.cancel;
-      default:
-        return Icons.notifications;
-    }
-  }
-
-  Color _getNotificationColor(String type) {
-    switch (type) {
-      case 'interest_received':
-        return AppColors.primary;
-      case 'profile_visitor':
-        return AppColors.info;
-      case 'interest_accepted':
-        return AppColors.success;
-      case 'interest_declined':
-        return AppColors.error;
-      default:
-        return AppColors.primary;
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notifications'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              setState(() {
-                for (var notification in _notifications) {
-                  notification['isRead'] = true;
-                }
-              });
-            },
-            child: const Text('Mark all read'),
-          ),
-        ],
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _notifications.isEmpty
-              ? Center(
+      bottomNavigationBar: const BottomNavigationWidget(),
+      body: Consumer<NotificationCountProvider>(
+        builder: (context, provider, _) {
+          if (provider.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final counts = provider.counts;
+
+          final categories = [
+            _NotificationCategory(
+              id: 'interest-received',
+              label: 'Interests Received',
+              route: '/interests-received',
+              count: counts.interestReceived,
+              icon: Icons.favorite,
+              iconColor: AppColors.primary,
+              badgeIcon: Icons.auto_awesome,
+              badgeColor: Colors.amber,
+            ),
+            _NotificationCategory(
+              id: 'interest-sent',
+              label: 'Interests Sent',
+              route: '/interests-sent',
+              count: counts.interestSent,
+              icon: Icons.favorite,
+              iconColor: AppColors.primary,
+            ),
+            _NotificationCategory(
+              id: 'unlocked-profiles',
+              label: 'Unlocked Profiles',
+              route: '/unlocked-profiles',
+              count: counts.unlockedProfiles,
+              icon: Icons.favorite,
+              iconColor: AppColors.primary,
+              badgeIcon: Icons.lock,
+              badgeColor: Colors.amber,
+            ),
+            _NotificationCategory(
+              id: 'i-declined',
+              label: 'I Declined',
+              route: '/i-declined',
+              count: counts.iDeclined,
+              icon: Icons.favorite,
+              iconColor: Colors.orange,
+              badgeIcon: Icons.close,
+              badgeColor: Colors.white,
+            ),
+            _NotificationCategory(
+              id: 'they-declined',
+              label: 'They Declined',
+              route: '/they-declined',
+              count: counts.theyDeclined,
+              icon: Icons.favorite,
+              iconColor: AppColors.primary,
+              badgeIcon: Icons.close,
+              badgeColor: Colors.white,
+            ),
+            _NotificationCategory(
+              id: 'shortlisted',
+              label: 'Shortlisted Profiles',
+              route: '/shortlisted',
+              count: counts.shortlisted,
+              icon: Icons.flag,
+              iconColor: Colors.red,
+            ),
+            _NotificationCategory(
+              id: 'ignored',
+              label: 'Ignored Profiles',
+              route: '/ignored',
+              count: counts.ignored,
+              icon: Icons.block,
+              iconColor: Colors.blue,
+              badgeIcon: Icons.close,
+              badgeColor: Colors.white,
+            ),
+            _NotificationCategory(
+              id: 'blocked',
+              label: 'Blocked Profiles',
+              route: '/blocked',
+              count: counts.blocked,
+              icon: Icons.block,
+              iconColor: Colors.red,
+              badgeIcon: Icons.close,
+              badgeColor: Colors.white,
+            ),
+          ];
+
+          return RefreshIndicator(
+            onRefresh: () => provider.fetchCounts(),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        Icons.notifications_off_outlined,
-                        size: 64,
-                        color: theme.textTheme.bodySmall?.color,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No notifications yet',
-                        style: theme.textTheme.bodyLarge,
-                      ),
+                  // Categories
+                  ...categories.map((category) => _buildCategoryCard(
+                        context,
+                        category,
+                      )),
                     ],
                   ),
-                )
-              : RefreshIndicator(
-                  onRefresh: _loadNotifications,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _notifications.length,
-                    itemBuilder: (context, index) {
-                      final notification = _notifications[index];
-                      final isRead = notification['isRead'] as bool;
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildCategoryCard(
+    BuildContext context,
+    _NotificationCategory category,
+  ) {
+    final theme = Theme.of(context);
+    final hasCount = category.count > 0;
 
                       return Container(
                         margin: const EdgeInsets.only(bottom: 12),
+      child: Material(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(20),
+        child: InkWell(
+          onTap: () => context.push(category.route),
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: isRead
-                              ? theme.cardColor
-                              : AppColors.primary.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: isRead
-                                ? theme.dividerColor
-                                : AppColors.primary.withOpacity(0.2),
+                color: theme.dividerColor,
                           ),
                         ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.all(16),
-                          leading: Container(
+            child: Row(
+              children: [
+                // Icon
+                Stack(
+                  children: [
+                    Container(
                             width: 48,
                             height: 48,
                             decoration: BoxDecoration(
-                              color: _getNotificationColor(notification['type'])
-                                  .withOpacity(0.1),
+                        color: category.iconColor.withOpacity(0.1),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
-                              _getNotificationIcon(notification['type']),
-                              color: _getNotificationColor(notification['type']),
+                        category.icon,
+                        color: category.iconColor,
+                        size: 24,
                             ),
                           ),
-                          title: Text(
-                            notification['title'],
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight:
-                                  isRead ? FontWeight.normal : FontWeight.w600,
-                            ),
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 4),
-                              Text(
-                                notification['message'],
-                                style: theme.textTheme.bodyMedium,
+                    if (category.badgeIcon != null)
+                      Positioned(
+                        right: -2,
+                        top: -2,
+                        child: Container(
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            color: category.badgeColor,
+                            shape: BoxShape.circle,
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                notification['time'],
-                                style: theme.textTheme.bodySmall,
+                          child: Icon(
+                            category.badgeIcon,
+                            size: 12,
+                            color: category.iconColor,
+                          ),
+                        ),
                               ),
                             ],
                           ),
-                          trailing: !isRead
-                              ? Container(
-                                  width: 8,
-                                  height: 8,
+                const SizedBox(width: 16),
+                // Label
+                Expanded(
+                  child: Text(
+                    category.label,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                // Count badge
+                if (hasCount)
+                  Container(
+                    width: 24,
+                    height: 24,
                                   decoration: const BoxDecoration(
-                                    color: AppColors.primary,
+                      color: Colors.green,
                                     shape: BoxShape.circle,
                                   ),
-                                )
-                              : null,
-                          onTap: () {
-                            setState(() {
-                              notification['isRead'] = true;
-                            });
-                            // Navigate based on notification type
-                          },
+                    child: Center(
+                      child: Text(
+                        category.count > 9 ? '9+' : '${category.count}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
                         ),
-                      );
-                    },
+                      ),
+                    ),
+                  ),
+                const SizedBox(width: 8),
+                // Arrow
+                Icon(
+                  Icons.chevron_right,
+                  color: theme.textTheme.bodySmall?.color,
+                ),
+              ],
+                        ),
+          ),
                   ),
                 ),
     );
   }
 }
 
+class _NotificationCategory {
+  final String id;
+  final String label;
+  final String route;
+  final int count;
+  final IconData icon;
+  final Color iconColor;
+  final IconData? badgeIcon;
+  final Color? badgeColor;
+
+  _NotificationCategory({
+    required this.id,
+    required this.label,
+    required this.route,
+    required this.count,
+    required this.icon,
+    required this.iconColor,
+    this.badgeIcon,
+    this.badgeColor,
+  });
+}

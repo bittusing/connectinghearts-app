@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../services/auth_service.dart';
+import '../../services/storage_service.dart';
 import '../../theme/colors.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -17,6 +20,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   int _currentStep = 0; // 0: Phone, 1: OTP, 2: New Password
   bool _isLoading = false;
   bool _showPassword = false;
+  String? _forgotPasswordToken;
+  final AuthService _authService = AuthService();
+  final StorageService _storageService = StorageService();
 
   @override
   void dispose() {
@@ -51,13 +57,36 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       return;
     }
 
+    final phoneNumber =
+        _phoneController.text.trim().replaceAll(RegExp(r'\D'), '');
+    if (phoneNumber.length < 10) {
+      _showError('Please enter a valid mobile number');
+      return;
+    }
+
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 1));
-    setState(() {
-      _isLoading = false;
-      _currentStep = 1;
-    });
-    _showSuccess('OTP sent successfully');
+
+    try {
+      // Match webapp: GET /auth/forgetPassword/{phoneNumber}
+      final response = await _authService.forgetPassword(phoneNumber);
+
+      if (response.success && mounted) {
+        setState(() {
+          _isLoading = false;
+          _currentStep = 1;
+        });
+        _showSuccess(response.message ?? 'OTP sent successfully!');
+      } else {
+        setState(() => _isLoading = false);
+        _showError(response.message ?? 'Failed to send OTP. Please try again.');
+      }
+    } catch (e) {
+      setState(() => _isLoading = false);
+      String errorMsg = e.toString().replaceAll(RegExp(r'^Exception:\s*'), '');
+      _showError(errorMsg.isNotEmpty
+          ? errorMsg
+          : 'Failed to send OTP. Please try again.');
+    }
   }
 
   Future<void> _verifyOtp() async {
@@ -66,13 +95,40 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       return;
     }
 
+    final phoneNumber =
+        _phoneController.text.trim().replaceAll(RegExp(r'\D'), '');
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 1));
-    setState(() {
-      _isLoading = false;
-      _currentStep = 2;
-    });
-    _showSuccess('OTP verified successfully');
+
+    try {
+      // Match webapp: POST /auth/verifyForgottenOTP
+      final response = await _authService.verifyForgottenOtp(
+          phoneNumber, _otpController.text);
+
+      // Response structure: { code, status, message, token }
+      final status = response['status']?.toString() ?? '';
+      final token = response['token']?.toString();
+
+      if (status == 'success' && token != null && token.isNotEmpty) {
+        // Store the token temporarily (like webapp)
+        _forgotPasswordToken = token;
+
+        setState(() {
+          _isLoading = false;
+          _currentStep = 2;
+        });
+        _showSuccess(
+            response['message']?.toString() ?? 'OTP verified successfully!');
+      } else {
+        setState(() => _isLoading = false);
+        _showError(response['message']?.toString() ??
+            'Invalid OTP. Please try again.');
+      }
+    } catch (e) {
+      setState(() => _isLoading = false);
+      String errorMsg = e.toString().replaceAll(RegExp(r'^Exception:\s*'), '');
+      _showError(
+          errorMsg.isNotEmpty ? errorMsg : 'Invalid OTP. Please try again.');
+    }
   }
 
   Future<void> _resetPassword() async {
@@ -85,11 +141,63 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       return;
     }
 
+    if (_forgotPasswordToken == null) {
+      _showError('Session expired. Please start again.');
+      return;
+    }
+
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 1));
-    setState(() => _isLoading = false);
-    _showSuccess('Password reset successfully');
-    Navigator.pop(context);
+
+    try {
+      // Store original token temporarily (like webapp)
+      final originalToken = await _storageService.getToken();
+
+      // Set forgot password token temporarily
+      if (_forgotPasswordToken != null) {
+        await _storageService.setToken(_forgotPasswordToken!);
+      }
+
+      // Match webapp: POST /auth/updateForgottenPassword
+      final response = await _authService
+          .updateForgottenPassword(_newPasswordController.text);
+
+      // Restore original token (or remove if there wasn't one)
+      if (originalToken != null && originalToken.isNotEmpty) {
+        await _storageService.setToken(originalToken);
+      } else {
+        await _storageService.deleteToken();
+      }
+
+      if (response.success && mounted) {
+        setState(() => _isLoading = false);
+        _showSuccess(response.message ?? 'Password updated successfully!');
+        _forgotPasswordToken = null;
+
+        // Navigate to login after delay (like webapp)
+        await Future.delayed(const Duration(milliseconds: 1500));
+        if (mounted) {
+          context.go('/login');
+        }
+      } else {
+        setState(() => _isLoading = false);
+        _showError(
+            response.message ?? 'Failed to update password. Please try again.');
+      }
+    } catch (e) {
+      // Restore original token on error
+      final originalToken = await _storageService.getToken();
+      if (originalToken != null && originalToken.isNotEmpty) {
+        await _storageService.setToken(originalToken);
+      } else {
+        await _storageService.deleteToken();
+      }
+
+      setState(() => _isLoading = false);
+      String errorMsg = e.toString().replaceAll(RegExp(r'^Exception:\s*'), '');
+      _showError(errorMsg.isNotEmpty
+          ? errorMsg
+          : 'Failed to update password. Please try again.');
+    }
   }
 
   @override
@@ -217,8 +325,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 width: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  valueColor:
-                                      AlwaysStoppedAnimation<Color>(Colors.white),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
                                 ),
                               )
                             : Text(_getButtonText()),
@@ -324,4 +432,3 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     }
   }
 }
-

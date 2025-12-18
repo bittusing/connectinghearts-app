@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../theme/colors.dart';
+import '../../providers/auth_provider.dart';
 
 class VerificationPendingScreen extends StatelessWidget {
   const VerificationPendingScreen({super.key});
@@ -35,7 +37,7 @@ class VerificationPendingScreen extends StatelessWidget {
                     color: AppColors.primary.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.verified_user_outlined,
                     size: 80,
                     color: AppColors.primary,
@@ -63,7 +65,16 @@ class VerificationPendingScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 48),
                 ElevatedButton(
-                  onPressed: () => context.go('/login'),
+                  onPressed: () async {
+                    // Logout user first
+                    final authProvider =
+                        Provider.of<AuthProvider>(context, listen: false);
+                    await authProvider.logout();
+                    // Then navigate to login
+                    if (context.mounted) {
+                      context.go('/login');
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
@@ -91,4 +102,3 @@ class VerificationPendingScreen extends StatelessWidget {
     );
   }
 }
-

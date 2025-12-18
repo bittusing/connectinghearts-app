@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../theme/colors.dart';
+import '../../services/auth_service.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -30,17 +31,35 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   Future<void> _handleChangePassword() async {
     if (!_formKey.currentState!.validate()) return;
 
+    if (_newPasswordController.text != _confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('New password and confirmation must match.'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
-      await Future.delayed(const Duration(seconds: 1));
+      final authService = AuthService();
+      final response = await authService.changePassword(
+        _currentPasswordController.text,
+        _newPasswordController.text,
+      );
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Password changed successfully'),
+          SnackBar(
+            content: Text(response.message ?? 'Password updated successfully.'),
             backgroundColor: AppColors.success,
           ),
         );
+        _currentPasswordController.clear();
+        _newPasswordController.clear();
+        _confirmPasswordController.clear();
         if (Navigator.canPop(context)) {
           context.pop();
         } else {
@@ -51,7 +70,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.toString()),
+            content: Text(e.toString().replaceAll('API ', '')),
             backgroundColor: AppColors.error,
           ),
         );

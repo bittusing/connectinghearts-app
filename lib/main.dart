@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/auth_provider.dart';
 import 'providers/lookup_provider.dart';
+import 'providers/notification_count_provider.dart';
 import 'theme/app_theme.dart';
 import 'navigation/app_router.dart';
 
@@ -29,6 +30,7 @@ class ConnectingHeartApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => LookupProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationCountProvider()),
       ],
       child: Consumer2<ThemeProvider, AuthProvider>(
         builder: (context, themeProvider, authProvider, child) {

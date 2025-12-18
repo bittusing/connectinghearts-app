@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HelpCenterScreen extends StatelessWidget {
   const HelpCenterScreen({super.key});
@@ -62,22 +63,28 @@ class HelpCenterScreen extends StatelessWidget {
                     _buildHelpItem(
                       context,
                       icon: Icons.email_outlined,
-                      title: 'Email Support',
-                      subtitle: 'support@connectingheart.co.in',
+                      title: 'Email',
+                      subtitle: 'connectinghearts.helpdesk@gmail.com',
+                      onTap: () async {
+                        final uri = Uri.parse(
+                            'mailto:connectinghearts.helpdesk@gmail.com');
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(uri);
+                        }
+                      },
                     ),
                     const Divider(),
                     _buildHelpItem(
                       context,
                       icon: Icons.phone_outlined,
-                      title: 'Phone Support',
-                      subtitle: '+91 1800 XXX XXXX',
-                    ),
-                    const Divider(),
-                    _buildHelpItem(
-                      context,
-                      icon: Icons.chat_outlined,
-                      title: 'Live Chat',
-                      subtitle: 'Available 9 AM - 6 PM',
+                      title: 'Phone',
+                      subtitle: '+91-9450312512',
+                      onTap: () async {
+                        final uri = Uri.parse('tel:+919450312512');
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(uri);
+                        }
+                      },
                     ),
                   ],
                 ),
@@ -134,6 +141,7 @@ class HelpCenterScreen extends StatelessWidget {
     required IconData icon,
     required String title,
     required String subtitle,
+    VoidCallback? onTap,
   }) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
@@ -141,7 +149,7 @@ class HelpCenterScreen extends StatelessWidget {
       title: Text(title),
       subtitle: Text(subtitle),
       trailing: const Icon(Icons.chevron_right),
-      onTap: () {},
+      onTap: onTap,
     );
   }
 

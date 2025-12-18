@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../theme/colors.dart';
+import '../../services/membership_service.dart';
+import '../../widgets/common/bottom_navigation_widget.dart';
+import '../../widgets/common/header_widget.dart';
+import '../../widgets/common/sidebar_widget.dart';
+import '../../models/profile_models.dart';
 
 class MembershipScreen extends StatefulWidget {
   const MembershipScreen({super.key});
@@ -9,100 +14,112 @@ class MembershipScreen extends StatefulWidget {
 }
 
 class _MembershipScreenState extends State<MembershipScreen> {
+  final MembershipService _membershipService = MembershipService();
   bool _isLoading = true;
+  String? _error;
   final List<Map<String, dynamic>> _plans = [];
   Map<String, dynamic>? _activePlan;
+  int _heartCoins = 0;
 
   @override
   void initState() {
     super.initState();
-    _loadPlans();
+    _loadMembershipData();
   }
 
-  Future<void> _loadPlans() async {
-    await Future.delayed(const Duration(seconds: 1));
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-        _plans.addAll([
-          {
-            'id': 'silver',
-            'name': 'Silver',
-            'price': 999,
-            'duration': 1,
-            'heartCoins': 30,
-            'features': [
-              '1 month validity',
-              'View 30 contacts',
-              'Basic search filters',
-            ],
-            'cardColor': const Color(0xFFF3F4F6),
-            'borderColor': const Color(0xFFE5E7EB),
-          },
-          {
-            'id': 'gold',
-            'name': 'Gold',
-            'price': 1999,
-            'duration': 3,
-            'heartCoins': 50,
-            'features': [
-              '3 months validity',
-              'View 50 contacts',
-              '3X faster matches',
-              'Profile boost',
-            ],
-            'cardColor': const Color(0xFFFEF3C7),
-            'borderColor': const Color(0xFFFDE68A),
-          },
-          {
-            'id': 'platinum',
-            'name': 'Platinum',
-            'price': 4999,
-            'duration': 6,
-            'heartCoins': 100,
-            'features': [
-              '6 months validity',
-              'View 100 contacts',
-              '3X faster matches',
-              'Profile boost top spot',
-              'Priority support',
-            ],
-            'cardColor': const Color(0xFFFDF2F8),
-            'borderColor': const Color(0xFFFBCFE8),
-          },
-        ]);
-      });
+  Future<void> _loadMembershipData() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final results = await Future.wait([
+        _membershipService.getMembershipPlans(),
+        _membershipService.getMyMembershipDetails(),
+      ]);
+
+      final plansResponse = results[0] as List<MembershipPlanApi>;
+      final membershipResponse = results[1] as MembershipDetailsResponse;
+
+      if (mounted) {
+        setState(() {
+          _plans.clear();
+          for (var plan in plansResponse) {
+            _plans.add({
+              'id': plan.id,
+              'name': plan.planName,
+              'price': plan.membershipAmount,
+              'duration': plan.duration,
+              'heartCoins': plan.heartCoins,
+              'features': plan.features ?? [],
+              'currency': plan.currency,
+            });
+          }
+
+          // Set active plan if membershipData exists and has valid data (like webapp)
+          // Check if any field is not null to determine if membership exists
+          if (membershipResponse.membershipData != null) {
+            final membership = membershipResponse.membershipData!;
+            // Check if membership has valid data (planName, expiryDate, or membership_id)
+            if (membership.planName != null ||
+                membership.memberShipExpiryDate != null ||
+                membership.membership_id != null) {
+              _activePlan = {
+                'name': membership.planName ?? 'Active Plan',
+                'expiryDate': membership.memberShipExpiryDate,
+                'membership_id': membership.membership_id,
+              };
+              _heartCoins = membership.heartCoins;
+            } else {
+              _activePlan = null;
+              _heartCoins = 0;
+            }
+          } else {
+            _activePlan = null;
+            _heartCoins = 0;
+          }
+
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = e.toString();
+          _isLoading = false;
+        });
+      }
     }
   }
 
-  void _handleChoosePlan(Map<String, dynamic> plan) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Choose ${plan['name']} Plan'),
-        content: Text(
-          'You are about to purchase the ${plan['name']} plan for ₹${plan['price']}.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+  Future<void> _handleChoosePlan(Map<String, dynamic> plan) async {
+    try {
+      final orderResponse = await _membershipService.buyMembership(plan['id']);
+      // TODO: Integrate Razorpay payment
+      // For now, show success message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              orderResponse.message ?? 'Payment integration coming soon',
+            ),
+            backgroundColor: AppColors.success,
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // TODO: Implement payment
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Payment integration coming soon'),
-                ),
-              );
-            },
-            child: const Text('Proceed'),
+        );
+        // Reload membership data after purchase
+        _loadMembershipData();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll('API ', '')),
+            backgroundColor: AppColors.error,
           ),
-        ],
-      ),
-    );
+        );
+      }
+    }
   }
 
   @override
@@ -110,100 +127,162 @@ class _MembershipScreenState extends State<MembershipScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
+      appBar: const HeaderWidget(),
+      drawer: const SidebarWidget(),
+      bottomNavigationBar: const BottomNavigationWidget(),
       body: SafeArea(
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    // Header Card
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: theme.cardColor,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: theme.dividerColor),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'MEMBERSHIP',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              letterSpacing: 1.6,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Activate your plan',
-                            style: theme.textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Choose a plan that matches your family\'s expectations. Upgrade anytime — your preferences stay intact.',
-                            style: theme.textTheme.bodyMedium,
-                          ),
-                          const SizedBox(height: 16),
-                          // Active Plan Status
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: AppColors.success.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Active plan: ${_activePlan?['name'] ?? 'No active plan'}',
-                                  style: const TextStyle(
-                                    color: AppColors.success,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                if (_activePlan == null)
-                                  Text(
-                                    'Choose a plan to get started',
-                                    style: TextStyle(
-                                      color: AppColors.success.withOpacity(0.8),
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+            : _error != null
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          _error!,
+                          style: const TextStyle(color: AppColors.error),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: _loadMembershipData,
+                          child: const Text('Retry'),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 24),
-                    // Plans
-                    ..._plans.map((plan) => _buildPlanCard(plan)),
-                    const SizedBox(height: 32),
-                  ],
-                ),
-              ),
+                  )
+                : SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        // Header Card
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: theme.cardColor,
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(color: theme.dividerColor),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'MEMBERSHIP',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  letterSpacing: 1.6,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Activate your plan',
+                                style: theme.textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Choose a plan that matches your family\'s expectations. Upgrade anytime — your preferences stay intact.',
+                                style: theme.textTheme.bodyMedium,
+                              ),
+                              const SizedBox(height: 16),
+                              // Active Plan Status
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: _activePlan != null
+                                      ? AppColors.success.withOpacity(0.1)
+                                      : AppColors.primary.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      _activePlan != null
+                                          ? 'Active plan: ${_activePlan!['name']}'
+                                          : 'No active membership',
+                                      style: TextStyle(
+                                        color: _activePlan != null
+                                            ? AppColors.success
+                                            : AppColors.primary,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    if (_activePlan != null) ...[
+                                      if (_activePlan!['expiryDate'] !=
+                                          null) ...[
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'Expires on ${_formatDate(_activePlan!['expiryDate'])}',
+                                          style: TextStyle(
+                                            color: AppColors.success
+                                                .withOpacity(0.8),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                        ),
+                                      ],
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '$_heartCoins Heart Coins remaining',
+                                        style: TextStyle(
+                                          color: AppColors.success
+                                              .withOpacity(0.8),
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                      ),
+                                    ],
+                                    if (_activePlan == null) ...[
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'Unlock premium filters, heart coins, and faster matches.',
+                                        style: TextStyle(
+                                          color: AppColors.primary
+                                              .withOpacity(0.8),
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        // Plans
+                        ..._plans.map((plan) => _buildPlanCard(plan)),
+                        const SizedBox(height: 32),
+                      ],
+                    ),
+                  ),
       ),
     );
   }
 
   Widget _buildPlanCard(Map<String, dynamic> plan) {
     final theme = Theme.of(context);
-    final isPlatinum = plan['id'] == 'platinum';
+    final planName = (plan['name'] as String? ?? '').toLowerCase();
+    final isPlatinum = planName.contains('platinum');
+
+    // Determine card colors based on plan
+    final cardColor = theme.cardColor;
+    final borderColor = theme.dividerColor;
 
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 24),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: plan['cardColor'] as Color,
+        color: cardColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: plan['borderColor'] as Color),
+        border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
             color: isPlatinum
@@ -241,7 +320,7 @@ class _MembershipScreenState extends State<MembershipScreen> {
                 ],
               ),
               Text(
-                '₹${plan['price']} / ${plan['duration']} ${plan['duration'] == 1 ? 'month' : 'months'}',
+                '${_getCurrencySymbol(plan['currency'] ?? 'INR')}${_formatPrice(plan['price'])} / ${plan['duration']} ${plan['duration'] == 1 ? 'month' : 'months'}',
                 style: const TextStyle(
                   color: AppColors.primary,
                   fontSize: 18,
@@ -257,7 +336,7 @@ class _MembershipScreenState extends State<MembershipScreen> {
           ),
           const SizedBox(height: 16),
           // Features
-          ...(plan['features'] as List<String>).map((feature) {
+          ...((plan['features'] as List<dynamic>?) ?? []).map((feature) {
             return Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: Row(
@@ -288,17 +367,12 @@ class _MembershipScreenState extends State<MembershipScreen> {
             child: ElevatedButton(
               onPressed: () => _handleChoosePlan(plan),
               style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    isPlatinum ? const Color(0xFF9333EA) : theme.cardColor,
-                foregroundColor: isPlatinum
-                    ? Colors.white
-                    : theme.textTheme.bodyLarge?.color,
+                backgroundColor: theme.cardColor,
+                foregroundColor: theme.textTheme.bodyLarge?.color,
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(999),
-                  side: isPlatinum
-                      ? BorderSide.none
-                      : BorderSide(color: theme.dividerColor),
+                  side: BorderSide(color: theme.dividerColor),
                 ),
               ),
               child: const Text(
@@ -310,5 +384,47 @@ class _MembershipScreenState extends State<MembershipScreen> {
         ],
       ),
     );
+  }
+
+  String _getCurrencySymbol(String currency) {
+    if (currency == 'INR') return '₹';
+    return '$currency ';
+  }
+
+  String _formatDate(String? dateString) {
+    if (dateString == null || dateString.isEmpty) return '';
+    try {
+      final date = DateTime.parse(dateString);
+      final months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec'
+      ];
+      return '${months[date.month - 1]} ${date.day.toString().padLeft(2, '0')}, ${date.year}';
+    } catch (_) {
+      return dateString;
+    }
+  }
+
+  String _formatPrice(dynamic price) {
+    if (price == null) return '0';
+    if (price is int) {
+      return price.toString().replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+    }
+    if (price is num) {
+      return price.toInt().toString().replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+    }
+    return price.toString();
   }
 }

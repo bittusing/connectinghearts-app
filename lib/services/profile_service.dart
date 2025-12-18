@@ -65,8 +65,9 @@ class ProfileService {
 
   Future<ApiProfileResponse> searchProfiles(
       ProfileSearchPayload payload) async {
+    // Match webapp endpoint: POST /dashboard/searchProfile
     final response = await _apiClient.post<Map<String, dynamic>>(
-      '/profile/searchProfiles',
+      '/dashboard/searchProfile',
       body: payload.toJson(),
     );
     return ApiProfileResponse.fromJson(response);
@@ -102,23 +103,24 @@ class ProfileService {
 
   Future<void> unsendInterest(String targetId,
       {bool useReceiverId = false}) async {
+    // Match webapp: always use receiver_id in body
     await _apiClient.post<Map<String, dynamic>>(
       '/interest/unsendInterest',
-      body: useReceiverId ? {'receiver_id': targetId} : {'targetId': targetId},
+      body: {'receiver_id': targetId},
     );
   }
 
-  Future<void> acceptInterest(String interestId) async {
+  Future<void> acceptInterest(String profileId) async {
     await _apiClient.post<Map<String, dynamic>>(
       '/interest/updateInterest',
-      body: {'_id': interestId, 'status': 'accept'},
+      body: {'_id': profileId, 'status': 'accept'},
     );
   }
 
-  Future<void> declineInterest(String interestId) async {
+  Future<void> declineInterest(String profileId) async {
     await _apiClient.post<Map<String, dynamic>>(
       '/interest/updateInterest',
-      body: {'_id': interestId, 'status': 'reject'},
+      body: {'_id': profileId, 'status': 'reject'},
     );
   }
 
@@ -159,9 +161,9 @@ class ProfileService {
   }
 
   Future<UnlockProfileResponse> unlockProfile(String profileId) async {
-    final response = await _apiClient.post<Map<String, dynamic>>(
-      '/profile/unlockProfile',
-      body: {'profileId': profileId},
+    // Match webapp: GET method, not POST
+    final response = await _apiClient.get<Map<String, dynamic>>(
+      '/dashboard/unlockProfile/$profileId',
     );
     return UnlockProfileResponse.fromJson(response);
   }
@@ -280,24 +282,62 @@ class ProfileService {
     return response;
   }
 
-  // Upload SRCM ID image
+  // Upload SRCM ID image (field name matches webapp: srcmPhoto)
   Future<Map<String, dynamic>> uploadSrcmIdImage(String filePath) async {
     final file = File(filePath);
     final response = await _apiClient.uploadFile<Map<String, dynamic>>(
       path: '/srcmDetails/uploadSrcmId',
       file: file,
-      fieldName: 'srcmIdImage',
+      fieldName: 'srcmPhoto',
     );
     return response;
   }
 
-  // Upload profile image
-  Future<Map<String, dynamic>> uploadProfileImage(String filePath) async {
+  // Update family details
+  Future<Map<String, dynamic>> updateFamilyDetails(
+      Map<String, dynamic> payload) async {
+    final response = await _apiClient.patch<Map<String, dynamic>>(
+      '/family',
+      body: payload,
+    );
+    return response;
+  }
+
+  // Get partner preferences
+  Future<Map<String, dynamic>> getPartnerPreferences() async {
+    final response = await _apiClient.get<Map<String, dynamic>>(
+      '/preference',
+    );
+    return response;
+  }
+
+  // Update partner preferences
+  Future<Map<String, dynamic>> updatePartnerPreferences(
+      Map<String, dynamic> payload) async {
+    final response = await _apiClient.patch<Map<String, dynamic>>(
+      '/preference',
+      body: payload,
+    );
+    return response;
+  }
+
+  // Upload profile image (field name matches webapp: profilePhoto, primary: true)
+  Future<Map<String, dynamic>> uploadProfileImage(String filePath,
+      {bool primary = true}) async {
     final file = File(filePath);
     final response = await _apiClient.uploadFile<Map<String, dynamic>>(
-      path: '/personalDetails/uploadProfilePic',
+      path: '/profile/uploadProfilePic',
       file: file,
-      fieldName: 'profilePic',
+      fieldName: 'profilePhoto',
+      additionalFields: {'primary': primary.toString()},
+    );
+    return response;
+  }
+
+  // Delete profile picture
+  Future<Map<String, dynamic>> deleteProfilePic(String photoId) async {
+    final response = await _apiClient.delete<Map<String, dynamic>>(
+      '/profile/deleteProfilePic/$photoId',
     );
     return response;
   }

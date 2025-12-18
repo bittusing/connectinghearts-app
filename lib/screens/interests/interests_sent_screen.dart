@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import '../../theme/colors.dart';
 import '../../widgets/profile/profile_match_card.dart';
 import '../../widgets/common/empty_state_widget.dart';
+import '../../widgets/common/bottom_navigation_widget.dart';
 import '../../services/profile_service.dart';
-import '../../models/profile_models.dart';
 import '../../utils/profile_utils.dart';
 
 class InterestsSentScreen extends StatefulWidget {
@@ -57,7 +56,8 @@ class _InterestsSentScreenState extends State<InterestsSentScreen> {
 
   Future<void> _handleUnsendInterest(String profileId) async {
     try {
-      await _profileService.unsendInterest(profileId);
+      // Use receiver_id for unsending interest (as per webapp pattern)
+      await _profileService.unsendInterest(profileId, useReceiverId: true);
       _showToast('Interest unsent successfully');
       _loadProfiles();
     } catch (e) {
@@ -73,6 +73,7 @@ class _InterestsSentScreenState extends State<InterestsSentScreen> {
       appBar: AppBar(
         title: const Text('Interests Sent'),
       ),
+      bottomNavigationBar: const BottomNavigationWidget(),
       body: RefreshIndicator(
         onRefresh: _loadProfiles,
         child: _isLoading
@@ -163,8 +164,19 @@ class _InterestsSentScreenState extends State<InterestsSentScreen> {
                                     salary: profile['income'],
                                     imageUrl: profile['imageUrl'],
                                     gender: profile['gender'],
-                                    onSendInterest: () =>
-                                        _handleUnsendInterest(profile['id']),
+                                    customActions: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        _buildCustomButton(
+                                          icon: Icons.cancel_outlined,
+                                          label: 'Cancel Interest',
+                                          color: Colors.orange,
+                                          onTap: () => _handleUnsendInterest(
+                                              profile['id']),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 );
                               },
@@ -176,6 +188,46 @@ class _InterestsSentScreenState extends State<InterestsSentScreen> {
                           ),
                         ],
                       ),
+      ),
+    );
+  }
+
+  Widget _buildCustomButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(25),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: Colors.white, size: 20),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

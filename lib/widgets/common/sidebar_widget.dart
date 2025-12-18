@@ -7,10 +7,135 @@ import '../../providers/auth_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../theme/colors.dart';
 import '../../widgets/common/confirm_modal.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import '../../services/profile_service.dart';
+import '../../services/auth_service.dart';
+import '../../services/storage_service.dart';
+import '../../config/api_config.dart';
 
-class SidebarWidget extends StatelessWidget {
+class SidebarWidget extends StatefulWidget {
   const SidebarWidget({super.key});
+
+  @override
+  State<SidebarWidget> createState() => _SidebarWidgetState();
+}
+
+class _SidebarWidgetState extends State<SidebarWidget> {
+  final ProfileService _profileService = ProfileService();
+  final AuthService _authService = AuthService();
+  final StorageService _storageService = StorageService();
+  String? _profileImageUrl;
+  String? _profileName;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileData();
+  }
+
+  Future<void> _loadProfileData() async {
+    try {
+      // First, try to load from storage (fast, no API call)
+      final storedName = await _storageService.getProfileName();
+      final storedImageUrl = await _storageService.getProfileImageUrl();
+
+      if (storedName != null) {
+        _profileName = storedName;
+      }
+      if (storedImageUrl != null) {
+        _profileImageUrl = storedImageUrl;
+      }
+
+      if (mounted) {
+        setState(() {});
+      }
+
+      // Then, refresh from API in background (update storage if changed)
+      try {
+        final userResponse = await _authService.getUser();
+        if (userResponse['code'] == 'CH200' &&
+            userResponse['status'] == 'success' &&
+            userResponse['data'] != null) {
+          final userData = userResponse['data'] as Map<String, dynamic>;
+
+          // Extract and store name
+          final name = userData['name']?.toString();
+          if (name != null && name.isNotEmpty) {
+            _profileName = name;
+            await _storageService.setProfileName(name);
+          }
+
+          // Extract and store profile picture
+          final profilePic = userData['profilePic'] as List<dynamic>?;
+          if (profilePic != null && profilePic.isNotEmpty) {
+            final primaryPic = profilePic.firstWhere(
+              (pic) => pic['primary'] == true,
+              orElse: () => profilePic.first,
+            ) as Map<String, dynamic>?;
+
+            if (primaryPic != null && primaryPic['id'] != null) {
+              final userId = userData['_id']?.toString() ?? '';
+              if (userId.isNotEmpty) {
+                final imageUrl = ApiConfig.buildImageUrl(
+                    userId, primaryPic['id'].toString());
+                _profileImageUrl = imageUrl;
+                await _storageService.setProfileImageUrl(imageUrl);
+              }
+            }
+          }
+        }
+      } catch (e) {
+        // If getUser fails, fallback to profile service
+        try {
+          final profileResponse = await _profileService.getUserProfileData();
+          if (profileResponse['status'] == 'success' &&
+              profileResponse['data'] != null) {
+            final data = profileResponse['data'] as Map<String, dynamic>;
+            final basic = data['basic'] as Map<String, dynamic>?;
+            final misc = data['miscellaneous'] as Map<String, dynamic>?;
+
+            // Extract name
+            final name = basic?['name']?.toString();
+            if (name != null && name.isNotEmpty) {
+              _profileName = name;
+              await _storageService.setProfileName(name);
+            }
+
+            // Extract profile picture
+            final profilePic = misc?['profilePic'] as List<dynamic>?;
+            if (profilePic != null && profilePic.isNotEmpty) {
+              final primaryPic = profilePic.firstWhere(
+                (pic) => pic['primary'] == true,
+                orElse: () => profilePic.first,
+              ) as Map<String, dynamic>?;
+
+              if (primaryPic != null && primaryPic['id'] != null) {
+                final authProvider =
+                    Provider.of<AuthProvider>(context, listen: false);
+                final clientId = misc?['clientID']?.toString() ??
+                    authProvider.user?.id ??
+                    misc?['heartsId']?.toString() ??
+                    '';
+                if (clientId.isNotEmpty) {
+                  final imageUrl = ApiConfig.buildImageUrl(
+                      clientId, primaryPic['id'].toString());
+                  _profileImageUrl = imageUrl;
+                  await _storageService.setProfileImageUrl(imageUrl);
+                }
+              }
+            }
+          }
+        } catch (e2) {
+          // Silently fail
+        }
+      }
+    } catch (e) {
+      // Silently fail
+    } finally {
+      if (mounted) {
+        setState(() {});
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,45 +155,87 @@ class SidebarWidget extends StatelessWidget {
                 child: Row(
                   children: [
                     // Profile Picture
-                    Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.grey[200],
-                      ),
-                      child: ClipOval(
-                        child: authProvider.user?.avatarUrl != null
-                            ? CachedNetworkImage(
-                                imageUrl: authProvider.user!.avatarUrl!,
-                                fit: BoxFit.cover,
-                                placeholder: (context, url) => const Icon(
-                                  Icons.person,
-                                  color: Colors.grey,
-                                  size: 30,
-                                ),
-                                errorWidget: (context, url, error) =>
-                                    const Icon(
-                                  Icons.person,
-                                  color: Colors.grey,
-                                  size: 30,
-                                ),
-                              )
-                            : const Icon(
-                                Icons.person,
-                                color: Colors.grey,
-                                size: 30,
+                    Stack(
+                      children: [
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.amber.withOpacity(0.5),
+                              width: 2,
+                            ),
+                            color: Colors.grey[200],
+                          ),
+                          child: ClipOval(
+                            child: _profileImageUrl != null
+                                ? CachedNetworkImage(
+                                    imageUrl: _profileImageUrl!,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => const Icon(
+                                      Icons.person,
+                                      color: Colors.grey,
+                                      size: 30,
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        const Icon(
+                                      Icons.person,
+                                      color: Colors.grey,
+                                      size: 30,
+                                    ),
+                                  )
+                                : (authProvider.user?.avatarUrl != null
+                                    ? CachedNetworkImage(
+                                        imageUrl: authProvider.user!.avatarUrl!,
+                                        fit: BoxFit.cover,
+                                        placeholder: (context, url) =>
+                                            const Icon(
+                                          Icons.person,
+                                          color: Colors.grey,
+                                          size: 30,
+                                        ),
+                                        errorWidget: (context, url, error) =>
+                                            const Icon(
+                                          Icons.person,
+                                          color: Colors.grey,
+                                          size: 30,
+                                        ),
+                                      )
+                                    : const Icon(
+                                        Icons.person,
+                                        color: Colors.grey,
+                                        size: 30,
+                                      )),
+                          ),
+                        ),
+                        // Online status indicator
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            width: 16,
+                            height: 16,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.green,
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 2,
                               ),
-                      ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(width: 12),
-                    // Name and ID
+                    // Name and Edit Profile
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            authProvider.user?.name ?? 'User',
+                            _profileName ?? authProvider.user?.name ?? 'User',
                             style: const TextStyle(
                               color: Colors.black87,
                               fontSize: 16,
@@ -77,12 +244,28 @@ class SidebarWidget extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'ID - ${authProvider.user?.heartsId != null ? 'UWSS${authProvider.user!.heartsId}' : (authProvider.user?.id ?? 'N/A')}',
-                            style: const TextStyle(
-                              color: Colors.black54,
-                              fontSize: 13,
+                          const SizedBox(height: 4),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                              context.go('/my-profile');
+                            },
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.edit,
+                                  size: 14,
+                                  color: Colors.grey[600],
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Edit Profile',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -120,10 +303,10 @@ class SidebarWidget extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             // Promotional Text
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: const Text(
-                'UPTO 65% OFF ALL MEMBERSHIP PLANS',
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                '',
                 style: TextStyle(
                   color: Colors.black54,
                   fontSize: 11,
@@ -170,7 +353,7 @@ class SidebarWidget extends StatelessWidget {
                     context,
                     icon: Icons.favorite,
                     title: 'Preference Setup',
-                    route: '/partner-preference',
+                    route: '/settings-partner-preference',
                     currentPath: currentPath,
                   ),
                   _buildMenuItem(
@@ -407,9 +590,48 @@ class SidebarWidget extends StatelessWidget {
   }
 
   Future<void> _launchURL(String url) async {
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    try {
+      final uri = Uri.parse(url);
+
+      // Try to launch URL - use externalApplication for web URLs
+      if (await canLaunchUrl(uri)) {
+        final launched = await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
+        if (!launched && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Could not open the URL'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      } else {
+        // If canLaunchUrl returns false, try anyway
+        try {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        } catch (_) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Could not open the URL'),
+                duration: Duration(seconds: 2),
+              ),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      print('Error launching URL: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
     }
   }
 }

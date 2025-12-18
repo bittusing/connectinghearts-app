@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import '../../theme/colors.dart';
 import '../../widgets/profile/profile_match_card.dart';
 import '../../widgets/common/empty_state_widget.dart';
+import '../../widgets/common/bottom_navigation_widget.dart';
 import '../../services/profile_service.dart';
-import '../../models/profile_models.dart';
 import '../../utils/profile_utils.dart';
 
 class ShortlistedProfilesScreen extends StatefulWidget {
@@ -83,6 +82,7 @@ class _ShortlistedProfilesScreenState extends State<ShortlistedProfilesScreen> {
       appBar: AppBar(
         title: const Text('Shortlisted Profiles'),
       ),
+      bottomNavigationBar: const BottomNavigationWidget(),
       body: RefreshIndicator(
         onRefresh: _loadProfiles,
         child: _isLoading
@@ -173,10 +173,19 @@ class _ShortlistedProfilesScreenState extends State<ShortlistedProfilesScreen> {
                                     salary: profile['income'],
                                     imageUrl: profile['imageUrl'],
                                     gender: profile['gender'],
-                                    onShortlist: () =>
-                                        _handleUnshortlist(profile['id']),
-                                    onSendInterest: () =>
-                                        _handleSendInterest(profile['id']),
+                                    customActions: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        _buildCustomButton(
+                                          icon: Icons.star_outline,
+                                          label: 'Remove from Shortlist',
+                                          color: Colors.orange,
+                                          onTap: () =>
+                                              _handleUnshortlist(profile['id']),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 );
                               },
@@ -188,6 +197,46 @@ class _ShortlistedProfilesScreenState extends State<ShortlistedProfilesScreen> {
                           ),
                         ],
                       ),
+      ),
+    );
+  }
+
+  Widget _buildCustomButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(25),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: Colors.white, size: 20),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

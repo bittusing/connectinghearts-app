@@ -5,6 +5,8 @@ import '../../theme/colors.dart';
 import '../../providers/lookup_provider.dart';
 import '../../services/profile_service.dart';
 import '../../models/profile_models.dart';
+import '../../widgets/common/searchable_dropdown.dart';
+import '../../widgets/common/searchable_multi_select.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -130,6 +132,7 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void _handleAdvancedSearch() {
+    final lookupProvider = Provider.of<LookupProvider>(context, listen: false);
     final payload = ProfileSearchPayload();
 
     if (_selectedCountry != null) {
@@ -151,23 +154,58 @@ class _SearchScreenState extends State<SearchScreen> {
       payload.maritalStatus = _selectedMaritalStatuses;
     }
 
+    // Helper to convert lookup option value to int
+    int? getOptionValueAsInt(
+        String? selectedValue, List<LookupOption> options) {
+      if (selectedValue == null) return null;
+      try {
+        final option = options.firstWhere(
+          (opt) => opt.value?.toString() == selectedValue,
+        );
+        if (option.value == null) return null;
+        if (option.value is int) return option.value as int;
+        if (option.value is num) return (option.value as num).toInt();
+        return int.tryParse(option.value.toString());
+      } catch (_) {
+        // Fallback: try parsing the selectedValue directly
+        return int.tryParse(selectedValue);
+      }
+    }
+
+    // Convert age, height, income values to numbers (matching webapp)
     if (_minAge != null || _maxAge != null) {
-      payload.age = {
-        if (_minAge != null) 'min': int.tryParse(_minAge!),
-        if (_maxAge != null) 'max': int.tryParse(_maxAge!),
-      };
+      final minAge = getOptionValueAsInt(_minAge, lookupProvider.ageOptions);
+      final maxAge = getOptionValueAsInt(_maxAge, lookupProvider.ageOptions);
+      if (minAge != null || maxAge != null) {
+        payload.age = {
+          if (minAge != null) 'min': minAge,
+          if (maxAge != null) 'max': maxAge,
+        };
+      }
     }
     if (_minHeight != null || _maxHeight != null) {
-      payload.height = {
-        if (_minHeight != null) 'min': int.tryParse(_minHeight!),
-        if (_maxHeight != null) 'max': int.tryParse(_maxHeight!),
-      };
+      final minHeight =
+          getOptionValueAsInt(_minHeight, lookupProvider.heightOptions);
+      final maxHeight =
+          getOptionValueAsInt(_maxHeight, lookupProvider.heightOptions);
+      if (minHeight != null || maxHeight != null) {
+        payload.height = {
+          if (minHeight != null) 'min': minHeight,
+          if (maxHeight != null) 'max': maxHeight,
+        };
+      }
     }
     if (_minIncome != null || _maxIncome != null) {
-      payload.income = {
-        if (_minIncome != null) 'min': int.tryParse(_minIncome!),
-        if (_maxIncome != null) 'max': int.tryParse(_maxIncome!),
-      };
+      final minIncome =
+          getOptionValueAsInt(_minIncome, lookupProvider.incomeOptions);
+      final maxIncome =
+          getOptionValueAsInt(_maxIncome, lookupProvider.incomeOptions);
+      if (minIncome != null || maxIncome != null) {
+        payload.income = {
+          if (minIncome != null) 'min': minIncome,
+          if (maxIncome != null) 'max': maxIncome,
+        };
+      }
     }
 
     if (!payload.hasFilters) {
@@ -286,6 +324,11 @@ class _SearchScreenState extends State<SearchScreen> {
                         child: TextField(
                           controller: _profileIdController,
                           keyboardType: TextInputType.number,
+                          style: TextStyle(
+                            color: theme.textTheme.bodyLarge?.color ??
+                                Colors.black87,
+                            fontSize: 16,
+                          ),
                           decoration: InputDecoration(
                             hintText: '123456',
                             border: OutlineInputBorder(
@@ -363,18 +406,29 @@ class _SearchScreenState extends State<SearchScreen> {
                     const Center(child: CircularProgressIndicator())
                   else ...[
                     // Country
-                    _buildDropdown(
+                    SearchableDropdown(
                       label: 'Country',
                       value: _selectedCountry,
                       options: lookupProvider.countries,
+                      hint: 'Select country',
                       onChanged: (value) {
-                        setState(() => _selectedCountry = value);
-                        if (value != null) _loadStates(value);
+                        setState(() {
+                          _selectedCountry = value;
+                          // Reset state and city when country changes
+                          if (value != null) {
+                            _loadStates(value);
+                          } else {
+                            _selectedState = null;
+                            _selectedCities = [];
+                            _states = [];
+                            _cities = [];
+                          }
+                        });
                       },
                     ),
                     const SizedBox(height: 16),
                     // State
-                    _buildDropdown(
+                    SearchableDropdown(
                       label: 'State',
                       value: _selectedState,
                       options: _states,
@@ -385,8 +439,31 @@ class _SearchScreenState extends State<SearchScreen> {
                               ? 'Loading...'
                               : 'Select state',
                       onChanged: (value) {
-                        setState(() => _selectedState = value);
-                        if (value != null) _loadCities(value);
+                        setState(() {
+                          _selectedState = value;
+                          if (value != null) {
+                            _loadCities(value);
+                          } else {
+                            _selectedCities = [];
+                            _cities = [];
+                          }
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    // City (Multi-select)
+                    SearchableMultiSelect(
+                      label: 'City',
+                      values: _selectedCities,
+                      options: _cities,
+                      enabled: _selectedState != null && !_loadingCities,
+                      hint: _selectedState == null
+                          ? 'Select state first'
+                          : _loadingCities
+                              ? 'Loading...'
+                              : 'Select cities',
+                      onChanged: (values) {
+                        setState(() => _selectedCities = values);
                       },
                     ),
                     const SizedBox(height: 16),
@@ -421,20 +498,22 @@ class _SearchScreenState extends State<SearchScreen> {
                     Row(
                       children: [
                         Expanded(
-                          child: _buildDropdown(
+                          child: SearchableDropdown(
                             label: 'Min Age',
                             value: _minAge,
                             options: lookupProvider.ageOptions,
+                            hint: 'Select Min Age',
                             onChanged: (value) =>
                                 setState(() => _minAge = value),
                           ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: _buildDropdown(
+                          child: SearchableDropdown(
                             label: 'Max Age',
                             value: _maxAge,
                             options: lookupProvider.ageOptions,
+                            hint: 'Select Max Age',
                             onChanged: (value) =>
                                 setState(() => _maxAge = value),
                           ),
@@ -446,20 +525,22 @@ class _SearchScreenState extends State<SearchScreen> {
                     Row(
                       children: [
                         Expanded(
-                          child: _buildDropdown(
+                          child: SearchableDropdown(
                             label: 'Min Height',
                             value: _minHeight,
                             options: lookupProvider.heightOptions,
+                            hint: 'Select Min Height',
                             onChanged: (value) =>
                                 setState(() => _minHeight = value),
                           ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: _buildDropdown(
+                          child: SearchableDropdown(
                             label: 'Max Height',
                             value: _maxHeight,
                             options: lookupProvider.heightOptions,
+                            hint: 'Select Max Height',
                             onChanged: (value) =>
                                 setState(() => _maxHeight = value),
                           ),
@@ -471,20 +552,22 @@ class _SearchScreenState extends State<SearchScreen> {
                     Row(
                       children: [
                         Expanded(
-                          child: _buildDropdown(
+                          child: SearchableDropdown(
                             label: 'Min Income',
                             value: _minIncome,
                             options: lookupProvider.incomeOptions,
+                            hint: 'Select Min Income',
                             onChanged: (value) =>
                                 setState(() => _minIncome = value),
                           ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: _buildDropdown(
+                          child: SearchableDropdown(
                             label: 'Max Income',
                             value: _maxIncome,
                             options: lookupProvider.incomeOptions,
+                            hint: 'Select Max Income',
                             onChanged: (value) =>
                                 setState(() => _maxIncome = value),
                           ),
@@ -527,49 +610,6 @@ class _SearchScreenState extends State<SearchScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildDropdown({
-    required String label,
-    required String? value,
-    required List<LookupOption> options,
-    required ValueChanged<String?> onChanged,
-    bool enabled = true,
-    String? hint,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        DropdownButtonFormField<String>(
-          value: value,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 12,
-            ),
-          ),
-          hint: Text(hint ?? 'Select $label'),
-          items: options.map((option) {
-            return DropdownMenuItem(
-              value: option.value.toString(),
-              child: Text(option.label),
-            );
-          }).toList(),
-          onChanged: enabled ? onChanged : null,
-        ),
-      ],
     );
   }
 

@@ -4,6 +4,7 @@ class ApiProfile {
   final String? heartsId;
   final String? name;
   final int? age;
+  final String? dob;
   final String? height;
   final String? religion;
   final String? caste;
@@ -22,6 +23,7 @@ class ApiProfile {
     this.heartsId,
     this.name,
     this.age,
+    this.dob,
     this.height,
     this.religion,
     this.caste,
@@ -37,14 +39,14 @@ class ApiProfile {
 
   factory ApiProfile.fromJson(Map<String, dynamic> json) {
     // Helper function to convert dynamic to String
-    String? _toString(dynamic value) {
+    String? toString(dynamic value) {
       if (value == null) return null;
       if (value is String) return value.isEmpty ? null : value;
       return value.toString();
     }
 
     // Helper to safely get ID (can be String or ObjectId)
-    String? _getId(dynamic value) {
+    String? getId(dynamic value) {
       if (value == null) return null;
       if (value is String) return value.isEmpty ? null : value;
       if (value is Map) return value['\$oid']?.toString() ?? value.toString();
@@ -52,25 +54,29 @@ class ApiProfile {
     }
 
     return ApiProfile(
-      id: _getId(json['_id'] ?? json['id']),
-      clientID: _toString(json['clientID']),
+      id: getId(json['_id'] ?? json['id']),
+      clientID: toString(json['clientID']),
       heartsId: json['heartsId']?.toString(),
-      name: _toString(json['name']),
+      name: toString(json['name']),
       age: json['age'] is int
           ? json['age']
           : (json['age'] is String
               ? int.tryParse(json['age'])
               : (json['age'] is num ? json['age'].toInt() : null)),
-      height: json['height']?.toString(), // Can be int or String
-      religion: _toString(json['religion']),
-      caste: _toString(json['caste'] ?? json['cast']),
-      city: _toString(json['city']),
-      state: _toString(json['state']),
-      country: _toString(json['country']),
-      occupation: _toString(json['occupation']),
+      dob: toString(json['dob']),
+      // Try to get height from basic.height if available, otherwise from top level
+      height: (json['basic'] is Map && json['basic']['height'] != null)
+          ? json['basic']['height'].toString()
+          : json['height']?.toString(), // Can be int or String
+      religion: toString(json['religion']),
+      caste: toString(json['caste'] ?? json['cast']),
+      city: toString(json['city']),
+      state: toString(json['state']),
+      country: toString(json['country']),
+      occupation: toString(json['occupation']),
       income: json['income']?.toString(), // Can be int, double, or String
-      qualification: _toString(json['qualification']),
-      gender: _toString(json['gender']),
+      qualification: toString(json['qualification']),
+      gender: toString(json['gender']),
       profilePic: (json['profilePic'] as List<dynamic>?)
           ?.map((pic) => ProfilePic.fromJson(pic))
           .toList(),
@@ -183,8 +189,9 @@ class ProfileSearchPayload {
     if (city?.isNotEmpty ?? false) map['city'] = city;
     if (religion?.isNotEmpty ?? false) map['religion'] = religion;
     if (motherTongue?.isNotEmpty ?? false) map['motherTongue'] = motherTongue;
-    if (maritalStatus?.isNotEmpty ?? false)
+    if (maritalStatus?.isNotEmpty ?? false) {
       map['maritalStatus'] = maritalStatus;
+    }
     if (age?.isNotEmpty ?? false) map['age'] = age;
     if (height?.isNotEmpty ?? false) map['height'] = height;
     if (income?.isNotEmpty ?? false) map['income'] = income;
@@ -320,12 +327,22 @@ class MembershipPlanApi {
   });
 
   factory MembershipPlanApi.fromJson(Map<String, dynamic> json) {
+    // heartCoins can be a string or int from API
+    int parseHeartCoins(dynamic value) {
+      if (value == null) return 0;
+      if (value is int) return value;
+      if (value is String) {
+        return int.tryParse(value) ?? 0;
+      }
+      return 0;
+    }
+
     return MembershipPlanApi(
       id: json['_id'] ?? json['id'],
       planName: json['planName'],
       membershipAmount: json['membershipAmount'] ?? 0,
       duration: json['duration'] ?? 0,
-      heartCoins: json['heartCoins'] ?? 0,
+      heartCoins: parseHeartCoins(json['heartCoins']),
       currency: json['currency'] ?? 'INR',
       features: (json['features'] as List<dynamic>?)
           ?.map((f) => f.toString())
@@ -336,24 +353,63 @@ class MembershipPlanApi {
 
 class MembershipDetailsResponse {
   final bool success;
-  final String? planName;
-  final String? memberShipExpiryDate;
-  final int? heartCoins;
+  final MembershipData? membershipData;
 
   MembershipDetailsResponse({
     required this.success,
-    this.planName,
-    this.memberShipExpiryDate,
-    this.heartCoins,
+    this.membershipData,
   });
 
   factory MembershipDetailsResponse.fromJson(Map<String, dynamic> json) {
-    final data = json['data'] ?? json;
+    final membershipData = json['membershipData'];
+    // Check if membershipData exists and has at least one non-null field
+    // If all fields are null, treat it as no membership
+    if (membershipData != null && membershipData is Map<String, dynamic>) {
+      final hasValidData = membershipData['planName'] != null ||
+          membershipData['memberShipExpiryDate'] != null ||
+          membershipData['membership_id'] != null;
+      return MembershipDetailsResponse(
+        success: json['status'] == 'success',
+        membershipData:
+            hasValidData ? MembershipData.fromJson(membershipData) : null,
+      );
+    }
     return MembershipDetailsResponse(
-      success: json['success'] ?? false,
-      planName: data['planName'],
-      memberShipExpiryDate: data['memberShipExpiryDate'],
-      heartCoins: data['heartCoins'],
+      success: json['status'] == 'success',
+      membershipData: null,
+    );
+  }
+}
+
+class MembershipData {
+  final String? planName;
+  final String? memberShipExpiryDate;
+  final int heartCoins;
+  final String? membership_id;
+
+  MembershipData({
+    this.planName,
+    this.memberShipExpiryDate,
+    this.heartCoins = 0,
+    this.membership_id,
+  });
+
+  factory MembershipData.fromJson(Map<String, dynamic> json) {
+    // heartCoins can be null or a number from API
+    int parseHeartCoins(dynamic value) {
+      if (value == null) return 0;
+      if (value is int) return value;
+      if (value is String) {
+        return int.tryParse(value) ?? 0;
+      }
+      return 0;
+    }
+
+    return MembershipData(
+      planName: json['planName'],
+      memberShipExpiryDate: json['memberShipExpiryDate'],
+      heartCoins: parseHeartCoins(json['heartCoins']),
+      membership_id: json['membership_id'],
     );
   }
 }
@@ -362,13 +418,15 @@ class PaymentOrderResponse {
   final String orderId;
   final int amount;
   final String currency;
-  final String? key;
+  final String? keyId;
+  final String? message;
 
   PaymentOrderResponse({
     required this.orderId,
     required this.amount,
     required this.currency,
-    this.key,
+    this.keyId,
+    this.message,
   });
 
   factory PaymentOrderResponse.fromJson(Map<String, dynamic> json) {
@@ -377,7 +435,8 @@ class PaymentOrderResponse {
       orderId: data['orderId'] ?? '',
       amount: data['amount'] ?? 0,
       currency: data['currency'] ?? 'INR',
-      key: data['key'],
+      keyId: data['keyId'] ?? data['key'],
+      message: data['message'] ?? json['message'],
     );
   }
 }

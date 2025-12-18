@@ -23,9 +23,22 @@ class ApiResponse<T> {
       success = json['status'] == 'success';
     }
 
+    // Extract message - check for 'err' field first (like webapp error format)
+    String? message = json['message'];
+    if (message == null || message.isEmpty) {
+      // Check for 'err' field (can be string or object with 'msg')
+      if (json['err'] != null) {
+        if (json['err'] is String) {
+          message = json['err'] as String;
+        } else if (json['err'] is Map && json['err']['msg'] != null) {
+          message = json['err']['msg'] as String;
+        }
+      }
+    }
+
     return ApiResponse<T>(
       success: success,
-      message: json['message'],
+      message: message,
       data: json['data'] != null && fromJsonT != null
           ? fromJsonT(json['data'])
           : json['data'],
@@ -66,18 +79,25 @@ class VerifyOtpResponse {
   final String? token;
   final String? userId;
   final String? message;
+  final String? status;
+  final bool success;
 
   VerifyOtpResponse({
     this.token,
     this.userId,
     this.message,
+    this.status,
+    this.success = false,
   });
 
   factory VerifyOtpResponse.fromJson(Map<String, dynamic> json) {
+    final status = json['status']?.toString() ?? '';
     return VerifyOtpResponse(
       token: json['token'],
       userId: json['userId'],
       message: json['message'],
+      status: status,
+      success: status == 'success' || json['code'] == 'CH200',
     );
   }
 }
@@ -87,12 +107,14 @@ class ValidateTokenResponse {
   final String? name;
   final String? email;
   final String? phoneNumber;
+  final String? screenName;
 
   ValidateTokenResponse({
     this.id,
     this.name,
     this.email,
     this.phoneNumber,
+    this.screenName,
   });
 
   factory ValidateTokenResponse.fromJson(Map<String, dynamic> json) {
@@ -101,6 +123,7 @@ class ValidateTokenResponse {
       name: json['name'],
       email: json['email'],
       phoneNumber: json['phoneNumber'],
+      screenName: json['screenName'],
     );
   }
 

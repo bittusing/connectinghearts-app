@@ -4,7 +4,7 @@ import '../models/profile_models.dart';
 
 class LookupProvider with ChangeNotifier {
   final LookupService _lookupService = LookupService();
-  
+
   Map<String, List<LookupOption>> _lookupData = {};
   List<LookupOption> _countries = [];
   bool _isLoading = false;
@@ -21,10 +21,28 @@ class LookupProvider with ChangeNotifier {
   List<LookupOption> get maritalStatuses => _lookupData['maritalStatus'] ?? [];
   List<LookupOption> get castes => _lookupData['casts'] ?? [];
   List<LookupOption> get qualifications => _lookupData['qualification'] ?? [];
+  List<LookupOption> get highestEducation =>
+      _lookupData['highestEducation'] ?? [];
   List<LookupOption> get occupations => _lookupData['occupation'] ?? [];
   List<LookupOption> get ageOptions => _lookupData['age'] ?? [];
   List<LookupOption> get heightOptions => _lookupData['height'] ?? [];
   List<LookupOption> get incomeOptions => _lookupData['income'] ?? [];
+  List<LookupOption> get residentialStatuses =>
+      _lookupData['residentialStatus'] ?? [];
+  List<LookupOption> get employedInOptions => _lookupData['employed_in'] ?? [];
+  List<LookupOption> get horoscopes => _lookupData['horoscopes'] ?? [];
+  List<LookupOption> get manglik => _lookupData['manglik'] ?? [];
+  List<LookupOption> get familyStatusOptions =>
+      _lookupData['familyStatus'] ?? [];
+  List<LookupOption> get familyTypeOptions => _lookupData['familyType'] ?? [];
+  List<LookupOption> get familyValuesOptions =>
+      _lookupData['familyValues'] ?? [];
+  List<LookupOption> get fathersOccupationOptions =>
+      _lookupData['fathersOccupation'] ?? [];
+  List<LookupOption> get mothersOccupationOptions =>
+      _lookupData['mothersOccupation'] ?? [];
+  List<LookupOption> get livingWithParentsOptions =>
+      _lookupData['livingWithParents'] ?? [];
 
   Future<void> loadLookupData() async {
     if (_lookupData.isNotEmpty) return;
@@ -69,4 +87,3 @@ class LookupProvider with ChangeNotifier {
     notifyListeners();
   }
 }
-

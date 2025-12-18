@@ -2,11 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/lookup_provider.dart';
 import '../../theme/colors.dart';
 import '../../widgets/profile/profile_card.dart';
 import '../../widgets/profile/stat_card.dart';
 import '../../services/profile_service.dart';
+import '../../services/auth_service.dart';
+import '../../services/storage_service.dart';
 import '../../utils/profile_utils.dart';
+import '../../config/api_config.dart';
+import '../../widgets/dashboard/dashboard_banner_slider.dart';
+import '../../models/profile_models.dart';
+import '../../services/static_data_service.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -17,12 +24,26 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   final ProfileService _profileService = ProfileService();
+  final AuthService _authService = AuthService();
+  final StorageService _storageService = StorageService();
   bool _isLoading = true;
   int _acceptanceCount = 0;
   int _justJoinedCount = 0;
+  List<Map<String, dynamic>> _interestReceived = [];
   List<Map<String, dynamic>> _dailyRecommendations = [];
   List<Map<String, dynamic>> _profileVisitors = [];
   List<Map<String, dynamic>> _allProfiles = [];
+
+  // Loading states for each section
+  bool _isLoadingInterestReceived = true;
+  bool _isLoadingDailyRecommendations = true;
+  bool _isLoadingProfileVisitors = true;
+  bool _isLoadingAllProfiles = true;
+
+  // Profile data
+  String? _profileName;
+  String? _profileImageUrl;
+  int? _heartsId;
 
   @override
   void initState() {
@@ -34,33 +55,266 @@ class _DashboardScreenState extends State<DashboardScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // Load stats
-      final acceptanceResponse = await _profileService.getProfilesByEndpoint(
-        'dashboard/getAcceptanceProfiles/acceptedMe',
+      // First, try to load from storage (fast, no API call)
+      final storedName = await _storageService.getProfileName();
+      final storedImageUrl = await _storageService.getProfileImageUrl();
+
+      if (storedName != null) {
+        _profileName = storedName;
+      }
+      if (storedImageUrl != null) {
+        _profileImageUrl = storedImageUrl;
+      }
+
+      // Only call getUser API if storage doesn't have data
+      if (_profileName == null || _profileImageUrl == null) {
+        try {
+          final userResponse = await _authService.getUser();
+          if (userResponse['code'] == 'CH200' &&
+              userResponse['status'] == 'success' &&
+              userResponse['data'] != null) {
+            final userData = userResponse['data'] as Map<String, dynamic>;
+
+            // Extract and store name
+            final name = userData['name']?.toString();
+            if (name != null && name.isNotEmpty) {
+              _profileName = name;
+              await _storageService.setProfileName(name);
+            }
+
+            // Extract and store profile picture
+            final profilePic = userData['profilePic'] as List<dynamic>?;
+            if (profilePic != null && profilePic.isNotEmpty) {
+              final primaryPic = profilePic.firstWhere(
+                (pic) => pic['primary'] == true,
+                orElse: () => profilePic.first,
+              ) as Map<String, dynamic>?;
+
+              if (primaryPic != null && primaryPic['id'] != null) {
+                final userId = userData['_id']?.toString() ?? '';
+                if (userId.isNotEmpty) {
+                  final imageUrl = ApiConfig.buildImageUrl(
+                    userId,
+                    primaryPic['id'].toString(),
+                  );
+                  _profileImageUrl = imageUrl;
+                  await _storageService.setProfileImageUrl(imageUrl);
+                }
+              }
+            }
+
+            // Extract heartsId
+            final heartsIdValue = userData['heartsId'];
+            if (heartsIdValue != null) {
+              _heartsId = heartsIdValue is int
+                  ? heartsIdValue
+                  : int.tryParse(heartsIdValue.toString());
+            }
+          }
+        } catch (e) {
+          // If getUser fails, continue with stored data or fallback
+        }
+      }
+
+      // Fallback: Fetch user profile data if storage and getUser didn't provide name/image
+      if (_profileName == null || _profileImageUrl == null) {
+        final profileResponse = await _profileService.getUserProfileData();
+        if (profileResponse['status'] == 'success' &&
+            profileResponse['data'] != null) {
+          final data = profileResponse['data'] as Map<String, dynamic>;
+          final basic = data['basic'] as Map<String, dynamic>?;
+          final misc = data['miscellaneous'] as Map<String, dynamic>?;
+
+          // Extract name and heartsId
+          if (_profileName == null) {
+            _profileName = basic?['name']?.toString() ??
+                (misc?['heartsId'] != null
+                    ? 'HEARTS-${misc!['heartsId']}'
+                    : null);
+            if (_profileName != null) {
+              await _storageService.setProfileName(_profileName!);
+            }
+          }
+
+          if (_heartsId == null) {
+            _heartsId = misc?['heartsId'] is int
+                ? misc!['heartsId'] as int
+                : (misc?['heartsId'] != null
+                    ? int.tryParse(misc!['heartsId'].toString())
+                    : null);
+          }
+
+          // Extract profile picture
+          if (_profileImageUrl == null) {
+            final profilePic = misc?['profilePic'] as List<dynamic>?;
+            if (profilePic != null && profilePic.isNotEmpty) {
+              final primaryPic = profilePic.firstWhere(
+                (pic) => pic['primary'] == true,
+                orElse: () => profilePic.first,
+              ) as Map<String, dynamic>?;
+
+              if (primaryPic != null && primaryPic['id'] != null) {
+                final authProvider = Provider.of<AuthProvider>(
+                  context,
+                  listen: false,
+                );
+                final userId = authProvider.user?.id ??
+                    _heartsId?.toString() ??
+                    misc?['clientID']?.toString() ??
+                    '';
+                if (userId.isNotEmpty) {
+                  _profileImageUrl = ApiConfig.buildImageUrl(
+                    userId,
+                    primaryPic['id'].toString(),
+                  );
+                  await _storageService.setProfileImageUrl(_profileImageUrl!);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Load static data first (cities, states, countries - fast, no API call)
+      final staticDataService = StaticDataService.instance;
+      await staticDataService.loadAllData();
+
+      // Load lookup data for location resolution (only if not already loaded)
+      final lookupProvider = Provider.of<LookupProvider>(
+        context,
+        listen: false,
       );
-      final justJoinedResponse = await _profileService.getJustJoinedProfiles();
+      if (lookupProvider.lookupData.isEmpty) {
+        await lookupProvider.loadLookupData();
+      }
+      final lookupData = lookupProvider.lookupData;
+      final countries = lookupProvider.countries;
 
-      // Load sections
-      final dailyRecs = await _profileService.getDailyRecommendations();
-      final visitors = await _profileService.getProfileVisitors();
-      final allProfiles = await _profileService.getAllProfiles();
+      // Load only essential stats first (for stat cards)
+      final statsFuture = Future.wait([
+        _profileService.getProfilesByEndpoint(
+          'dashboard/getAcceptanceProfiles/acceptedMe',
+        ),
+        _profileService.getJustJoinedProfiles(),
+      ]);
 
+      final stats = await statsFuture;
+      final acceptanceResponse = stats[0];
+      final justJoinedResponse = stats[1];
+
+      // Load sections lazily - only load first 3-5 profiles per section
+      // Load sections in parallel but limit data
+      final sectionsFuture = Future.wait([
+        _profileService.getInterestsReceived().then((response) {
+          if (mounted) setState(() => _isLoadingInterestReceived = false);
+          // Limit to first 5 profiles for dashboard preview
+          return ApiProfileResponse(
+            status: response.status,
+            data: response.data.take(5).toList(),
+          );
+        }).catchError((e) {
+          if (mounted) setState(() => _isLoadingInterestReceived = false);
+          return ApiProfileResponse(status: 'error', data: []);
+        }),
+        _profileService.getDailyRecommendations().then((response) {
+          if (mounted) setState(() => _isLoadingDailyRecommendations = false);
+          return ApiProfileResponse(
+            status: response.status,
+            data: response.data.take(5).toList(),
+          );
+        }).catchError((e) {
+          if (mounted) setState(() => _isLoadingDailyRecommendations = false);
+          return ApiProfileResponse(status: 'error', data: []);
+        }),
+        _profileService.getProfileVisitors().then((response) {
+          if (mounted) setState(() => _isLoadingProfileVisitors = false);
+          return ApiProfileResponse(
+            status: response.status,
+            data: response.data.take(5).toList(),
+          );
+        }).catchError((e) {
+          if (mounted) setState(() => _isLoadingProfileVisitors = false);
+          return ApiProfileResponse(status: 'error', data: []);
+        }),
+        _profileService.getAllProfiles().then((response) {
+          if (mounted) setState(() => _isLoadingAllProfiles = false);
+          return ApiProfileResponse(
+            status: response.status,
+            data: response.data.take(5).toList(),
+          );
+        }).catchError((e) {
+          if (mounted) setState(() => _isLoadingAllProfiles = false);
+          return ApiProfileResponse(status: 'error', data: []);
+        }),
+      ]);
+
+      final sections = await sectionsFuture;
+      final interestReceived = sections[0];
+      final dailyRecs = sections[1];
+      final visitors = sections[2];
+      final allProfiles = sections[3];
+
+      // Capture countries for use in setState closure
+      final countriesList = countries;
+
+      // Transform profiles using simple transformProfile (no expensive location resolution)
       if (mounted) {
         setState(() {
           _acceptanceCount = acceptanceResponse.data.length;
           _justJoinedCount = justJoinedResponse.data.length;
-          _dailyRecommendations =
-              dailyRecs.data.map((p) => transformProfile(p)).toList();
-          _profileVisitors =
-              visitors.data.map((p) => transformProfile(p)).toList();
-          _allProfiles =
-              allProfiles.data.map((p) => transformProfile(p)).toList();
+          _interestReceived = interestReceived.data
+              .map(
+                (p) => transformProfile(
+                  p,
+                  lookupData: lookupData,
+                  countries: countriesList,
+                ),
+              )
+              .toList();
+          _dailyRecommendations = dailyRecs.data
+              .map(
+                (p) => transformProfile(
+                  p,
+                  lookupData: lookupData,
+                  countries: countriesList,
+                ),
+              )
+              .toList();
+          _profileVisitors = visitors.data
+              .map(
+                (p) => transformProfile(
+                  p,
+                  lookupData: lookupData,
+                  countries: countriesList,
+                ),
+              )
+              .toList();
+          _allProfiles = allProfiles.data
+              .map(
+                (p) => transformProfile(
+                  p,
+                  lookupData: lookupData,
+                  countries: countriesList,
+                ),
+              )
+              .toList();
           _isLoading = false;
         });
       }
     } catch (e) {
+      print('Error loading dashboard data: $e');
       if (mounted) {
-        setState(() => _isLoading = false);
+        setState(() {
+          _isLoading = false;
+        });
+        // Show error message to user
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error loading data: ${e.toString()}'),
+            backgroundColor: AppColors.error,
+            duration: const Duration(seconds: 3),
+          ),
+        );
       }
     }
   }
@@ -112,27 +366,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               ),
                               color: Colors.white.withOpacity(0.2),
                             ),
-                            child: const Icon(
-                              Icons.person,
-                              size: 40,
-                              color: Colors.white,
-                            ),
-                          ),
-                          Positioned(
-                            bottom: -2,
-                            right: -2,
-                            child: Container(
-                              width: 24,
-                              height: 24,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: AppColors.success,
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 3,
-                                ),
-                              ),
-                            ),
+                            child: _profileImageUrl != null
+                                ? ClipOval(
+                                    child: Image.network(
+                                      _profileImageUrl!,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return const Icon(
+                                          Icons.person,
+                                          size: 40,
+                                          color: Colors.white,
+                                        );
+                                      },
+                                    ),
+                                  )
+                                : const Icon(
+                                    Icons.person,
+                                    size: 40,
+                                    color: Colors.white,
+                                  ),
                           ),
                         ],
                       ),
@@ -152,8 +405,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              authProvider.user?.name ??
-                                  'HEARTS-${authProvider.user?.heartsId ?? ''}',
+                              _profileName ??
+                                  authProvider.user?.name ??
+                                  (_heartsId != null
+                                      ? 'HEARTS-$_heartsId'
+                                      : 'HEARTS-${authProvider.user?.heartsId ?? ''}'),
                               style: const TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.w700,
@@ -161,15 +417,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              authProvider.user?.planName != null
-                                  ? '${authProvider.user!.planName} Plan'
-                                  : 'Profile completion 100%',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.white.withOpacity(0.75),
-                              ),
-                            ),
                           ],
                         ),
                       ),
@@ -221,6 +468,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             const SizedBox(height: 16),
+            // Banner Slider
+            DashboardBannerSlider(
+              slides: const [
+                {
+                  'image': 'assets/images/banner11.jpg',
+                  'title': 'Heartfulness Celebrations',
+                },
+                {
+                  'image': 'assets/images/banner1.jpg',
+                  'title': 'Heartfulness Weddings',
+                },
+                {
+                  'image': 'assets/images/banner2.jpg',
+                  'title': 'Celebrating Togetherness',
+                },
+                {
+                  'image': 'assets/images/banner3.jpg',
+                  'title': 'Sacred Moments',
+                },
+              ],
+            ),
+            const SizedBox(height: 16),
             // Stats Cards
             Row(
               children: [
@@ -243,36 +512,56 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 32),
-            // Daily Recommendations
-            _buildSection(
-              context,
-              title: 'Daily Recommendation',
-              count: _dailyRecommendations.length,
-              profiles: _dailyRecommendations,
-              onViewAll: () => context.push('/daily-picks'),
-              isLoading: _isLoading,
-            ),
-            const SizedBox(height: 32),
-            // Profile Visitors
-            _buildSection(
-              context,
-              title: 'Profile Visitors',
-              count: _profileVisitors.length,
-              profiles: _profileVisitors,
-              onViewAll: () => context.push('/profile-visitors'),
-              isLoading: _isLoading,
-            ),
-            const SizedBox(height: 32),
-            // All Profiles
-            _buildSection(
-              context,
-              title: 'All Profiles',
-              count: _allProfiles.length,
-              profiles: _allProfiles,
-              onViewAll: () => context.push('/profiles'),
-              isLoading: _isLoading,
-            ),
+
+            // Interest Received - only show if data exists or loading
+            if (_interestReceived.length > 0 || _isLoadingInterestReceived) ...[
+              _buildSection(
+                context,
+                title: 'Interest Received',
+                count: _interestReceived.length,
+                profiles: _interestReceived,
+                onViewAll: () => context.push('/interest-received'),
+                isLoading: _isLoadingInterestReceived,
+              ),
+              const SizedBox(height: 32),
+            ],
+            // Daily Recommendations - only show if data exists or loading
+            if (_dailyRecommendations.length > 0 ||
+                _isLoadingDailyRecommendations) ...[
+              _buildSection(
+                context,
+                title: 'Daily Recommendation',
+                count: _dailyRecommendations.length,
+                profiles: _dailyRecommendations,
+                onViewAll: () => context.push('/daily-picks'),
+                isLoading: _isLoadingDailyRecommendations,
+              ),
+              const SizedBox(height: 32),
+            ],
+            // Profile Visitors - only show if data exists or loading
+            if (_profileVisitors.length > 0 || _isLoadingProfileVisitors) ...[
+              _buildSection(
+                context,
+                title: 'Profile Visitors',
+                count: _profileVisitors.length,
+                profiles: _profileVisitors,
+                onViewAll: () => context.push('/profile-visitors'),
+                isLoading: _isLoadingProfileVisitors,
+              ),
+              const SizedBox(height: 32),
+            ],
+            // All Profiles - only show if data exists or loading
+            if (_allProfiles.length > 0 || _isLoadingAllProfiles) ...[
+              _buildSection(
+                context,
+                title: 'All Profiles',
+                count: _allProfiles.length,
+                profiles: _allProfiles,
+                onViewAll: () => context.push('/profiles'),
+                isLoading: _isLoadingAllProfiles,
+              ),
+              const SizedBox(height: 32),
+            ],
             const SizedBox(height: 100),
           ],
         ),
@@ -345,9 +634,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ? Center(
                       child: Text(
                         'No profiles available',
-                        style: TextStyle(
-                          color: theme.textTheme.bodySmall?.color,
-                        ),
+                        style:
+                            TextStyle(color: theme.textTheme.bodySmall?.color),
                       ),
                     )
                   : ListView.builder(
@@ -362,12 +650,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             name: profile['name'] ??
                                 'HEARTS-${profile['id'] ?? ''}',
                             age: profile['age'] ?? 0,
-                            height: profile['height'] ?? '',
+                            height: profile['height']?.toString() ?? '',
                             location: profile['location'] ?? '',
+                            cast: profile['caste'] ?? profile['cast'] ?? '',
                             imageUrl: profile['imageUrl'],
                             gender: profile['gender'],
                             onTap: () => context.push(
-                                '/profile/${profile['clientID'] ?? profile['id']}'),
+                              '/profile/${profile['clientID'] ?? profile['id']}',
+                            ),
                           ),
                         );
                       },

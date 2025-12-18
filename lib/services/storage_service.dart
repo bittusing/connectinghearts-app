@@ -3,6 +3,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class StorageService {
   static const String _tokenKey = 'connectingheart-token';
   static const String _userIdKey = 'connectingheart-userId';
+  static const String _profileNameKey = 'connectingheart-profileName';
+  static const String _profileImageUrlKey = 'connectingheart-profileImageUrl';
 
   final FlutterSecureStorage _storage = const FlutterSecureStorage(
     aOptions: AndroidOptions(
@@ -35,6 +37,38 @@ class StorageService {
 
   Future<void> deleteUserId() async {
     await _storage.delete(key: _userIdKey);
+  }
+
+  // Profile name storage
+  Future<String?> getProfileName() async {
+    return await _storage.read(key: _profileNameKey);
+  }
+
+  Future<void> setProfileName(String name) async {
+    await _storage.write(key: _profileNameKey, value: name);
+  }
+
+  Future<void> deleteProfileName() async {
+    await _storage.delete(key: _profileNameKey);
+  }
+
+  // Profile image URL storage
+  Future<String?> getProfileImageUrl() async {
+    return await _storage.read(key: _profileImageUrlKey);
+  }
+
+  Future<void> setProfileImageUrl(String imageUrl) async {
+    await _storage.write(key: _profileImageUrlKey, value: imageUrl);
+  }
+
+  Future<void> deleteProfileImageUrl() async {
+    await _storage.delete(key: _profileImageUrlKey);
+  }
+
+  // Clear profile data
+  Future<void> clearProfileData() async {
+    await deleteProfileName();
+    await deleteProfileImageUrl();
   }
 
   Future<void> clearAll() async {

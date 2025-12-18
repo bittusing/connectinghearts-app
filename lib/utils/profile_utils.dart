@@ -1,5 +1,6 @@
 import '../config/api_config.dart';
 import '../models/profile_models.dart';
+import '../services/static_data_service.dart';
 
 /// Get gender-based placeholder image
 String getGenderPlaceholder(String? gender) {
@@ -32,37 +33,96 @@ String? getProfileImageUrl(ApiProfile profile) {
 Map<String, dynamic> transformProfile(
   ApiProfile apiProfile, {
   Map<String, List<LookupOption>>? lookupData,
+  List<LookupOption>? countries,
   String? dob,
 }) {
-  // Calculate age from DOB if available
+  // Calculate age from DOB if available (prioritize apiProfile.dob, then parameter dob)
   int? age;
-  if (dob != null && dob.isNotEmpty) {
+  final dobToUse = apiProfile.dob ?? dob;
+  if (dobToUse != null && dobToUse.isNotEmpty) {
     try {
-      final dobDate = DateTime.parse(dob);
+      final dobDate = DateTime.parse(dobToUse);
       age = calculateAge(dobDate);
-    } catch (_) {}
+    } catch (_) {
+      // If parsing fails, try to calculate from age field if available
+      age = apiProfile.age;
+    }
+  } else {
+    // Fallback to age field if DOB is not available
+    age = apiProfile.age;
   }
 
-  // Get location labels
+  // Get location labels - use static data for cities, states, countries (fast, no API call)
   String location = '';
-  if (lookupData != null) {
-    final cityLabel = _getLabelFromLookup(lookupData, 'city', apiProfile.city);
-    final stateLabel =
-        _getLabelFromLookup(lookupData, 'state', apiProfile.state);
-    final countryLabel =
-        _getLabelFromLookup(lookupData, 'country', apiProfile.country);
-    location = [cityLabel, stateLabel, countryLabel]
-        .where((s) => s != null && s.isNotEmpty && s != 'Not Filled')
-        .join(', ');
+  final staticDataService = StaticDataService.instance;
+
+  String? cityLabel;
+  if (apiProfile.city != null && apiProfile.city!.isNotEmpty) {
+    // Try static data first (fast, synchronous if already loaded)
+    if (staticDataService.isCitiesLoaded) {
+      cityLabel = staticDataService.getCityLabel(apiProfile.city);
+    }
+
+    // Fallback to lookup data if static data doesn't have it or not loaded yet
+    if (cityLabel == null && lookupData != null) {
+      cityLabel = _getLabelFromLookup(lookupData, 'city', apiProfile.city);
+    }
   }
 
-  if (location.isEmpty) {
-    location = [
-      apiProfile.city,
-      apiProfile.state,
-      apiProfile.country,
-    ].where((s) => s != null && s.isNotEmpty).join(', ');
+  String? stateLabel;
+  if (apiProfile.state != null && apiProfile.state!.isNotEmpty) {
+    // Try static data first (fast, synchronous if already loaded)
+    if (staticDataService.isStatesLoaded) {
+      stateLabel = staticDataService.getStateLabel(apiProfile.state);
+    }
+
+    // If static data doesn't have it and we have country, try to fetch states for that country
+    // Note: This would require async call, so we skip it for now and rely on static data
+    // Fallback to lookup data if static data doesn't have it or not loaded yet
+    if (stateLabel == null && lookupData != null) {
+      stateLabel = _getLabelFromLookup(lookupData, 'state', apiProfile.state);
+    }
   }
+
+  String? countryLabel;
+  if (apiProfile.country != null && apiProfile.country!.isNotEmpty) {
+    // Try static data first (fast, synchronous if already loaded)
+    if (staticDataService.isCountriesLoaded) {
+      countryLabel = staticDataService.getCountryLabel(apiProfile.country);
+    }
+
+    // Fallback to countries list if provided
+    if (countryLabel == null && countries != null) {
+      try {
+        final country = countries.firstWhere(
+          (c) => c.value?.toString() == apiProfile.country?.toString(),
+        );
+        countryLabel = country.label;
+      } catch (_) {
+        // Country not found in list
+      }
+    }
+
+    // Final fallback to lookup data if static data doesn't have it or not loaded yet
+    if (countryLabel == null && lookupData != null) {
+      countryLabel = _getLabelFromLookup(
+        lookupData,
+        'country',
+        apiProfile.country,
+      );
+    }
+  }
+
+  // Use labels if available, otherwise fallback to raw values
+  final cityDisplay = cityLabel ?? apiProfile.city;
+  final stateDisplay = stateLabel ?? apiProfile.state;
+  final countryDisplay = countryLabel ?? apiProfile.country;
+
+  location = [
+    cityDisplay,
+    stateDisplay,
+    countryDisplay,
+  ].where((s) => s != null && s.isNotEmpty && s != 'Not Filled').join(', ');
 
   // Get primary image
   String? imageUrl;
@@ -88,19 +148,23 @@ Map<String, dynamic> transformProfile(
         ? 'HEARTS-${apiProfile.heartsId}'
         : (apiProfile.name ?? 'Unknown'),
     'age': age ?? apiProfile.age ?? 0,
-    'height': formatHeight(apiProfile.height),
+    'height': formatHeightInMeters(apiProfile.height),
     'location': location,
     'religion':
         _getLabelFromLookup(lookupData, 'religion', apiProfile.religion) ??
             (apiProfile.religion?.toString()),
-    'caste': _getLabelFromLookup(lookupData, 'casts', apiProfile.caste) ??
-        (apiProfile.caste?.toString()),
+    'caste': _getCastLabel(apiProfile.caste, staticDataService, lookupData),
+    'cast': _getCastLabel(apiProfile.caste, staticDataService,
+        lookupData), // Also include 'cast' key for compatibility
     'occupation':
         _getLabelFromLookup(lookupData, 'occupation', apiProfile.occupation) ??
             (apiProfile.occupation?.toString()),
     'income': formatIncome(apiProfile.income),
     'qualification': _getLabelFromLookup(
-            lookupData, 'qualification', apiProfile.qualification) ??
+          lookupData,
+          'qualification',
+          apiProfile.qualification,
+        ) ??
         (apiProfile.qualification?.toString()),
     'imageUrl': imageUrl,
     'heartsId': apiProfile.heartsId,
@@ -127,6 +191,33 @@ String? _getLabelFromLookup(
   }
 }
 
+/// Get cast label from value using static data first, then lookup data
+String? _getCastLabel(
+  dynamic castValue,
+  StaticDataService staticDataService,
+  Map<String, List<LookupOption>>? lookupData,
+) {
+  if (castValue == null) return null;
+  final castValueStr = castValue.toString();
+  if (castValueStr.isEmpty) return null;
+
+  // Try static data first (fast, synchronous if already loaded)
+  if (staticDataService.isLookupsLoaded) {
+    final castLabel = staticDataService.getCastLabel(castValueStr);
+    if (castLabel != null && castLabel.isNotEmpty) {
+      return castLabel;
+    }
+  }
+
+  // Fallback to lookup data
+  if (lookupData != null) {
+    return _getLabelFromLookup(lookupData, 'casts', castValue);
+  }
+
+  // Final fallback to raw value
+  return castValueStr;
+}
+
 /// Format height from inches to feet'inches format
 String formatHeight(dynamic height) {
   if (height == null) return '';
@@ -148,6 +239,30 @@ String formatHeight(dynamic height) {
   final feet = inches ~/ 12;
   final remainingInches = inches % 12;
   return "$feet' $remainingInches\"";
+}
+
+//////formate height from feet and inches to meters like 5'0" (1.52 mts)
+String formatHeightInMeters(dynamic height) {
+  if (height == null) return '';
+
+  int inches;
+  if (height is int) {
+    inches = height;
+  } else if (height is double) {
+    inches = height.toInt();
+  } else if (height is String) {
+    if (height.isEmpty) return '';
+    inches = int.tryParse(height) ?? 0;
+  } else {
+    return '';
+  }
+
+  if (inches == 0) return '';
+
+  final feet = inches ~/ 12;
+  final remainingInches = inches % 12;
+  final meters = (inches * 0.0254).toStringAsFixed(2);
+  return "$feet'$remainingInches\" ($meters mts)";
 }
 
 /// Format income from code to readable string
@@ -188,14 +303,36 @@ String formatIncome(dynamic income) {
   return income.toString();
 }
 
-/// Calculate age from date of birth
+/// Calculate age from date of birth (matches TypeScript version)
+/// const calculateAge = (dob: string): number => {
+///   const birthDate = new Date(dob)
+///   const today = new Date()
+///   let age = today.getFullYear() - birthDate.getFullYear()
+///   const monthDiff = today.getMonth() - birthDate.getMonth()
+///   if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+///     age--
+///   }
+///   return age
+/// }
 int calculateAge(DateTime dob) {
-  final now = DateTime.now();
-  int age = now.year - dob.year;
-  if (now.month < dob.month || (now.month == dob.month && now.day < dob.day)) {
+  final today = DateTime.now();
+  int age = today.year - dob.year;
+  final monthDiff = today.month - dob.month;
+  if (monthDiff < 0 || (monthDiff == 0 && today.day < dob.day)) {
     age--;
   }
   return age;
+}
+
+/// Calculate age from date of birth string (ISO format)
+int? calculateAgeFromString(String? dobString) {
+  if (dobString == null || dobString.isEmpty) return null;
+  try {
+    final dob = DateTime.parse(dobString);
+    return calculateAge(dob);
+  } catch (_) {
+    return null;
+  }
 }
 
 /// Format date to readable string
