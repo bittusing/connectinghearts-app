@@ -63,7 +63,7 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/images/logo.jpeg"
+  image_path: "assets/images/Gemini_Generated_Image_x4v1ddx4v1ddx4v1.png"
   min_sdk_android: 21
-  adaptive_icon_background: "#FFFFFF"
-  adaptive_icon_foreground: "assets/images/logo.jpeg"
+  adaptive_icon_background: "#FF0066"
+  adaptive_icon_foreground: "assets/images/Gemini_Generated_Image_x4v1ddx4v1ddx4v1.png"
