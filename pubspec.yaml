@@ -46,6 +46,7 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^3.0.1
+  flutter_launcher_icons: ^0.13.1
 
 flutter:
   uses-material-design: true
@@ -57,9 +58,12 @@ flutter:
     - assets/data/connectinghearts.countries.json
     - assets/data/connectinghearts.lookups.json
 
-  # App icon configuration
-  # To generate app icons, use: flutter pub run flutter_launcher_icons
-  # flutter_launcher_icons:
-  #   android: true
-  #   ios: true
-  #   image_path: "assets/images/logo.png"
+# App icon configuration
+# To generate app icons, use: flutter pub run flutter_launcher_icons
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logo.jpeg"
+  min_sdk_android: 21
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/logo.jpeg"

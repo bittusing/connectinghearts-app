@@ -111,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 32),
                 // Title
                 Text(
-                  'Log in to your dashboard',
+                  'Sign in for Getting Your Perfect Match',
                   style: theme.textTheme.displaySmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     letterSpacing: -0.5,

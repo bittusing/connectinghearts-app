@@ -99,7 +99,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
   final _otpController = TextEditingController();
 
-  String _selectedCountryCode = '+91';
+  String _selectedCountryCode = ''; // Empty by default (like webapp)
+  String _autoOtp = ''; // Auto-fill OTP for non-+91 country codes
   bool _showPassword = false;
   bool _showConfirmPassword = false;
   bool _agreeToTerms = false;
@@ -129,8 +130,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _showError('Please enter a valid email');
       return false;
     }
+    // Validate country code (required)
+    if (_selectedCountryCode.isEmpty) {
+      _showError('Please select a country code');
+      return false;
+    }
     if (_phoneController.text.trim().isEmpty ||
-        _phoneController.text.length < 10) {
+        _phoneController.text.replaceAll(RegExp(r'\D'), '').length < 10) {
       _showError('Please enter a valid mobile number');
       return false;
     }
@@ -150,12 +156,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.error,
-      ),
-    );
+    if (!mounted) return;
+
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: AppColors.error,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    } catch (e) {
+      // If context is invalid, just print the error
+      print('Error showing snackbar: $e');
+      print('Error message: $message');
+    }
   }
 
   Future<void> _handleRegister() async {
@@ -177,6 +192,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
           await _authService.generateOtp(phoneNumber, _selectedCountryCode);
 
       if (response.success && mounted) {
+        // Auto-fill OTP if country code is not +91 and OTP is returned in response (like webapp)
+        if (_selectedCountryCode != '+91' && response.data != null) {
+          // Check if response.data contains otp field
+          final responseData = response.data;
+          if (responseData is Map<String, dynamic> &&
+              responseData['otp'] != null) {
+            setState(() {
+              _autoOtp = responseData['otp'].toString();
+            });
+          } else {
+            setState(() {
+              _autoOtp = '';
+            });
+          }
+        } else {
+          setState(() {
+            _autoOtp = '';
+          });
+        }
+
         // Show alert with WhatsApp number (like webapp)
         _showSuccess('OTP sent to your mobile number');
         _showAlertDialog();
@@ -200,6 +235,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void _handleAlertConfirm() {
     // Open OTP modal after alert is confirmed (like webapp)
+    // Auto-fill OTP if available (for non-+91 country codes)
+    if (_autoOtp.isNotEmpty) {
+      _otpController.text = _autoOtp;
+    }
     _displayOtpDialog();
   }
 
@@ -293,19 +332,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             // Extract error from signup response (check for err field like webapp)
             final errorMsg = signupResponse.message ?? 'Registration failed';
 
-            // Check if error indicates profile already exists - navigate to login
-            if (errorMsg.toLowerCase().contains('profile already exists') ||
-                errorMsg.toLowerCase().contains('please login')) {
-              _showError(errorMsg);
-              // Navigate to login screen after showing error
-              if (mounted) {
-                Future.delayed(const Duration(seconds: 2), () {
-                  if (mounted) {
-                    context.go('/login');
-                  }
-                });
-              }
-            } else {
+            // Show error message on same page (like webapp) - don't navigate
+            if (mounted) {
               _showError(errorMsg);
             }
           }
@@ -320,19 +348,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             errorMsg = 'Registration failed';
           }
 
-          // Check if error indicates profile already exists - navigate to login
-          if (errorMsg.toLowerCase().contains('profile already exists') ||
-              errorMsg.toLowerCase().contains('please login')) {
-            _showError(errorMsg);
-            // Navigate to login screen after showing error
-            if (mounted) {
-              Future.delayed(const Duration(seconds: 2), () {
-                if (mounted) {
-                  context.go('/login');
-                }
-              });
-            }
-          } else {
+          // Show error message on same page (like webapp) - don't navigate
+          if (mounted) {
             _showError(errorMsg);
           }
         }
@@ -371,44 +388,63 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void _showCountryCodePicker() {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        return DraggableScrollableSheet(
+          initialChildSize: 0.7,
+          minChildSize: 0.5,
+          maxChildSize: 0.95,
+          expand: false,
+          builder: (context, scrollController) {
+            return Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Select Country Code',
-                    style: Theme.of(context).textTheme.titleLarge,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Select Country Code',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.close),
+                      ),
+                    ],
                   ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: ListView.builder(
+                      controller: scrollController,
+                      shrinkWrap: true,
+                      itemCount: countryCodes.length,
+                      itemBuilder: (context, index) {
+                        final country = countryCodes[index];
+                        return ListTile(
+                          title: Text('${country.name} (${country.dialCode})'),
+                          trailing: _selectedCountryCode == country.dialCode
+                              ? const Icon(Icons.check,
+                                  color: AppColors.primary)
+                              : null,
+                          onTap: () {
+                            setState(
+                                () => _selectedCountryCode = country.dialCode);
+                            Navigator.pop(context);
+                          },
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              ...countryCodes.map((country) {
-                return ListTile(
-                  title: Text('${country.name} (${country.dialCode})'),
-                  trailing: _selectedCountryCode == country.dialCode
-                      ? const Icon(Icons.check, color: AppColors.primary)
-                      : null,
-                  onTap: () {
-                    setState(() => _selectedCountryCode = country.dialCode);
-                    Navigator.pop(context);
-                  },
-                );
-              }),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -506,7 +542,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         child: Row(
                           children: [
-                            Text(_selectedCountryCode),
+                            Text(
+                              _selectedCountryCode.isEmpty
+                                  ? 'Select Country Code'
+                                  : _selectedCountryCode,
+                              style: TextStyle(
+                                color: _selectedCountryCode.isEmpty
+                                    ? theme.hintColor
+                                    : theme.textTheme.bodyLarge?.color,
+                              ),
+                            ),
                             const SizedBox(width: 8),
                             const Icon(Icons.keyboard_arrow_down, size: 16),
                           ],

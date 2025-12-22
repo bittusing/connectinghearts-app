@@ -225,9 +225,9 @@ class _InterestsSentScreenState extends State<InterestsSentScreen> {
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
-            ),
-          ],
-        ),
+                          ),
+                        ],
+                      ),
       ),
     );
   }

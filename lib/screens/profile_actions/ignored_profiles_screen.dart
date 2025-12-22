@@ -172,7 +172,7 @@ class _IgnoredProfilesScreenState extends State<IgnoredProfilesScreen> {
                                           label: 'Remove',
                                           color: Colors.blue,
                                           onTap: () =>
-                                              _handleUnignore(profile['id']),
+                                        _handleUnignore(profile['id']),
                                         ),
                                       ],
                                     ),
@@ -224,9 +224,9 @@ class _IgnoredProfilesScreenState extends State<IgnoredProfilesScreen> {
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
-            ),
-          ],
-        ),
+                          ),
+                        ],
+                      ),
       ),
     );
   }
