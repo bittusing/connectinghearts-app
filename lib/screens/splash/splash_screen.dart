@@ -77,11 +77,13 @@ class _SplashScreenState extends State<SplashScreen> {
               child: Image.asset(
                 'assets/images/splash.jpg',
                 fit: BoxFit.cover,
-                width: double.infinity,
-                height: double.infinity,
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
                 errorBuilder: (context, error, stackTrace) {
                   // Fallback to white container if image fails
                   return Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
                     color: Colors.white,
                     child: const Center(
                       child: Icon(
@@ -94,30 +96,33 @@ class _SplashScreenState extends State<SplashScreen> {
                 },
               ),
             ),
-            // Loading indicator overlay - positioned at bottom center
+            // Loading indicator overlay - positioned at bottom center with proper dimensions
             Positioned(
-              bottom: 80,
+              bottom: 100,
               left: 0,
               right: 0,
               child: Center(
                 child: Container(
-                  padding: const EdgeInsets.all(12),
+                  width: 56,
+                  height: 56,
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.95),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        blurRadius: 8,
-                        spreadRadius: 1,
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 12,
+                        spreadRadius: 2,
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
                   child: SizedBox(
-                    width: 24,
-                    height: 24,
+                    width: 28,
+                    height: 28,
                     child: CircularProgressIndicator(
-                      strokeWidth: 2.5,
+                      strokeWidth: 3.0,
                       valueColor: AlwaysStoppedAnimation<Color>(
                         Theme.of(context).primaryColor,
                       ),

@@ -12,3 +12,4 @@ PRODUCT_BUNDLE_IDENTIFIER = com.connectingheart.connectingheartMobile
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2025 com.connectingheart. All rights reserved.
+pubspec.yaml
