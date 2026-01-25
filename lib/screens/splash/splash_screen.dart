@@ -75,7 +75,7 @@ class _SplashScreenState extends State<SplashScreen> {
             // Background image - responsive and perfectly sized
             Positioned.fill(
               child: Image.asset(
-                'assets/images/splash.jpg',
+                'assets/images/splash.jpeg',
                 fit: BoxFit.cover,
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,

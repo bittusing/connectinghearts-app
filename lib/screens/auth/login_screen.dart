@@ -120,7 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Continue where you left off. APIs will plug into this form once backend routes go live.',
+                  'Sign in to access your Connecting Hearts dashboard.',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurface.withOpacity(0.7),
                     height: 1.5,
@@ -140,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
                   decoration: InputDecoration(
-                    hintText: '+91 90000 00000',
+                    hintText: '90000 00000',
                     filled: true,
                     fillColor: theme.cardColor,
                     border: OutlineInputBorder(

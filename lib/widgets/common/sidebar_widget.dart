@@ -444,18 +444,18 @@ class _SidebarWidgetState extends State<SidebarWidget> {
                     externalUrl:
                         'https://contributions.heartfulness.org/in-en/donation-general-fund',
                   ),
-                  const Divider(color: Colors.grey),
-                  _buildMenuItem(
-                    context,
-                    icon: themeProvider.isDarkMode
-                        ? Icons.light_mode
-                        : Icons.dark_mode,
-                    title:
-                        themeProvider.isDarkMode ? 'Light Mode' : 'Dark Mode',
-                    route: null,
-                    currentPath: currentPath,
-                    onTap: () => themeProvider.toggleTheme(),
-                  ),
+                  // const Divider(color: Colors.grey),
+                  // _buildMenuItem(
+                  //   context,
+                  //   icon: themeProvider.isDarkMode
+                  //       ? Icons.light_mode
+                  //       : Icons.dark_mode,
+                  //   title:
+                  //       themeProvider.isDarkMode ? 'Light Mode' : 'Dark Mode',
+                  //   route: null,
+                  //   currentPath: currentPath,
+                  //   onTap: () => themeProvider.toggleTheme(),
+                  // ),
                 ],
               ),
             ),
