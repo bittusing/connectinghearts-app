@@ -15,6 +15,8 @@ import '../../config/api_config.dart';
 import '../../widgets/dashboard/dashboard_banner_slider.dart';
 import '../../models/profile_models.dart';
 import '../../services/static_data_service.dart';
+import '../../services/version_service.dart';
+import '../../widgets/common/update_dialog.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -27,6 +29,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final ProfileService _profileService = ProfileService();
   final AuthService _authService = AuthService();
   final StorageService _storageService = StorageService();
+  final VersionService _versionService = VersionService();
   bool _isLoading = true;
   int _acceptanceCount = 0;
   int _justJoinedCount = 0;
@@ -53,6 +56,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _loadData();
     // Refresh notification counts when dashboard opens
     _refreshNotificationCounts();
+    // Check for app updates - use addPostFrameCallback to ensure context is ready
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkForUpdate();
+    });
   }
 
   @override
@@ -79,6 +86,50 @@ class _DashboardScreenState extends State<DashboardScreen> {
         }
       }
     });
+  }
+
+  Future<void> _checkForUpdate() async {
+    print('🔍 Dashboard: Checking for update...');
+    try {
+      // TEMPORARY: For testing - Uncomment below to test popup without backend API
+      
+      if (mounted) {
+        print('✅ Dashboard: Showing update dialog (TEST MODE)');
+        showDialog(
+          context: context,
+          barrierDismissible: false, // Force update - can't dismiss
+          builder: (context) => const UpdateDialog(
+            forceUpgrade: true,  // Change to false for optional update
+            recommendUpgrade: false,
+          ),
+        );
+        return;
+      }
+      
+      
+      final updateInfo = await _versionService.checkForUpdate();
+      
+      if (updateInfo != null && mounted) {
+        final forceUpgrade = updateInfo['forceUpgrade'] ?? false;
+        final recommendUpgrade = updateInfo['recommendUpgrade'] ?? false;
+        
+        if (forceUpgrade || recommendUpgrade) {
+          print('✅ Dashboard: Showing update dialog');
+          // Show update dialog
+          showDialog(
+            context: context,
+            barrierDismissible: !forceUpgrade, // Can't dismiss if force upgrade
+            builder: (context) => UpdateDialog(
+              forceUpgrade: forceUpgrade,
+              recommendUpgrade: recommendUpgrade,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      // Silently fail - don't block user
+      print('❌ Version check failed: $e');
+    }
   }
 
   Future<void> _loadData() async {
