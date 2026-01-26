@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/version_service.dart';
+import '../../widgets/common/update_dialog.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -12,6 +14,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   bool _hasNavigated = false;
+  final VersionService _versionService = VersionService();
 
   @override
   void initState() {
@@ -26,6 +29,9 @@ class _SplashScreenState extends State<SplashScreen> {
     while (authProvider.isCheckingAuth) {
       await Future.delayed(const Duration(milliseconds: 100));
     }
+
+    // Check for app update (only once per day)
+    await _checkForUpdate();
 
     // Navigate based on authentication status
     if (mounted && !_hasNavigated) {
@@ -58,6 +64,32 @@ class _SplashScreenState extends State<SplashScreen> {
           context.go('/login');
         }
       }
+    }
+  }
+
+  Future<void> _checkForUpdate() async {
+    try {
+      final updateInfo = await _versionService.checkForUpdate();
+      
+      if (updateInfo != null && mounted) {
+        final forceUpgrade = updateInfo['forceUpgrade'] ?? false;
+        final recommendUpgrade = updateInfo['recommendUpgrade'] ?? false;
+        
+        if (forceUpgrade || recommendUpgrade) {
+          // Show update dialog
+          showDialog(
+            context: context,
+            barrierDismissible: !forceUpgrade, // Can't dismiss if force upgrade
+            builder: (context) => UpdateDialog(
+              forceUpgrade: forceUpgrade,
+              recommendUpgrade: recommendUpgrade,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      // Silently fail - don't block user
+      print('Version check failed: $e');
     }
   }
 
