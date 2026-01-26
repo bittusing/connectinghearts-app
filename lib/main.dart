@@ -37,9 +37,12 @@ class ConnectingHeartApp extends StatelessWidget {
           return MaterialApp.router(
             title: 'Connecting Hearts',
             debugShowCheckedModeBanner: false,
+            // Only light theme is enabled for now
             theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: themeProvider.themeMode,
+            // Dark theme is commented out
+            // darkTheme: AppTheme.darkTheme,
+            // Force light mode only
+            themeMode: ThemeMode.light, // themeProvider.themeMode,
             routerConfig: createAppRouter(authProvider),
           );
         },

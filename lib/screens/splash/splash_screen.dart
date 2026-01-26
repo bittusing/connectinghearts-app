@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/version_service.dart';
+import '../../widgets/common/update_dialog.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -12,6 +14,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   bool _hasNavigated = false;
+  final VersionService _versionService = VersionService();
 
   @override
   void initState() {
@@ -26,6 +29,9 @@ class _SplashScreenState extends State<SplashScreen> {
     while (authProvider.isCheckingAuth) {
       await Future.delayed(const Duration(milliseconds: 100));
     }
+
+    // Check for app update (only once per day)
+    await _checkForUpdate();
 
     // Navigate based on authentication status
     if (mounted && !_hasNavigated) {
@@ -61,6 +67,32 @@ class _SplashScreenState extends State<SplashScreen> {
     }
   }
 
+  Future<void> _checkForUpdate() async {
+    try {
+      final updateInfo = await _versionService.checkForUpdate();
+      
+      if (updateInfo != null && mounted) {
+        final forceUpgrade = updateInfo['forceUpgrade'] ?? false;
+        final recommendUpgrade = updateInfo['recommendUpgrade'] ?? false;
+        
+        if (forceUpgrade || recommendUpgrade) {
+          // Show update dialog
+          showDialog(
+            context: context,
+            barrierDismissible: !forceUpgrade, // Can't dismiss if force upgrade
+            builder: (context) => UpdateDialog(
+              forceUpgrade: forceUpgrade,
+              recommendUpgrade: recommendUpgrade,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      // Silently fail - don't block user
+      print('Version check failed: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,13 +107,15 @@ class _SplashScreenState extends State<SplashScreen> {
             // Background image - responsive and perfectly sized
             Positioned.fill(
               child: Image.asset(
-                'assets/images/splash.jpg',
+                'assets/images/splash.jpeg',
                 fit: BoxFit.cover,
-                width: double.infinity,
-                height: double.infinity,
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
                 errorBuilder: (context, error, stackTrace) {
                   // Fallback to white container if image fails
                   return Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
                     color: Colors.white,
                     child: const Center(
                       child: Icon(
@@ -94,15 +128,37 @@ class _SplashScreenState extends State<SplashScreen> {
                 },
               ),
             ),
-            // Loading indicator overlay
+            // Loading indicator overlay - positioned at bottom center with proper dimensions
             Positioned(
-              bottom: 50,
+              bottom: 100,
               left: 0,
               right: 0,
               child: Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    Theme.of(context).primaryColor,
+                child: Container(
+                  width: 56,
+                  height: 56,
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.95),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 12,
+                        spreadRadius: 2,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: SizedBox(
+                    width: 28,
+                    height: 28,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3.0,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Theme.of(context).primaryColor,
+                      ),
+                    ),
                   ),
                 ),
               ),

@@ -341,4 +341,21 @@ class ProfileService {
     );
     return response;
   }
+
+  // Update notification count (mark as seen)
+  // Match webapp: POST dashboard/updateNotificationCount
+  Future<void> updateNotificationCount(
+    List<String> profileIds,
+    String notificationType,
+  ) async {
+    if (profileIds.isEmpty) return;
+
+    await _apiClient.post<Map<String, dynamic>>(
+      '/dashboard/updateNotificationCount',
+      body: {
+        'ids': profileIds,
+        'type': notificationType,
+      },
+    );
+  }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 import '../../theme/colors.dart';
 import '../../services/membership_service.dart';
 import '../../widgets/common/bottom_navigation_widget.dart';
@@ -15,7 +16,9 @@ class MembershipScreen extends StatefulWidget {
 
 class _MembershipScreenState extends State<MembershipScreen> {
   final MembershipService _membershipService = MembershipService();
+  late Razorpay _razorpay;
   bool _isLoading = true;
+  String? _processingPlanId; // Track which specific plan is being processed
   String? _error;
   final List<Map<String, dynamic>> _plans = [];
   Map<String, dynamic>? _activePlan;
@@ -24,7 +27,17 @@ class _MembershipScreenState extends State<MembershipScreen> {
   @override
   void initState() {
     super.initState();
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
     _loadMembershipData();
+  }
+
+  @override
+  void dispose() {
+    _razorpay.clear();
+    super.dispose();
   }
 
   Future<void> _loadMembershipData() async {
@@ -94,31 +107,176 @@ class _MembershipScreenState extends State<MembershipScreen> {
   }
 
   Future<void> _handleChoosePlan(Map<String, dynamic> plan) async {
+    final planId = plan['id'] as String;
+
+    // Prevent multiple clicks on the same or different plans
+    if (_processingPlanId != null) return;
+
+    setState(() => _processingPlanId = planId);
+
     try {
-      final orderResponse = await _membershipService.buyMembership(plan['id']);
-      // TODO: Integrate Razorpay payment
-      // For now, show success message
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              orderResponse.message ?? 'Payment integration coming soon',
+      // STEP 1: Create order with backend
+      print('Creating payment order for plan: $planId');
+      final orderResponse = await _membershipService.buyMembership(planId);
+      print(
+          'Order created: ${orderResponse.orderId}, Amount: ${orderResponse.amount}');
+
+      if (orderResponse.keyId == null || orderResponse.keyId!.isEmpty) {
+        throw Exception(
+            'Payment gateway not configured. Please contact support.');
+      }
+
+      if (orderResponse.orderId.isEmpty) {
+        throw Exception('Invalid order ID received from server.');
+      }
+
+      // STEP 2: Open Razorpay checkout
+      final options = {
+        'key': orderResponse.keyId!,
+        'amount': orderResponse.amount * 100, // Convert to paise
+        'name': 'Connecting Hearts',
+        'description': 'Membership: ${plan['name']}',
+        'order_id': orderResponse.orderId,
+        'prefill': {
+          'contact': '', // Can be filled with user's phone if available
+          'email': '', // Can be filled with user's email if available
+        },
+        'theme': {
+          'color': '#ec4899', // Pink color matching theme
+        },
+      };
+
+      print('Opening Razorpay checkout with options: $options');
+      try {
+        _razorpay.open(options);
+        print('Razorpay checkout opened successfully');
+      } catch (razorpayError) {
+        print('Error opening Razorpay: $razorpayError');
+        setState(() => _processingPlanId = null);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  'Failed to open payment gateway: ${razorpayError.toString()}'),
+              backgroundColor: AppColors.error,
+              duration: const Duration(seconds: 3),
             ),
-            backgroundColor: AppColors.success,
-          ),
-        );
-        // Reload membership data after purchase
-        _loadMembershipData();
+          );
+        }
       }
     } catch (e) {
+      print('Error in _handleChoosePlan: $e');
+      setState(() => _processingPlanId = null);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.toString().replaceAll('API ', '')),
             backgroundColor: AppColors.error,
+            duration: const Duration(seconds: 3),
           ),
         );
       }
+    }
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) async {
+    setState(() => _processingPlanId = null);
+
+    try {
+      // STEP 3: Verify payment with backend
+      final verifyResponse = await _membershipService.verifyPayment(
+        response.orderId ?? '',
+      );
+
+      if (verifyResponse.success) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                verifyResponse.message ??
+                    'Payment successful! Membership activated.',
+              ),
+              backgroundColor: AppColors.success,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+          // Reload membership data after successful payment
+          _loadMembershipData();
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                verifyResponse.message ?? 'Payment verification failed.',
+              ),
+              backgroundColor: AppColors.error,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Payment was successful, but verification failed. Please contact support if the issue persists.',
+            ),
+            backgroundColor: AppColors.error,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+        // Still reload data in case payment was processed
+        _loadMembershipData();
+      }
+    }
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    setState(() => _processingPlanId = null);
+
+    String errorMessage = 'Payment failed';
+    if (response.message != null) {
+      errorMessage = response.message!;
+    } else if (response.code != null) {
+      errorMessage = 'Payment failed: ${response.code}';
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: AppColors.error,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('External wallet selected: ${response.walletName}'),
+          backgroundColor: Colors.blue,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  void _handlePaymentDismissed() {
+    print('Payment dialog dismissed by user');
+    setState(() => _processingPlanId = null);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Payment cancelled'),
+          backgroundColor: Colors.orange,
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
   }
 
@@ -365,7 +523,9 @@ class _MembershipScreenState extends State<MembershipScreen> {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () => _handleChoosePlan(plan),
+              onPressed: _processingPlanId != null
+                  ? null
+                  : () => _handleChoosePlan(plan),
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.cardColor,
                 foregroundColor: theme.textTheme.bodyLarge?.color,
@@ -375,10 +535,16 @@ class _MembershipScreenState extends State<MembershipScreen> {
                   side: BorderSide(color: theme.dividerColor),
                 ),
               ),
-              child: const Text(
-                'Choose plan',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
+              child: _processingPlanId == plan['id']
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text(
+                      'Choose plan',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
             ),
           ),
         ],

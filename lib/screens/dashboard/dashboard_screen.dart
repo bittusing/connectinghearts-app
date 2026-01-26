@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/lookup_provider.dart';
+import '../../providers/notification_count_provider.dart';
 import '../../theme/colors.dart';
 import '../../widgets/profile/profile_card.dart';
 import '../../widgets/profile/stat_card.dart';
@@ -44,11 +45,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String? _profileName;
   String? _profileImageUrl;
   int? _heartsId;
+  DateTime? _lastNotificationRefresh;
 
   @override
   void initState() {
     super.initState();
     _loadData();
+    // Refresh notification counts when dashboard opens
+    _refreshNotificationCounts();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Refresh notification counts when screen becomes visible again
+    // Only refresh if it's been more than 1 second since last refresh (avoid too many calls)
+    final now = DateTime.now();
+    if (_lastNotificationRefresh == null ||
+        now.difference(_lastNotificationRefresh!).inSeconds > 1) {
+      _refreshNotificationCounts();
+    }
+  }
+
+  void _refreshNotificationCounts() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        try {
+          _lastNotificationRefresh = DateTime.now();
+          Provider.of<NotificationCountProvider>(context, listen: false)
+              .fetchCounts();
+        } catch (e) {
+          // Provider might not be available, ignore silently
+        }
+      }
+    });
   }
 
   Future<void> _loadData() async {

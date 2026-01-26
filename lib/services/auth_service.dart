@@ -16,6 +16,7 @@ class AuthService {
   }
 
   // Match webapp: POST /auth/generateOtp with extension (not countryCode)
+  // Returns ApiResponse with OTP in data field if present (for non-+91 country codes)
   Future<ApiResponse> generateOtp(String phoneNumber, String extension) async {
     final response = await _apiClient.post<Map<String, dynamic>>(
       '/auth/generateOtp',
@@ -24,7 +25,18 @@ class AuthService {
         'extension': extension,
       },
     );
-    return ApiResponse.fromJson(response);
+    // Create ApiResponse and preserve OTP from raw response (if present)
+    // OTP is at root level in response (like webapp: response.otp)
+    // Store it in data field for easy access
+    final data =
+        response['otp'] != null ? {'otp': response['otp']} : response['data'];
+
+    return ApiResponse(
+      success: response['status'] == 'success' ||
+          (response['code'] != null && response['code'] == 'CH200'),
+      message: response['message'],
+      data: data,
+    );
   }
 
   // Match webapp: POST /auth/verifyOtp

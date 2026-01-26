@@ -1,4 +1,4 @@
-package com.connectingheart.connectingheart_mobile
+package digi.coder.connectingheart
 
 import io.flutter.embedding.android.FlutterActivity
 

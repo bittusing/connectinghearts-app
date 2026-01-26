@@ -14,8 +14,8 @@ class MembershipService {
     }
     // Handle object with data field
     if (response is Map<String, dynamic>) {
-    final data = response['data'] as List<dynamic>? ?? [];
-    return data.map((plan) => MembershipPlanApi.fromJson(plan)).toList();
+      final data = response['data'] as List<dynamic>? ?? [];
+      return data.map((plan) => MembershipPlanApi.fromJson(plan)).toList();
     }
     return [];
   }
@@ -35,9 +35,8 @@ class MembershipService {
   }
 
   Future<PaymentVerificationResponse> verifyPayment(String orderId) async {
-    final response = await _apiClient.post<Map<String, dynamic>>(
-      '/membership/verifyPayment',
-      body: {'orderId': orderId},
+    final response = await _apiClient.get<Map<String, dynamic>>(
+      '/dashboard/verifyPayment/$orderId',
     );
     return PaymentVerificationResponse.fromJson(response);
   }

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../theme/colors.dart';
 import '../../widgets/profile/profile_match_card.dart';
 import '../../widgets/common/empty_state_widget.dart';
 import '../../widgets/common/bottom_navigation_widget.dart';
 import '../../services/profile_service.dart';
 import '../../utils/profile_utils.dart';
+import '../../providers/notification_count_provider.dart';
 
 class ShortlistedProfilesScreen extends StatefulWidget {
   const ShortlistedProfilesScreen({super.key});
@@ -34,10 +36,38 @@ class _ShortlistedProfilesScreenState extends State<ShortlistedProfilesScreen> {
 
     try {
       final response = await _profileService.getShortlistedProfiles();
+      final profiles = response.data.map((p) => transformProfile(p)).toList();
+
       setState(() {
-        _profiles = response.data.map((p) => transformProfile(p)).toList();
+        _profiles = profiles;
         _isLoading = false;
       });
+
+      // Mark notifications as seen (like webapp)
+      if (profiles.isNotEmpty && mounted) {
+        final profileIds = profiles
+            .map((p) => p['id']?.toString())
+            .whereType<String>()
+            .where((id) => id.isNotEmpty)
+            .toList();
+
+        if (profileIds.isNotEmpty) {
+          try {
+            await _profileService.updateNotificationCount(
+              profileIds,
+              'shortlistedProfile',
+            );
+            // Refresh notification counts
+            if (mounted) {
+              Provider.of<NotificationCountProvider>(context, listen: false)
+                  .fetchCounts();
+            }
+          } catch (e) {
+            // Silently fail - this is a background operation
+            print('Failed to update notification count: $e');
+          }
+        }
+      }
     } catch (e) {
       setState(() {
         _error = e.toString();
@@ -60,6 +90,11 @@ class _ShortlistedProfilesScreenState extends State<ShortlistedProfilesScreen> {
       await _profileService.unshortlistProfile(profileId);
       _showToast('Removed from shortlist');
       _loadProfiles();
+      // Refresh notification counts after action
+      if (mounted) {
+        Provider.of<NotificationCountProvider>(context, listen: false)
+            .fetchCounts();
+      }
     } catch (e) {
       _showToast(e.toString(), isError: true);
     }
