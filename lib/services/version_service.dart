@@ -8,7 +8,7 @@ class VersionService {
 
   // Get app version from pubspec.yaml
   String getCurrentVersion() {
-    return '1.0.0'; // This matches pubspec.yaml version
+    return '1.0.2'; // This matches pubspec.yaml version (1.0.1+3)
   }
 
   // Check if we should check for update (to avoid too many API calls)
@@ -35,15 +35,19 @@ class VersionService {
     try {
       // Check if we should make API call
       if (!await shouldCheckForUpdate()) {
+        print('⏭️ Skipping version check (checked recently)');
         return null; // Don't check too frequently
       }
 
       final currentVersion = getCurrentVersion();
+      print('📱 App version: $currentVersion');
       
       // Call API with current version
       final response = await _apiClient.get<Map<String, dynamic>>(
         '/auth/checkUpdate/$currentVersion',
       );
+
+      print('🔍 Backend response: $response');
 
       // Save last check time
       await _saveLastCheckTime();
@@ -55,6 +59,8 @@ class VersionService {
           final forceUpgrade = message['forceUpgrade'] ?? false;
           final recommendUpgrade = message['recommendUpgrade'] ?? false;
           
+          print('✅ forceUpgrade: $forceUpgrade, recommendUpgrade: $recommendUpgrade');
+          
           // Only return if update is needed
           if (forceUpgrade || recommendUpgrade) {
             return {
@@ -65,9 +71,10 @@ class VersionService {
         }
       }
       
+      print('✅ No update needed');
       return null; // No update needed
     } catch (e) {
-      print('Version check failed: $e');
+      print('❌ Version check failed: $e');
       return null; // Fail silently
     }
   }

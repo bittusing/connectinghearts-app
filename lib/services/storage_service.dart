@@ -1,10 +1,12 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'dart:convert';
 
 class StorageService {
   static const String _tokenKey = 'connectingheart-token';
   static const String _userIdKey = 'connectingheart-userId';
   static const String _profileNameKey = 'connectingheart-profileName';
   static const String _profileImageUrlKey = 'connectingheart-profileImageUrl';
+  static const String _dashboardCacheKey = 'connectingheart-dashboardCache';
 
   final FlutterSecureStorage _storage = const FlutterSecureStorage(
     aOptions: AndroidOptions(
@@ -65,10 +67,37 @@ class StorageService {
     await _storage.delete(key: _profileImageUrlKey);
   }
 
+  // Dashboard cache storage
+  Future<Map<String, dynamic>?> getDashboardCache() async {
+    try {
+      final cacheJson = await _storage.read(key: _dashboardCacheKey);
+      if (cacheJson != null) {
+        return json.decode(cacheJson) as Map<String, dynamic>;
+      }
+    } catch (e) {
+      print('Error reading dashboard cache: $e');
+    }
+    return null;
+  }
+
+  Future<void> setDashboardCache(Map<String, dynamic> data) async {
+    try {
+      final cacheJson = json.encode(data);
+      await _storage.write(key: _dashboardCacheKey, value: cacheJson);
+    } catch (e) {
+      print('Error saving dashboard cache: $e');
+    }
+  }
+
+  Future<void> deleteDashboardCache() async {
+    await _storage.delete(key: _dashboardCacheKey);
+  }
+
   // Clear profile data
   Future<void> clearProfileData() async {
     await deleteProfileName();
     await deleteProfileImageUrl();
+    await deleteDashboardCache();
   }
 
   Future<void> clearAll() async {

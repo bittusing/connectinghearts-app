@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/theme_provider.dart';
+import '../../providers/dashboard_provider.dart';
 import '../../theme/colors.dart';
 import '../../widgets/common/confirm_modal.dart';
 import '../../services/profile_service.dart';
@@ -579,6 +580,15 @@ class _SidebarWidgetState extends State<SidebarWidget> {
         cancelLabel: 'No',
         onConfirm: () async {
           Navigator.pop(context);
+          
+          // Clear dashboard cache before logout
+          try {
+            final dashboardProvider = Provider.of<DashboardProvider>(context, listen: false);
+            await dashboardProvider.clearCache();
+          } catch (e) {
+            print('Error clearing dashboard cache: $e');
+          }
+          
           await authProvider.logout();
           if (context.mounted) {
             context.go('/login');

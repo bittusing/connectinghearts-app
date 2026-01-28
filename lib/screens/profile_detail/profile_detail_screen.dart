@@ -1067,41 +1067,45 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
                       _profile!['contactDetails']!['name']
                           .toString()
                           .isNotEmpty)
-                    _buildInfoRow('Name',
-                        _profile!['contactDetails']!['name'].toString()),
+                    _buildInfoRow(
+                        label: 'Name',
+                        value: _profile!['contactDetails']!['name'].toString()),
                   if (_profile!['contactDetails']!['phoneNumber'] != null &&
                       _profile!['contactDetails']!['phoneNumber']
                           .toString()
                           .isNotEmpty)
-                    _buildInfoRow('Phone Number',
-                        _profile!['contactDetails']!['phoneNumber'].toString()),
+                    _buildInfoRow(
+                        label: 'Phone Number',
+                        value: _profile!['contactDetails']!['phoneNumber'].toString()),
                   if (_profile!['contactDetails']!['altMobileNumber'] != null &&
                       _profile!['contactDetails']!['altMobileNumber']
                           .toString()
                           .isNotEmpty)
                     _buildInfoRow(
-                        'Alternate Mobile',
-                        _profile!['contactDetails']!['altMobileNumber']
+                        label: 'Alternate Mobile',
+                        value: _profile!['contactDetails']!['altMobileNumber']
                             .toString()),
                   if (_profile!['contactDetails']!['landline'] != null &&
                       _profile!['contactDetails']!['landline']
                           .toString()
                           .isNotEmpty)
-                    _buildInfoRow('Landline',
-                        _profile!['contactDetails']!['landline'].toString()),
+                    _buildInfoRow(
+                        label: 'Landline',
+                        value: _profile!['contactDetails']!['landline'].toString()),
                   if (_profile!['contactDetails']!['email'] != null &&
                       _profile!['contactDetails']!['email']
                           .toString()
                           .isNotEmpty)
-                    _buildInfoRow('Email',
-                        _profile!['contactDetails']!['email'].toString()),
+                    _buildInfoRow(
+                        label: 'Email',
+                        value: _profile!['contactDetails']!['email'].toString()),
                   if (_profile!['contactDetails']!['alternateEmail'] != null &&
                       _profile!['contactDetails']!['alternateEmail']
                           .toString()
                           .isNotEmpty)
                     _buildInfoRow(
-                        'Alternate Email',
-                        _profile!['contactDetails']!['alternateEmail']
+                        label: 'Alternate Email',
+                        value: _profile!['contactDetails']!['alternateEmail']
                             .toString()),
                 ],
               ),
@@ -1150,33 +1154,6 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 120,
-            child: Text(
-              label,
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: theme.textTheme.bodyMedium,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildFamilyTab() {
     final family = _profile!['familyDetails'] as Map<String, dynamic>?;
     final theme = Theme.of(context);
@@ -1210,12 +1187,16 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Family Type and Location
+          _buildSectionTitle('Family'),
+          const SizedBox(height: 16),
+
+          // Family Type and Location (full width text block)
           if ((family['familyType'] != null &&
                   family['familyType'].toString().isNotEmpty) ||
               (family['familyBasedOutOf'] != null &&
                   family['familyBasedOutOf'].toString().isNotEmpty)) ...[
             Container(
+              width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: theme.cardColor,
@@ -1229,9 +1210,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
                       family['familyType'].toString().isNotEmpty)
                     Text(
                       '${family['familyType']}${family['familyBasedOutOf'] != null && family['familyBasedOutOf'].toString().isNotEmpty ? ' from ${family['familyBasedOutOf']}' : ''}',
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: theme.textTheme.bodyMedium,
                     ),
                   if (family['familyValues'] != null &&
                       family['familyValues'].toString().isNotEmpty) ...[
@@ -1263,12 +1242,13 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
             const SizedBox(height: 16),
           ],
 
-          // Parents Occupation
+          // Parents Occupation (full width text block)
           if ((family['fatherOccupation'] != null &&
                   family['fatherOccupation'].toString().isNotEmpty) ||
               (family['motherOccupation'] != null &&
                   family['motherOccupation'].toString().isNotEmpty)) ...[
             Container(
+              width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: theme.cardColor,
@@ -1286,9 +1266,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
                             ? 'Father is ${family['fatherOccupation']} & Mother is ${family['motherOccupation']}'
                             : 'Father is ${family['fatherOccupation']}')
                         : 'Mother is ${family['motherOccupation']}',
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: theme.textTheme.bodyMedium,
                   ),
                   if (siblingsInfo.isNotEmpty) ...[
                     const SizedBox(height: 4),
@@ -1311,7 +1289,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
             const SizedBox(height: 16),
           ],
 
-          // About Family
+          // About Family (text block with border)
           if (family['aboutMyFamily'] != null &&
               family['aboutMyFamily'].toString().isNotEmpty) ...[
             Container(
@@ -1342,36 +1320,30 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
             const SizedBox(height: 16),
           ],
 
-          // Living with Parents
+          // Living with Parents (full width text block)
           if (family['livingWithParents'] != null &&
               family['livingWithParents'].toString().isNotEmpty) ...[
             Container(
+              width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: theme.cardColor,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: theme.dividerColor),
               ),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.home, color: theme.textTheme.bodySmall?.color),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Living with Parents',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          family['livingWithParents'].toString(),
-                          style: theme.textTheme.bodyMedium,
-                        ),
-                      ],
+                  Text(
+                    'Living with Parents',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
                     ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    family['livingWithParents'].toString(),
+                    style: theme.textTheme.bodyMedium,
                   ),
                 ],
               ),
@@ -1389,28 +1361,60 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
     final lifestyle = _profile!['lifestyleData'] as Map<String, dynamic>?;
     final theme = Theme.of(context);
 
+    // Debug: Check if kundali data exists
+    print('🔍 Kundali Data: $kundali');
+    print('🔍 Lifestyle Data: $lifestyle');
+
+    // Check if kundali has any data - EXPLICIT checks for release mode
+    bool hasKundaliData = false;
+    if (kundali != null) {
+      final rashi = kundali['rashi'];
+      final nakshatra = kundali['nakshatra'];
+      final timeOfBirth = kundali['timeOfBirth'];
+      final placeOfBirth = kundali['placeOfBirth'];
+      final manglik = kundali['manglik'];
+      final horoscope = kundali['horoscope'];
+      final city = kundali['city'];
+      final state = kundali['state'];
+      final country = kundali['country'];
+      
+      if ((rashi != null && rashi.toString().isNotEmpty) ||
+          (nakshatra != null && nakshatra.toString().isNotEmpty) ||
+          (timeOfBirth != null && timeOfBirth.toString().isNotEmpty) ||
+          (placeOfBirth != null && placeOfBirth.toString().isNotEmpty) ||
+          (manglik != null && manglik.toString().isNotEmpty) ||
+          (horoscope != null && horoscope.toString().isNotEmpty) ||
+          (city != null && city.toString().isNotEmpty) ||
+          (state != null && state.toString().isNotEmpty) ||
+          (country != null && country.toString().isNotEmpty)) {
+        hasKundaliData = true;
+      }
+    }
+
+    print('🔍 Has Kundali Data: $hasKundaliData');
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Show message if no kundali data
+          if (!hasKundaliData) ...[
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Text(
+                  'No Kundali details available',
+                  style: theme.textTheme.bodyMedium,
+                ),
+              ),
+            ),
+          ],
+          
           // Kundali & Astro Section
-          if (kundali != null &&
-              ((kundali['rashi'] != null &&
-                      kundali['rashi'].toString().isNotEmpty) ||
-                  (kundali['nakshatra'] != null &&
-                      kundali['nakshatra'].toString().isNotEmpty) ||
-                  (kundali['timeOfBirth'] != null &&
-                      kundali['timeOfBirth'].toString().isNotEmpty) ||
-                  (kundali['placeOfBirth'] != null &&
-                      kundali['placeOfBirth'].toString().isNotEmpty) ||
-                  (kundali['manglik'] != null &&
-                      kundali['manglik'].toString().isNotEmpty) ||
-                  (kundali['horoscope'] != null &&
-                      kundali['horoscope'].toString().isNotEmpty))) ...[
+          if (hasKundaliData && kundali != null) ...[
             _buildSectionTitle('Kundali & Astro'),
-            if (kundali['timeOfBirth'] != null &&
-                kundali['timeOfBirth'].toString().isNotEmpty) ...[
+            if (kundali['timeOfBirth'] != null && kundali['timeOfBirth'].toString().isNotEmpty) ...[
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -1432,21 +1436,20 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
               ),
               const SizedBox(height: 12),
             ],
-            if (kundali['placeOfBirth'] != null &&
-                kundali['placeOfBirth'].toString().isNotEmpty)
+            if (kundali['placeOfBirth'] != null && kundali['placeOfBirth'].toString().isNotEmpty)
               _buildInfoRow(
-                  'Place Of Birth', kundali['placeOfBirth'].toString()),
-            if (kundali['rashi'] != null &&
-                kundali['rashi'].toString().isNotEmpty)
-              _buildInfoRow('Rashi', kundali['rashi'].toString()),
-            if (kundali['nakshatra'] != null &&
-                kundali['nakshatra'].toString().isNotEmpty)
-              _buildInfoRow('Nakshatra', kundali['nakshatra'].toString()),
-            if (kundali['manglik'] != null &&
-                kundali['manglik'].toString().isNotEmpty)
-              _buildInfoRow('Manglik', kundali['manglik'].toString()),
-            if (kundali['horoscope'] != null &&
-                kundali['horoscope'].toString().isNotEmpty) ...[
+                  label: 'Place Of Birth',
+                  value: kundali['placeOfBirth'].toString()),
+            if (kundali['rashi'] != null && kundali['rashi'].toString().isNotEmpty)
+              _buildInfoRow(
+                  label: 'Rashi', value: kundali['rashi'].toString()),
+            if (kundali['nakshatra'] != null && kundali['nakshatra'].toString().isNotEmpty)
+              _buildInfoRow(
+                  label: 'Nakshatra', value: kundali['nakshatra'].toString()),
+            if (kundali['manglik'] != null && kundali['manglik'].toString().isNotEmpty)
+              _buildInfoRow(
+                  label: 'Manglik', value: kundali['manglik'].toString()),
+            if (kundali['horoscope'] != null && kundali['horoscope'].toString().isNotEmpty) ...[
               const SizedBox(height: 12),
               Container(
                 padding: const EdgeInsets.all(12),
@@ -1477,13 +1480,11 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
           ],
 
           // Lifestyle Section
-          if (lifestyle != null &&
-              ((lifestyle['drinkingHabits'] != null &&
-                      lifestyle['drinkingHabits'].toString().isNotEmpty) ||
-                  (lifestyle['dietaryHabits'] != null &&
-                      lifestyle['dietaryHabits'].toString().isNotEmpty) ||
-                  (lifestyle['smokingHabits'] != null &&
-                      lifestyle['smokingHabits'].toString().isNotEmpty))) ...[
+          if (lifestyle != null && (
+              (lifestyle['drinkingHabits']?.toString().isNotEmpty ?? false) ||
+              (lifestyle['dietaryHabits']?.toString().isNotEmpty ?? false) ||
+              (lifestyle['smokingHabits']?.toString().isNotEmpty ?? false)
+          )) ...[
             _buildSectionTitle('Lifestyle and Interests'),
             const SizedBox(height: 8),
             Text(
@@ -1801,80 +1802,208 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
     final matchDetails = _profile!['matchDetails'] as Map<String, dynamic>?;
     final matchData = matchDetails?['matchData'] as List<dynamic>? ?? [];
     final matchPercentage = matchDetails?['matchPercentage'];
+    final matchedCount = matchData.where((m) => m['isMatched'] == true).length;
+    final totalCount = matchData.length;
+    
+    final theme = Theme.of(context);
+    final gender = _profile!['gender']?.toString();
+    final profileImage = _profile!['avatar'];
+    final placeholderImage = getGenderPlaceholder(gender);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (matchPercentage != null)
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppColors.primary, Colors.pinkAccent],
-                ),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                children: [
-                  Text(
-                    '$matchPercentage%',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Text(
-                    'Match',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
+          // Match Summary with Images (matching webapp)
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: theme.cardColor,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: theme.dividerColor),
             ),
-          const SizedBox(height: 24),
-          ...matchData.map((match) {
-            final isMatched = match['isMatched'] ?? false;
-            return Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Theme.of(context).dividerColor,
-                ),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+            child: Column(
+              children: [
+                // Profile images row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // Their preference
+                    Column(
                       children: [
                         Text(
-                          match['label'] ?? '',
-                          style: const TextStyle(fontWeight: FontWeight.w500),
+                          'Their Preference',
+                          style: theme.textTheme.bodySmall,
                         ),
-                        Text(
-                          match['value'] ?? '',
-                          style: TextStyle(
-                            color: Theme.of(context).textTheme.bodySmall?.color,
+                        const SizedBox(height: 8),
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppColors.primary,
+                              width: 2,
+                            ),
+                          ),
+                          child: ClipOval(
+                            child: profileImage != null
+                                ? CachedNetworkImage(
+                                    imageUrl: profileImage,
+                                    fit: BoxFit.cover,
+                                    placeholder: (_, __) => Image.asset(
+                                      placeholderImage,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    errorWidget: (_, __, ___) => Image.asset(
+                                      placeholderImage,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                : Image.asset(
+                                    placeholderImage,
+                                    fit: BoxFit.cover,
+                                  ),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                  Icon(
-                    isMatched ? Icons.check_circle : Icons.cancel,
-                    color: isMatched ? AppColors.success : Colors.grey,
-                  ),
-                ],
+                    
+                    // Match percentage circle
+                    Column(
+                      children: [
+                        if (matchPercentage != null)
+                          Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: const LinearGradient(
+                                colors: [AppColors.primary, Colors.pinkAccent],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                            ),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    '$matchPercentage%',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const Text(
+                                    'Match',
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'You match $matchedCount/$totalCount',
+                          style: theme.textTheme.bodySmall,
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                    
+                    // You match
+                    Column(
+                      children: [
+                        Text(
+                          'You Match',
+                          style: theme.textTheme.bodySmall,
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppColors.primary,
+                              width: 2,
+                            ),
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              placeholderImage,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 24),
+          
+          // Matched criteria list
+          if (matchData.isNotEmpty) ...[
+            Text(
+              'Basic Details',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
               ),
-            );
-          }),
+            ),
+            const SizedBox(height: 12),
+            ...matchData.map((match) {
+              final isMatched = match['isMatched'] ?? false;
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: theme.dividerColor,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            match['label'] ?? '',
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            match['value'] ?? '',
+                            style: theme.textTheme.bodyMedium,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      isMatched ? Icons.check_circle : Icons.cancel,
+                      color: isMatched ? AppColors.success : Colors.grey,
+                      size: 28,
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ],
+          
           const SizedBox(height: 100),
         ],
       ),
@@ -1918,38 +2047,114 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
         .where((item) => item['value'] != null && item['value']!.isNotEmpty)
         .toList();
 
-    return Wrap(
-      spacing: 16,
-      runSpacing: 16,
-      children: validItems.map((item) {
-        return Container(
-          width: (MediaQuery.of(context).size.width - 48) / 2,
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Theme.of(context).dividerColor),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                item['label']!,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Theme.of(context).textTheme.bodySmall?.color,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                item['value']!,
-                style: const TextStyle(fontWeight: FontWeight.w500),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
+    return Column(
+      children: validItems
+          .map<Widget>((item) => _buildInfoRow(
+                label: item['label']!,
+                value: item['value']!,
+              ))
+          .toList(),
     );
+  }
+
+  // Simple row with icon (matching webapp design)
+  Widget _buildInfoRow({required String label, required String value}) {
+    final theme = Theme.of(context);
+    final icon = _getIconForLabel(label);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: theme.dividerColor.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Icon circle
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: theme.cardColor,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              size: 20,
+              color: theme.textTheme.bodySmall?.color,
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Label and value
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: theme.textTheme.bodyMedium,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Get appropriate icon for each label
+  IconData _getIconForLabel(String label) {
+    switch (label.toLowerCase()) {
+      case 'height':
+        return Icons.height;
+      case 'location':
+        return Icons.location_on_outlined;
+      case 'caste':
+        return Icons.book_outlined;
+      case 'income':
+        return Icons.currency_rupee;
+      case 'marital status':
+        return Icons.favorite_border;
+      case 'mother tongue':
+        return Icons.language;
+      case 'religion':
+        return Icons.book_outlined;
+      case 'body type':
+        return Icons.person_outline;
+      case 'disability':
+        return Icons.accessible;
+      case 'thalassemia':
+        return Icons.medical_services_outlined;
+      case 'hiv positive':
+        return Icons.warning_amber_outlined;
+      case 'occupation':
+        return Icons.work_outline;
+      case 'employed in':
+        return Icons.business_outlined;
+      case 'organisation':
+      case 'organisation name':
+        return Icons.business_outlined;
+      case 'interested in settling abroad':
+        return Icons.flight_outlined;
+      case 'qualification':
+        return Icons.school_outlined;
+      case 'school':
+        return Icons.school_outlined;
+      default:
+        return Icons.info_outline;
+    }
   }
 
   Widget _buildHabitsRow(Map<String, dynamic> lifestyle) {
