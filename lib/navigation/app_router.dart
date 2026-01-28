@@ -38,6 +38,7 @@ import '../screens/settings/delete_profile_screen.dart';
 import '../screens/profile_detail/profile_detail_screen.dart';
 import '../screens/my_profile/my_profile_screen.dart';
 import '../screens/profile_lists/profile_list_screen.dart';
+import '../screens/profile_lists/interest_received_list_screen.dart';
 import '../screens/acceptance/acceptance_screen.dart';
 import '../screens/notifications/notifications_screen.dart';
 import '../screens/notifications/unlocked_profiles_screen.dart';
@@ -216,6 +217,10 @@ GoRouter createAppRouter(AuthProvider authProvider) {
         },
       ),
       // Profile Lists
+      GoRoute(
+        path: '/interest-received',
+        builder: (context, state) => const InterestReceivedListScreen(),
+      ),
       GoRoute(
         path: '/interests-received',
         builder: (context, state) => const InterestsReceivedScreen(),

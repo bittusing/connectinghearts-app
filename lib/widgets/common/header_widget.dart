@@ -3,8 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../theme/colors.dart';
 import '../../providers/notification_count_provider.dart';
+import '../../services/storage_service.dart';
 
-class HeaderWidget extends StatelessWidget implements PreferredSizeWidget {
+class HeaderWidget extends StatefulWidget implements PreferredSizeWidget {
   final VoidCallback? onMenuTap;
   final int? notificationCount; // Optional override, otherwise uses provider
 
@@ -18,9 +19,32 @@ class HeaderWidget extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(64);
 
   @override
+  State<HeaderWidget> createState() => _HeaderWidgetState();
+}
+
+class _HeaderWidgetState extends State<HeaderWidget> {
+  final StorageService _storageService = StorageService();
+  String? _profileName;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileName();
+  }
+
+  Future<void> _loadProfileName() async {
+    final name = await _storageService.getProfileName();
+    if (mounted && name != null) {
+      setState(() {
+        _profileName = name;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Get notification count from provider if not overridden
-    int? displayCount = notificationCount;
+    int? displayCount = widget.notificationCount;
     if (displayCount == null) {
       try {
         final provider =
@@ -55,12 +79,12 @@ class HeaderWidget extends StatelessWidget implements PreferredSizeWidget {
               // Menu Button
               IconButton(
                 icon: const Icon(Icons.menu, color: Colors.white),
-                onPressed: onMenuTap ?? () => Scaffold.of(context).openDrawer(),
+                onPressed: widget.onMenuTap ?? () => Scaffold.of(context).openDrawer(),
               ),
               // Title
               Expanded(
                 child: Text(
-                  'Connecting Hearts',
+                  'Heartfulness connecting Hearts',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         color: Colors.white,
