@@ -50,7 +50,7 @@ class ProfileCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image on the left
+            // Image on the left - OPTIMIZED with better caching
             ClipRRect(
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(20),
@@ -64,9 +64,18 @@ class ProfileCard extends StatelessWidget {
                     ? CachedNetworkImage(
                         imageUrl: imageUrl!,
                         fit: BoxFit.cover,
-                        placeholder: (context, url) => Image.asset(
-                          getGenderPlaceholder(gender),
-                          fit: BoxFit.cover,
+                        memCacheWidth: 360, // Optimize memory usage
+                        memCacheHeight: 280,
+                        maxWidthDiskCache: 720, // Optimize disk cache
+                        maxHeightDiskCache: 560,
+                        fadeInDuration: const Duration(milliseconds: 200),
+                        fadeOutDuration: const Duration(milliseconds: 100),
+                        placeholder: (context, url) => Container(
+                          color: AppColors.primary.withOpacity(0.05),
+                          child: Image.asset(
+                            getGenderPlaceholder(gender),
+                            fit: BoxFit.cover,
+                          ),
                         ),
                         errorWidget: (context, url, error) => Image.asset(
                           getGenderPlaceholder(gender),

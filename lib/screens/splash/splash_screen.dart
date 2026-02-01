@@ -96,6 +96,31 @@ class _SplashScreenState extends State<SplashScreen> {
                 },
               ),
             ),
+            // Logo in center
+            Center(
+              child: Container(
+                width: 180,
+                height: 180,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 30,
+                      spreadRadius: 5,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/images/cone.logo.jpeg',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
             // Loading indicator overlay - positioned at bottom center with proper dimensions
             Positioned(
               bottom: 100,

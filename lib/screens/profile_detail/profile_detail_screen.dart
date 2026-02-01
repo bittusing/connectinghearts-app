@@ -22,6 +22,13 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
     with SingleTickerProviderStateMixin {
   final ProfileService _profileService = ProfileService();
   late TabController _tabController;
+  final ScrollController _scrollController = ScrollController();
+  
+  // Section keys for scroll position tracking
+  final GlobalKey _basicKey = GlobalKey();
+  final GlobalKey _familyKey = GlobalKey();
+  final GlobalKey _kundaliKey = GlobalKey();
+  final GlobalKey _matchKey = GlobalKey();
 
   bool _isLoading = true;
   String? _error;
@@ -32,32 +39,124 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
   bool _isShortlisted = false;
   bool _isIgnored = false;
   bool _isActionLoading = false;
+  
+  bool _isScrollingToTab = false; // Prevent scroll loop
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    _scrollController.addListener(_handleScroll);
     _loadProfile();
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_handleScroll);
+    _scrollController.dispose();
     _tabController.dispose();
     super.dispose();
+  }
+  
+  // Handle scroll to update tab indicator
+  void _handleScroll() {
+    if (_isScrollingToTab) return;
+    
+    // Get current scroll position
+    final scrollOffset = _scrollController.offset;
+    final screenHeight = MediaQuery.of(context).size.height;
+    
+    // Get positions of each section relative to scroll
+    final basicPos = _getSectionScrollPosition(_basicKey);
+    final familyPos = _getSectionScrollPosition(_familyKey);
+    final kundaliPos = _getSectionScrollPosition(_kundaliKey);
+    final matchPos = _getSectionScrollPosition(_matchKey);
+    
+    // Determine which section is most visible (center of screen)
+    final centerOffset = scrollOffset + (screenHeight * 0.3); // 30% from top
+    
+    int newIndex = 0;
+    
+    // Check which section the center point is in
+    if (centerOffset >= matchPos && matchPos > 0) {
+      newIndex = 3;
+    } else if (centerOffset >= kundaliPos && kundaliPos > 0) {
+      newIndex = 2;
+    } else if (centerOffset >= familyPos && familyPos > 0) {
+      newIndex = 1;
+    } else {
+      newIndex = 0;
+    }
+    
+    if (_tabController.index != newIndex) {
+      _tabController.animateTo(newIndex);
+    }
+  }
+  
+  // Get section scroll position
+  double _getSectionScrollPosition(GlobalKey key) {
+    final RenderBox? box = key.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null) return 0;
+    
+    try {
+      final position = box.localToGlobal(Offset.zero);
+      // Return absolute position in scroll
+      return _scrollController.offset + position.dy - 200; // Subtract header height
+    } catch (e) {
+      return 0;
+    }
+  }
+  
+  // Scroll to section when tab is clicked
+  void _scrollToTab(int index) {
+    _isScrollingToTab = true;
+    
+    GlobalKey? key;
+    switch (index) {
+      case 0:
+        key = _basicKey;
+        break;
+      case 1:
+        key = _familyKey;
+        break;
+      case 2:
+        key = _kundaliKey;
+        break;
+      case 3:
+        key = _matchKey;
+        break;
+    }
+    
+    if (key?.currentContext != null) {
+      Scrollable.ensureVisible(
+        key!.currentContext!,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+        alignment: 0.0, // Align to top
+      ).then((_) {
+        // Wait longer to ensure scroll is complete
+        Future.delayed(const Duration(milliseconds: 500), () {
+          _isScrollingToTab = false;
+        });
+      });
+    } else {
+      _isScrollingToTab = false;
+    }
   }
 
   // Transform API response to display format (matching webapp transformProfileDetailV1)
   Map<String, dynamic> _transformProfileData(Map<String, dynamic> apiData) {
-    final misc = apiData['miscellaneous'] as Map<String, dynamic>? ?? {};
-    final basic = apiData['basic'] as Map<String, dynamic>? ?? {};
-    final critical = apiData['critical'] as Map<String, dynamic>? ?? {};
-    final about = apiData['about'] as Map<String, dynamic>? ?? {};
-    final education = apiData['education'] as Map<String, dynamic>? ?? {};
-    final career = apiData['career'] as Map<String, dynamic>? ?? {};
-    final family = apiData['family'] as Map<String, dynamic>?;
-    final contact = apiData['contact'] as Map<String, dynamic>?;
-    final kundali = apiData['kundali'] as Map<String, dynamic>?;
-    final lifestyle = apiData['lifeStyleData'] as Map<String, dynamic>?;
+    try {
+      final misc = apiData['miscellaneous'] as Map<String, dynamic>? ?? {};
+      final basic = apiData['basic'] as Map<String, dynamic>? ?? {};
+      final critical = apiData['critical'] as Map<String, dynamic>? ?? {};
+      final about = apiData['about'] as Map<String, dynamic>? ?? {};
+      final education = apiData['education'] as Map<String, dynamic>? ?? {};
+      final career = apiData['career'] as Map<String, dynamic>? ?? {};
+      final family = apiData['family'] as Map<String, dynamic>?;
+      final contact = apiData['contact'] as Map<String, dynamic>?;
+      final kundali = apiData['kundali'] as Map<String, dynamic>?;
+      final lifestyle = apiData['lifeStyleData'] as Map<String, dynamic>?;
 
     final clientID = misc['clientID'] as String? ?? widget.profileId;
     final heartsId = misc['heartsId'] ?? '';
@@ -245,18 +344,18 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
             }
           : null,
 
-      // Kundali
+      // Kundali - match webapp behavior
       'kundaliDetails': kundali != null
           ? {
-              'rashi': kundali['rashi'] ?? '',
-              'nakshatra': kundali['nakshatra'] ?? '',
-              'timeOfBirth': timeOfBirth,
-              'manglik': kundali['manglik'] ?? '',
-              'horoscope': kundali['horoscope'] ?? '',
-              'city': kundali['city'] ?? '',
-              'state': kundali['state'] ?? '',
-              'country': kundali['country'] ?? '',
-              'placeOfBirth': placeOfBirth,
+              'rashi': kundali['rashi']?.toString().trim() ?? '',
+              'nakshatra': kundali['nakshatra']?.toString().trim() ?? '',
+              'timeOfBirth': timeOfBirth ?? '',
+              'manglik': kundali['manglik']?.toString().trim() ?? '',
+              'horoscope': kundali['horoscope']?.toString().trim() ?? '',
+              'city': kundali['city']?.toString().trim() ?? '',
+              'state': kundali['state']?.toString().trim() ?? '',
+              'country': kundali['country']?.toString().trim() ?? '',
+              'placeOfBirth': placeOfBirth ?? '',
             }
           : null,
 
@@ -303,6 +402,11 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
             }
           : null,
     };
+    } catch (e, stackTrace) {
+      debugPrint('❌ Error in _transformProfileData: $e');
+      debugPrint('❌ StackTrace: $stackTrace');
+      rethrow;
+    }
   }
 
   Future<void> _loadProfile() async {
@@ -331,8 +435,20 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
         throw Exception('Invalid response format');
       }
 
+      // Debug: Log raw kundali data from API
+      final rawKundali = apiData['kundali'];
+      debugPrint('📊 RAW API Kundali Data: $rawKundali');
+      debugPrint('📊 RAW API Kundali Type: ${rawKundali.runtimeType}');
+      if (rawKundali is Map) {
+        debugPrint('📊 Kundali Keys: ${rawKundali.keys.toList()}');
+        debugPrint('📊 Kundali Values: ${rawKundali.values.toList()}');
+      }
+
       // Transform to display format
       final transformed = _transformProfileData(apiData);
+      
+      // Debug: Log transformed kundali
+      debugPrint('📊 TRANSFORMED Kundali: ${transformed['kundaliDetails']}');
 
       setState(() {
         _profile = transformed;
@@ -503,6 +619,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
 
     return Scaffold(
       body: CustomScrollView(
+        controller: _scrollController,
         slivers: [
           // Image Header
           SliverAppBar(
@@ -695,6 +812,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
             delegate: _SliverTabBarDelegate(
               TabBar(
                 controller: _tabController,
+                onTap: _scrollToTab,
                 tabs: const [
                   Tab(text: 'Basic'),
                   Tab(text: 'Family'),
@@ -707,17 +825,32 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
               theme.cardColor,
             ),
           ),
-          // Tab Content
-          SliverFillRemaining(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildBasicTab(),
-                _buildFamilyTab(),
-                _buildKundaliTab(),
-                _buildMatchTab(),
-              ],
-            ),
+          // Continuous scrollable content (all sections in one scroll)
+          SliverList(
+            delegate: SliverChildListDelegate([
+              // Basic Section
+              Container(
+                key: _basicKey,
+                child: _buildBasicTab(),
+              ),
+              // Family Section
+              Container(
+                key: _familyKey,
+                child: _buildFamilyTab(),
+              ),
+              // Kundali Section
+              Container(
+                key: _kundaliKey,
+                child: _buildKundaliTab(),
+              ),
+              // Match Section
+              Container(
+                key: _matchKey,
+                child: _buildMatchTab(),
+              ),
+              // Bottom padding for action bar
+              const SizedBox(height: 100),
+            ]),
           ),
         ],
       ),
@@ -800,8 +933,8 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
   Widget _buildBasicTab() {
     final theme = Theme.of(context);
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8), // Reduced padding
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1182,8 +1315,8 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
           '$sisters Sister${sisters != 1 ? 's' : ''} ($marriedSisters Married)');
     }
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8), // Reduced padding
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1357,64 +1490,57 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
   }
 
   Widget _buildKundaliTab() {
-    final kundali = _profile!['kundaliDetails'] as Map<String, dynamic>?;
-    final lifestyle = _profile!['lifestyleData'] as Map<String, dynamic>?;
-    final theme = Theme.of(context);
+    try {
+      final kundali = _profile!['kundaliDetails'] as Map<String, dynamic>?;
+      final lifestyle = _profile!['lifestyleData'] as Map<String, dynamic>?;
+      final theme = Theme.of(context);
 
-    // Debug: Check if kundali data exists
-    print('🔍 Kundali Data: $kundali');
-    print('🔍 Lifestyle Data: $lifestyle');
-
-    // Check if kundali has any data - EXPLICIT checks for release mode
-    bool hasKundaliData = false;
-    if (kundali != null) {
-      final rashi = kundali['rashi'];
-      final nakshatra = kundali['nakshatra'];
-      final timeOfBirth = kundali['timeOfBirth'];
-      final placeOfBirth = kundali['placeOfBirth'];
-      final manglik = kundali['manglik'];
-      final horoscope = kundali['horoscope'];
-      final city = kundali['city'];
-      final state = kundali['state'];
-      final country = kundali['country'];
+      // Debug logging that works in release mode
+      debugPrint('🎨 UI - Kundali Data: $kundali');
       
-      if ((rashi != null && rashi.toString().isNotEmpty) ||
-          (nakshatra != null && nakshatra.toString().isNotEmpty) ||
-          (timeOfBirth != null && timeOfBirth.toString().isNotEmpty) ||
-          (placeOfBirth != null && placeOfBirth.toString().isNotEmpty) ||
-          (manglik != null && manglik.toString().isNotEmpty) ||
-          (horoscope != null && horoscope.toString().isNotEmpty) ||
-          (city != null && city.toString().isNotEmpty) ||
-          (state != null && state.toString().isNotEmpty) ||
-          (country != null && country.toString().isNotEmpty)) {
-        hasKundaliData = true;
+      // Check if kundali has any meaningful data
+      bool hasKundaliData = false;
+      if (kundali != null) {
+        try {
+          hasKundaliData = (kundali['rashi']?.toString().trim().isNotEmpty ?? false) ||
+              (kundali['nakshatra']?.toString().trim().isNotEmpty ?? false) ||
+              (kundali['timeOfBirth']?.toString().trim().isNotEmpty ?? false) ||
+              (kundali['placeOfBirth']?.toString().trim().isNotEmpty ?? false) ||
+              (kundali['manglik']?.toString().trim().isNotEmpty ?? false) ||
+              (kundali['horoscope']?.toString().trim().isNotEmpty ?? false) ||
+              (kundali['city']?.toString().trim().isNotEmpty ?? false) ||
+              (kundali['state']?.toString().trim().isNotEmpty ?? false) ||
+              (kundali['country']?.toString().trim().isNotEmpty ?? false);
+        } catch (e) {
+          debugPrint('❌ Error checking kundali data: $e');
+          hasKundaliData = false;
+        }
       }
-    }
+      
+      debugPrint('🎨 UI - Has Kundali Data: $hasKundaliData');
 
-    print('🔍 Has Kundali Data: $hasKundaliData');
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Show message if no kundali data
-          if (!hasKundaliData) ...[
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Text(
-                  'No Kundali details available',
-                  style: theme.textTheme.bodyMedium,
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Show message if no kundali data
+            if (!hasKundaliData) ...[
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Text(
+                    'No Kundali details available',
+                    style: theme.textTheme.bodyMedium,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
           
           // Kundali & Astro Section
           if (hasKundaliData && kundali != null) ...[
             _buildSectionTitle('Kundali & Astro'),
-            if (kundali['timeOfBirth'] != null && kundali['timeOfBirth'].toString().isNotEmpty) ...[
+            if (kundali['timeOfBirth']?.toString().trim().isNotEmpty ?? false) ...[
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -1720,6 +1846,21 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
         ],
       ),
     );
+    } catch (e, stackTrace) {
+      debugPrint('❌ Error in _buildKundaliTab: $e');
+      debugPrint('❌ StackTrace: $stackTrace');
+      return Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Center(
+          child: Text(
+            'Error loading Kundali details',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: AppColors.error,
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   Widget _buildPreferenceCard(String label, String value, IconData icon) {
@@ -1761,39 +1902,38 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
 
   Widget _buildSmallPreferenceCard(String label, String value, IconData icon) {
     final theme = Theme.of(context);
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: theme.dividerColor),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: AppColors.primary, size: 20),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
-                    ),
+    return Container(
+      width: (MediaQuery.of(context).size.width - 56) / 2, // Half width minus padding
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: theme.dividerColor),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: AppColors.primary, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
                   ),
-                  Text(
-                    value,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                ),
+                Text(
+                  value,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -1810,8 +1950,8 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
     final profileImage = _profile!['avatar'];
     final placeholderImage = getGenderPlaceholder(gender);
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8), // Reduced padding
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

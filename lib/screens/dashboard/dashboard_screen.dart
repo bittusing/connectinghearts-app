@@ -37,41 +37,55 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
+    // Load everything in parallel (non-blocking)
     _loadProfileData();
+    _loadDashboardData();
     _refreshNotificationCounts();
     // Check for app updates
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkForUpdate();
-      // Load dashboard data using provider
-      _loadDashboardData();
     });
   }
 
-  // Load dashboard data with lookup provider
+  // Load dashboard data with lookup provider - FULLY PARALLEL
   Future<void> _loadDashboardData() async {
     final dashboardProvider = Provider.of<DashboardProvider>(context, listen: false);
     final lookupProvider = Provider.of<LookupProvider>(context, listen: false);
     
-    // Ensure static data is loaded FIRST
-    final staticDataService = StaticDataService.instance;
-    await staticDataService.loadAllData();
+    // STEP 1: Load cache first (instant)
+    await dashboardProvider.loadFromCacheOnly();
     
-    // Ensure lookup data is loaded
-    if (lookupProvider.lookupData.isEmpty) {
-      await lookupProvider.loadLookupData();
+    // STEP 2: Load static data, lookup, and fresh data ALL IN PARALLEL
+    final futures = <Future>[];
+    
+    // Add static data loading
+    if (!StaticDataService.instance.isLoaded) {
+      futures.add(StaticDataService.instance.loadAllData());
     }
     
-    // Load dashboard with lookup data
-    await dashboardProvider.loadDashboard(
-      lookupData: lookupProvider.lookupData,
-      countries: lookupProvider.countries,
-    );
+    // Add lookup data loading
+    if (lookupProvider.lookupData.isEmpty) {
+      futures.add(lookupProvider.loadLookupData());
+    }
+    
+    // Wait for all to complete
+    if (futures.isNotEmpty) {
+      await Future.wait(futures);
+    }
+    
+    // STEP 3: Load fresh dashboard data (now that lookup is ready)
+    if (mounted) {
+      dashboardProvider.loadFreshDataInBackground(
+        lookupData: lookupProvider.lookupData,
+        countries: lookupProvider.countries,
+      );
+    }
   }
 
-  // Load profile data for header (name, image, heartsId)
+  // Load profile data for header (name, image, heartsId) - OPTIMIZED
   Future<void> _loadProfileData() async {
     try {
-      // First try to load from storage
+      // First try to load from storage (instant)
       final storedName = await _storageService.getProfileName();
       final storedImageUrl = await _storageService.getProfileImageUrl();
 
@@ -82,62 +96,69 @@ class _DashboardScreenState extends State<DashboardScreen> {
             _profileImageUrl = storedImageUrl;
           });
         }
+        // Still fetch from API in background to update if needed
+        _fetchProfileDataInBackground();
         return;
       }
 
       // If not in storage, fetch from API
-      try {
-        final userResponse = await _authService.getUser();
-        if (userResponse['code'] == 'CH200' &&
-            userResponse['status'] == 'success' &&
-            userResponse['data'] != null) {
-          final userData = userResponse['data'] as Map<String, dynamic>;
-
-          // Extract and store name
-          final name = userData['name']?.toString();
-          if (name != null && name.isNotEmpty) {
-            _profileName = name;
-            await _storageService.setProfileName(name);
-          }
-
-          // Extract and store profile picture
-          final profilePic = userData['profilePic'] as List<dynamic>?;
-          if (profilePic != null && profilePic.isNotEmpty) {
-            final primaryPic = profilePic.firstWhere(
-              (pic) => pic['primary'] == true,
-              orElse: () => profilePic.first,
-            ) as Map<String, dynamic>?;
-
-            if (primaryPic != null && primaryPic['id'] != null) {
-              final userId = userData['_id']?.toString() ?? '';
-              if (userId.isNotEmpty) {
-                final imageUrl = ApiConfig.buildImageUrl(
-                  userId,
-                  primaryPic['id'].toString(),
-                );
-                _profileImageUrl = imageUrl;
-                await _storageService.setProfileImageUrl(imageUrl);
-              }
-            }
-          }
-
-          // Extract heartsId
-          final heartsIdValue = userData['heartsId'];
-          if (heartsIdValue != null) {
-            _heartsId = heartsIdValue is int
-                ? heartsIdValue
-                : int.tryParse(heartsIdValue.toString());
-          }
-
-          if (mounted) {
-            setState(() {});
-          }
-        }
-      } catch (e) {
-        print('Error loading profile data: $e');
-      }
+      await _fetchProfileDataInBackground();
     } catch (e) {
       print('Error loading profile data: $e');
+    }
+  }
+
+  // Fetch profile data in background (non-blocking)
+  Future<void> _fetchProfileDataInBackground() async {
+    try {
+      final userResponse = await _authService.getUser();
+      if (userResponse['code'] == 'CH200' &&
+          userResponse['status'] == 'success' &&
+          userResponse['data'] != null) {
+        final userData = userResponse['data'] as Map<String, dynamic>;
+
+        // Extract and store name
+        final name = userData['name']?.toString();
+        if (name != null && name.isNotEmpty) {
+          _profileName = name;
+          await _storageService.setProfileName(name);
+        }
+
+        // Extract and store profile picture
+        final profilePic = userData['profilePic'] as List<dynamic>?;
+        if (profilePic != null && profilePic.isNotEmpty) {
+          final primaryPic = profilePic.firstWhere(
+            (pic) => pic['primary'] == true,
+            orElse: () => profilePic.first,
+          ) as Map<String, dynamic>?;
+
+          if (primaryPic != null && primaryPic['id'] != null) {
+            final userId = userData['_id']?.toString() ?? '';
+            if (userId.isNotEmpty) {
+              final imageUrl = ApiConfig.buildImageUrl(
+                userId,
+                primaryPic['id'].toString(),
+              );
+              _profileImageUrl = imageUrl;
+              await _storageService.setProfileImageUrl(imageUrl);
+            }
+          }
+        }
+
+        // Extract heartsId
+        final heartsIdValue = userData['heartsId'];
+        if (heartsIdValue != null) {
+          _heartsId = heartsIdValue is int
+              ? heartsIdValue
+              : int.tryParse(heartsIdValue.toString());
+        }
+
+        if (mounted) {
+          setState(() {});
+        }
+      }
+    } catch (e) {
+      print('Error fetching profile data: $e');
     }
   }
 
@@ -198,6 +219,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final dashboardProvider = Provider.of<DashboardProvider>(context);
     final lookupProvider = Provider.of<LookupProvider>(context, listen: false);
 
+    // Show skeleton loader immediately if no data
+    final showSkeleton = dashboardProvider.isLoading && !dashboardProvider.hasData;
+
     return RefreshIndicator(
       onRefresh: () => dashboardProvider.refresh(
         lookupData: lookupProvider.lookupData,
@@ -209,7 +233,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Profile Header Card
+            // Profile Header Card - Always show (even with placeholder)
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(24),
@@ -346,7 +370,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            // Banner Slider
+            // Banner Slider - Always show
             DashboardBannerSlider(
               slides: const [
                 {
@@ -368,12 +392,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            // Stats Cards
+            // Stats Cards - Always show (with 0 if loading)
             Row(
               children: [
                 Expanded(
                   child: StatCard(
-                    value: dashboardProvider.acceptanceCount,
+                    value: showSkeleton ? 0 : dashboardProvider.acceptanceCount,
                     title: 'Acceptance',
                     subtitle: 'Matches accepted this week',
                     onTap: () => context.push('/acceptance'),
@@ -382,7 +406,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: StatCard(
-                    value: dashboardProvider.justJoinedCount,
+                    value: showSkeleton ? 0 : dashboardProvider.justJoinedCount,
                     title: 'Just Joined',
                     subtitle: 'New prospects today',
                     onTap: () => context.push('/just-joined'),
@@ -391,55 +415,117 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
             ),
 
-            // Interest Received
-            if (dashboardProvider.interestReceived.isNotEmpty || dashboardProvider.isLoading) ...[
-              _buildSection(
-                context,
-                title: 'Interest Received',
-                count: dashboardProvider.interestReceived.length,
-                profiles: dashboardProvider.interestReceived,
-                onViewAll: () => context.push('/interest-received'),
-                isLoading: dashboardProvider.isLoading && dashboardProvider.interestReceived.isEmpty,
+            const SizedBox(height: 32),
+
+            // Sections - Show loading state if no data yet
+            if (showSkeleton) ...[
+              // Full width responsive loading card
+              const SizedBox(height: 16),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: Colors.grey.shade200),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 60,
+                      height: 60,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 5,
+                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Loading your matches...',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey.shade700,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Please wait while we find perfect matches for you',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade500,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 32),
+            ] else ...[
+              // Interest Received
+              if (dashboardProvider.interestReceived.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                _buildSection(
+                  context,
+                  title: 'Interest Received',
+                  count: dashboardProvider.interestReceived.length,
+                  profiles: dashboardProvider.interestReceived,
+                  onViewAll: () => context.push('/interest-received'),
+                  isLoading: false,
+                ),
+              ],
+              // Daily Recommendations
+              if (dashboardProvider.dailyRecommendations.isNotEmpty) ...[
+                const SizedBox(height: 32),
+                _buildSection(
+                  context,
+                  title: 'Daily Recommendation',
+                  count: dashboardProvider.dailyRecommendations.length,
+                  profiles: dashboardProvider.dailyRecommendations,
+                  onViewAll: () => context.push('/daily-picks'),
+                  isLoading: false,
+                ),
+              ],
+              // Profile Visitors
+              if (dashboardProvider.profileVisitors.isNotEmpty) ...[
+                const SizedBox(height: 32),
+                _buildSection(
+                  context,
+                  title: 'Profile Visitors',
+                  count: dashboardProvider.profileVisitors.length,
+                  profiles: dashboardProvider.profileVisitors,
+                  onViewAll: () => context.push('/profile-visitors'),
+                  isLoading: false,
+                ),
+              ],
+              // All Profiles
+              if (dashboardProvider.allProfiles.isNotEmpty) ...[
+                const SizedBox(height: 32),
+                _buildSection(
+                  context,
+                  title: 'All Profiles',
+                  count: dashboardProvider.allProfiles.length,
+                  profiles: dashboardProvider.allProfiles,
+                  onViewAll: () => context.push('/profiles'),
+                  isLoading: false,
+                ),
+              ],
             ],
-            // Daily Recommendations
-            if (dashboardProvider.dailyRecommendations.isNotEmpty || dashboardProvider.isLoading) ...[
-              _buildSection(
-                context,
-                title: 'Daily Recommendation',
-                count: dashboardProvider.dailyRecommendations.length,
-                profiles: dashboardProvider.dailyRecommendations,
-                onViewAll: () => context.push('/daily-picks'),
-                isLoading: dashboardProvider.isLoading && dashboardProvider.dailyRecommendations.isEmpty,
-              ),
-              const SizedBox(height: 32),
-            ],
-            // Profile Visitors
-            if (dashboardProvider.profileVisitors.isNotEmpty || dashboardProvider.isLoading) ...[
-              _buildSection(
-                context,
-                title: 'Profile Visitors',
-                count: dashboardProvider.profileVisitors.length,
-                profiles: dashboardProvider.profileVisitors,
-                onViewAll: () => context.push('/profile-visitors'),
-                isLoading: dashboardProvider.isLoading && dashboardProvider.profileVisitors.isEmpty,
-              ),
-              const SizedBox(height: 32),
-            ],
-            // All Profiles
-            if (dashboardProvider.allProfiles.isNotEmpty || dashboardProvider.isLoading) ...[
-              _buildSection(
-                context,
-                title: 'All Profiles',
-                count: dashboardProvider.allProfiles.length,
-                profiles: dashboardProvider.allProfiles,
-                onViewAll: () => context.push('/profiles'),
-                isLoading: dashboardProvider.isLoading && dashboardProvider.allProfiles.isEmpty,
-              ),
-              const SizedBox(height: 32),
-            ],
-            const SizedBox(height: 100),
+            // Bottom padding only if there's content (reduced from 100 to 24)
+            if (!showSkeleton && (dashboardProvider.interestReceived.isNotEmpty ||
+                dashboardProvider.dailyRecommendations.isNotEmpty ||
+                dashboardProvider.profileVisitors.isNotEmpty ||
+                dashboardProvider.allProfiles.isNotEmpty))
+              const SizedBox(height: 24),
           ],
         ),
       ),
@@ -455,6 +541,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     bool isLoading = false,
   }) {
     final theme = Theme.of(context);
+    final displayProfiles = profiles.length > 3 ? profiles.sublist(0, 3) : profiles;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -518,9 +605,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   : ListView.builder(
                       scrollDirection: Axis.horizontal,
                       padding: const EdgeInsets.symmetric(horizontal: 0),
-                      itemCount: profiles.length > 3 ? 3 : profiles.length,
+                      itemCount: displayProfiles.length,
+                      cacheExtent: 800, // Preload nearby items
+                      addAutomaticKeepAlives: true, // Keep loaded items alive
                       itemBuilder: (context, index) {
-                        final profile = profiles[index];
+                        final profile = displayProfiles[index];
                         return Padding(
                           padding: const EdgeInsets.only(right: 16),
                           child: ProfileCard(

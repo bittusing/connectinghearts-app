@@ -81,6 +81,30 @@ class _HeaderWidgetState extends State<HeaderWidget> {
                 icon: const Icon(Icons.menu, color: Colors.white),
                 onPressed: widget.onMenuTap ?? () => Scaffold.of(context).openDrawer(),
               ),
+              const SizedBox(width: 8),
+              // Logo
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/images/cone.logo.jpeg',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
               // Title
               Expanded(
                 child: Text(

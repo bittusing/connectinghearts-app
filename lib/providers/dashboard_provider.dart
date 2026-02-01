@@ -17,7 +17,7 @@ class DashboardProvider with ChangeNotifier {
   List<Map<String, dynamic>> _profileVisitors = [];
   List<Map<String, dynamic>> _allProfiles = [];
 
-  bool _isLoading = false;
+  bool _isLoading = true; // Start with true so loader shows immediately
   bool _hasLoadedOnce = false;
   DateTime? _lastRefreshTime;
 
@@ -67,6 +67,33 @@ class DashboardProvider with ChangeNotifier {
     }
   }
 
+  // NEW: Load cache only (instant, non-blocking)
+  Future<void> loadFromCacheOnly() async {
+    await _loadFromCache();
+  }
+
+  // NEW: Load fresh data in background (non-blocking)
+  Future<void> loadFreshDataInBackground({
+    Map<String, List<LookupOption>>? lookupData,
+    List<LookupOption>? countries,
+  }) async {
+    if (lookupData != null && countries != null) {
+      // Don't set loading state if we already have cached data
+      final hadData = hasData;
+      if (!hadData) {
+        _isLoading = true;
+        notifyListeners();
+      }
+      
+      await _fetchFreshData(lookupData, countries);
+      
+      if (!hadData) {
+        _isLoading = false;
+        notifyListeners();
+      }
+    }
+  }
+
   // Load from cache
   Future<void> _loadFromCache() async {
     try {
@@ -104,6 +131,7 @@ class DashboardProvider with ChangeNotifier {
           cachedData['allProfiles'] ?? [],
         );
         _hasLoadedOnce = true;
+        _isLoading = false; // Stop loading after cache is loaded
         notifyListeners();
         
         // Log cache age if available
@@ -118,104 +146,69 @@ class DashboardProvider with ChangeNotifier {
     }
   }
 
-  // Fetch fresh data from API
+  // Fetch fresh data from API - FULLY PARALLEL like webapp
   Future<void> _fetchFreshData(
     Map<String, List<LookupOption>> lookupData,
     List<LookupOption> countries,
   ) async {
-    _isLoading = true;
-    notifyListeners();
-
     try {
-      // Load static data FIRST (cities, states, countries) before transforming profiles
+      // Load static data ONCE at the start (not multiple times)
       final staticDataService = StaticDataService.instance;
-      await staticDataService.loadAllData();
+      if (!staticDataService.isLoaded) {
+        await staticDataService.loadAllData();
+      }
       
-      // Verify static data is loaded
-      print('🔍 Static Data Status:');
-      print('   Cities loaded: ${staticDataService.isCitiesLoaded}');
-      print('   States loaded: ${staticDataService.isStatesLoaded}');
-      print('   Countries loaded: ${staticDataService.isCountriesLoaded}');
+      print('🔍 Static Data Status: Cities=${staticDataService.isCitiesLoaded}, States=${staticDataService.isStatesLoaded}, Countries=${staticDataService.isCountriesLoaded}');
 
-      // Load stats
-      final statsFuture = Future.wait([
-        _profileService.getProfilesByEndpoint(
-          'dashboard/getAcceptanceProfiles/acceptedMe',
-        ),
+      // FULLY PARALLEL LOADING - All 6 API calls at once (like webapp Promise.all)
+      final results = await Future.wait([
+        _profileService.getProfilesByEndpoint('dashboard/getAcceptanceProfiles/acceptedMe'),
         _profileService.getJustJoinedProfiles(),
+        _profileService.getInterestsReceived(),
+        _profileService.getDailyRecommendations(),
+        _profileService.getProfileVisitors(),
+        _profileService.getAllProfiles(),
       ]);
 
-      final stats = await statsFuture;
-      final acceptanceResponse = stats[0];
-      final justJoinedResponse = stats[1];
-
-      // Load sections in parallel (limit to 5 profiles each)
-      final sectionsFuture = Future.wait([
-        _profileService.getInterestsReceived().then((response) {
-          return ApiProfileResponse(
-            status: response.status,
-            data: response.data.take(5).toList(),
-          );
-        }),
-        _profileService.getDailyRecommendations().then((response) {
-          return ApiProfileResponse(
-            status: response.status,
-            data: response.data.take(5).toList(),
-          );
-        }),
-        _profileService.getProfileVisitors().then((response) {
-          return ApiProfileResponse(
-            status: response.status,
-            data: response.data.take(5).toList(),
-          );
-        }),
-        _profileService.getAllProfiles().then((response) {
-          return ApiProfileResponse(
-            status: response.status,
-            data: response.data.take(5).toList(),
-          );
-        }),
-      ]);
-
-      final sections = await sectionsFuture;
-      final interestReceived = sections[0];
-      final dailyRecs = sections[1];
-      final visitors = sections[2];
-      final allProfiles = sections[3];
-
-      // Update state - transform profiles with static data loaded
-      _acceptanceCount = acceptanceResponse.data.length;
-      _justJoinedCount = justJoinedResponse.data.length;
+      // Extract and transform all results at once
+      _acceptanceCount = results[0].data.length;
+      _justJoinedCount = results[1].data.length;
       
-      // Transform profiles and log first profile to verify location mapping
-      _interestReceived = interestReceived.data
+      _interestReceived = results[2].data
+          .take(5)
           .map((p) => transformProfile(p, lookupData: lookupData, countries: countries))
           .toList();
+      
+      _dailyRecommendations = results[3].data
+          .take(5)
+          .map((p) => transformProfile(p, lookupData: lookupData, countries: countries))
+          .toList();
+      
+      _profileVisitors = results[4].data
+          .take(5)
+          .map((p) => transformProfile(p, lookupData: lookupData, countries: countries))
+          .toList();
+      
+      _allProfiles = results[5].data
+          .take(5)
+          .map((p) => transformProfile(p, lookupData: lookupData, countries: countries))
+          .toList();
+
+      // Log sample to verify
       if (_interestReceived.isNotEmpty) {
         print('📍 Sample location: ${_interestReceived.first['location']}');
       }
-      
-      _dailyRecommendations = dailyRecs.data
-          .map((p) => transformProfile(p, lookupData: lookupData, countries: countries))
-          .toList();
-      _profileVisitors = visitors.data
-          .map((p) => transformProfile(p, lookupData: lookupData, countries: countries))
-          .toList();
-      _allProfiles = allProfiles.data
-          .map((p) => transformProfile(p, lookupData: lookupData, countries: countries))
-          .toList();
 
       _hasLoadedOnce = true;
       _lastRefreshTime = DateTime.now();
 
-      // Save to cache
-      await _saveToCache();
+      // Save to cache (async, non-blocking)
+      _saveToCache();
 
-      print('✅ Dashboard: Fresh data loaded');
+      print('✅ Dashboard: All data loaded in parallel (Promise.all style)');
     } catch (e) {
       print('❌ Dashboard: Fetch failed: $e');
     } finally {
-      _isLoading = false;
       notifyListeners();
     }
   }
