@@ -140,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       child: const Text(
-                        'Connecting Hearts',
+                        'Heartfulness Connecting Hearts',
                         style: TextStyle(
                           color: AppColors.primary,
                           fontWeight: FontWeight.w600,

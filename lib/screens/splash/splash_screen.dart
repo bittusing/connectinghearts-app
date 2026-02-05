@@ -70,93 +70,26 @@ class _SplashScreenState extends State<SplashScreen> {
         decoration: const BoxDecoration(
           color: Colors.white,
         ),
-        child: Stack(
-          children: [
-            // Background image - responsive and perfectly sized
-            Positioned.fill(
-              child: Image.asset(
-                'assets/images/splash.jpeg',
-                fit: BoxFit.cover,
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                errorBuilder: (context, error, stackTrace) {
-                  // Fallback to white container if image fails
-                  return Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height,
-                    color: Colors.white,
-                    child: const Center(
-                      child: Icon(
-                        Icons.image_not_supported,
-                        size: 64,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            // Logo in center
-            Center(
-              child: Container(
-                width: 180,
-                height: 180,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
-                      blurRadius: 30,
-                      spreadRadius: 5,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: ClipOval(
-                  child: Image.asset(
-                    'assets/images/cone.logo.jpeg',
-                    fit: BoxFit.cover,
-                  ),
+        child: Image.asset(
+          'assets/images/splash.png',
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+          errorBuilder: (context, error, stackTrace) {
+            // Fallback to white container if image fails
+            return Container(
+              width: double.infinity,
+              height: double.infinity,
+              color: Colors.white,
+              child: const Center(
+                child: Icon(
+                  Icons.image_not_supported,
+                  size: 64,
+                  color: Colors.grey,
                 ),
               ),
-            ),
-            // Loading indicator overlay - positioned at bottom center with proper dimensions
-            Positioned(
-              bottom: 100,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Container(
-                  width: 56,
-                  height: 56,
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.95),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 12,
-                        spreadRadius: 2,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: SizedBox(
-                    width: 28,
-                    height: 28,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 3.0,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Theme.of(context).primaryColor,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );

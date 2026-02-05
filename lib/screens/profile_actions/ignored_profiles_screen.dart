@@ -151,7 +151,7 @@ class _IgnoredProfilesScreenState extends State<IgnoredProfilesScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'CONNECTING HEARTS',
+                                    'HEARTFULNESS CONNECTING HEARTS',
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       letterSpacing: 2,
                                     ),

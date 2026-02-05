@@ -108,7 +108,7 @@ class _HeaderWidgetState extends State<HeaderWidget> {
               // Title
               Expanded(
                 child: Text(
-                  'Heartfulness connecting Hearts',
+                  'Heartfulness Connecting Hearts',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         color: Colors.white,

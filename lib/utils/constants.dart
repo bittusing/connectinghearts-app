@@ -80,7 +80,7 @@ List<String> generateIncomeOptions() {
 }
 
 // App Constants
-const String appName = 'Connecting Hearts';
+const String appName = 'Heartfulness Connecting Hearts';
 const String appTagline = 'Find Your Perfect Match';
 
 // Validation Constants

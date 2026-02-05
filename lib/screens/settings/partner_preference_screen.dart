@@ -433,7 +433,7 @@ class _PartnerPreferenceScreenState extends State<PartnerPreferenceScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
             children: [
                           Text(
-                            'CONNECTING HEARTS',
+                            'HEARTFULNESS CONNECTING HEARTS',
                             style: theme.textTheme.bodySmall?.copyWith(
                               fontSize: 10,
                               letterSpacing: 3.5,

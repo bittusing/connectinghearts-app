@@ -134,7 +134,7 @@ class _MembershipScreenState extends State<MembershipScreen> {
       final options = {
         'key': orderResponse.keyId!,
         'amount': orderResponse.amount * 100, // Convert to paise
-        'name': 'Connecting Hearts',
+        'name': 'Heartfulness Connecting Hearts',
         'description': 'Membership: ${plan['name']}',
         'order_id': orderResponse.orderId,
         'prefill': {
