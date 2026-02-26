@@ -161,7 +161,7 @@ class _ShortlistedProfilesScreenState extends State<ShortlistedProfilesScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'HEARTFULNESS CONNECTING HEARTS',
+                                    'HEARTFULNESS MATRIMONY',
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       letterSpacing: 2,
                                     ),

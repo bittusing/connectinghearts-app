@@ -1,4 +1,4 @@
-package digi.coder.connectingheart
+package com.heartfulness.matrimony
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -167,7 +167,7 @@ class _InterestsReceivedScreenState extends State<InterestsReceivedScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'HEARTFULNESS CONNECTING HEARTS',
+                                    'HEARTFULNESS MATRIMONY',
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       letterSpacing: 2,
                                     ),
