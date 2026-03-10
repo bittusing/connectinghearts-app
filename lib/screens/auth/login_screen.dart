@@ -119,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       child: ClipOval(
                         child: Image.asset(
-                          'assets/images/newLogo.jpeg',
+                          'assets/images/newLogo.png',
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -140,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       child: const Text(
-                        'Heartfulness Matrimony',
+                        'Abhyasi Matrimony',
                         style: TextStyle(
                           color: AppColors.primary,
                           fontWeight: FontWeight.w600,

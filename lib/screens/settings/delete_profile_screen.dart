@@ -20,7 +20,7 @@ class _DeleteProfileScreenState extends State<DeleteProfileScreen> {
   bool _confirmed = false;
 
   final List<Map<String, dynamic>> _reasons = [
-    {'id': 1, 'label': 'I found my match on Heartfulness Matrimony'},
+    {'id': 1, 'label': 'I found my match on Abhyasi Matrimony'},
     {'id': 2, 'label': 'I found my match elsewhere'},
     {'id': 3, 'label': 'I am unhappy with services'},
     {'id': 4, 'label': 'Marry later / create profile later'},

@@ -127,7 +127,7 @@ class _TheyDeclinedScreenState extends State<TheyDeclinedScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'HEARTFULNESS MATRIMONY',
+                                    'ABHYASI MATRIMONY',
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       letterSpacing: 2,
                                     ),

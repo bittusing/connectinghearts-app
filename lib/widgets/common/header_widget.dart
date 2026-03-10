@@ -99,7 +99,7 @@ class _HeaderWidgetState extends State<HeaderWidget> {
                 ),
                 child: ClipOval(
                   child: Image.asset(
-                    'assets/images/newLogo.jpeg',
+                    'assets/images/newLogo.png',
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -108,7 +108,7 @@ class _HeaderWidgetState extends State<HeaderWidget> {
               // Title
               Expanded(
                 child: Text(
-                  'Heartfulness Matrimony',
+                  'Abhyasi Matrimony',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         color: Colors.white,

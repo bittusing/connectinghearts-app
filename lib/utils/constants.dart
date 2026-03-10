@@ -80,7 +80,7 @@ List<String> generateIncomeOptions() {
 }
 
 // App Constants
-const String appName = 'Heartfulness Matrimony';
+const String appName = 'Abhyasi Matrimony';
 const String appTagline = 'Find Your Perfect Match';
 
 // Validation Constants

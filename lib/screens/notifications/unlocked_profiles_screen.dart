@@ -200,7 +200,7 @@ class _UnlockedProfilesScreenState extends State<UnlockedProfilesScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'HEARTFULNESS MATRIMONY',
+                                    'ABHYASI MATRIMONY',
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       letterSpacing: 2,
                                     ),
