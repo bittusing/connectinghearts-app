@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../theme/colors.dart';
 import '../../providers/notification_count_provider.dart';
 import '../../widgets/common/bottom_navigation_widget.dart';
+import '../../widgets/common/header_widget.dart';
 
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
@@ -11,11 +12,7 @@ class NotificationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Notifications'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
+      appBar: const HeaderWidget(),
       bottomNavigationBar: const BottomNavigationWidget(),
       body: Consumer<NotificationCountProvider>(
         builder: (context, provider, _) {

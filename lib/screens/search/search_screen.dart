@@ -7,6 +7,8 @@ import '../../services/profile_service.dart';
 import '../../models/profile_models.dart';
 import '../../widgets/common/searchable_dropdown.dart';
 import '../../widgets/common/searchable_multi_select.dart';
+import '../../widgets/common/header_widget.dart';
+import '../../widgets/common/bottom_navigation_widget.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -244,7 +246,8 @@ class _SearchScreenState extends State<SearchScreen> {
     final lookupProvider = Provider.of<LookupProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Search Profiles')),
+      appBar: const HeaderWidget(),
+      bottomNavigationBar: const BottomNavigationWidget(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

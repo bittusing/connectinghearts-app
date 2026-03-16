@@ -22,7 +22,11 @@ class ApiClient {
 
   String _normalizeUrl(String path) {
     final normalizedPath = path.startsWith('/') ? path : '/$path';
-    return '$_baseUrl$normalizedPath';
+    final fullUrl = '$_baseUrl$normalizedPath';
+    print('🌐 Base URL: $_baseUrl');
+    print('🌐 Path: $normalizedPath');
+    print('🌐 Full API URL: $fullUrl');
+    return fullUrl;
   }
 
   Future<T> request<T>({
@@ -33,6 +37,9 @@ class ApiClient {
   }) async {
     final url = Uri.parse(_normalizeUrl(path));
     final headers = await _getHeaders();
+    
+    print('🚀 Making $method request to: $url');
+    print('📋 Headers: $headers');
 
     http.Response response;
 
@@ -67,6 +74,9 @@ class ApiClient {
       default:
         throw Exception('Unsupported HTTP method: $method');
     }
+
+    print('📊 Response status: ${response.statusCode}');
+    print('📄 Response body: ${response.body}');
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
       if (response.statusCode == 204 || response.body.isEmpty) {

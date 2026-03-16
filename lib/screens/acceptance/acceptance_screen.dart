@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../theme/colors.dart';
 import '../../widgets/profile/profile_match_card.dart';
 import '../../widgets/common/empty_state_widget.dart';
+import '../../widgets/common/bottom_navigation_widget.dart';
+import '../../widgets/chat/chat_button.dart';
 import '../../services/profile_service.dart';
 import '../../utils/profile_utils.dart';
 
@@ -74,10 +77,6 @@ class _AcceptanceScreenState extends State<AcceptanceScreen>
     );
   }
 
-  Future<void> _handleChat(String profileId) async {
-    _showToast('Chat Coming Soon');
-  }
-
   Future<void> _handleDecline(String profileId) async {
     try {
       await _profileService.declineInterest(profileId);
@@ -85,6 +84,12 @@ class _AcceptanceScreenState extends State<AcceptanceScreen>
       _loadProfiles();
     } catch (e) {
       _showToast(e.toString(), isError: true);
+    }
+  }
+
+  void _handleProfileTap(String profileId) {
+    if (profileId.isNotEmpty) {
+      context.push('/profile/$profileId');
     }
   }
 
@@ -105,10 +110,24 @@ class _AcceptanceScreenState extends State<AcceptanceScreen>
           labelColor: AppColors.primary,
         ),
       ),
+      bottomNavigationBar: const BottomNavigationWidget(),
       body: RefreshIndicator(
         onRefresh: _loadProfiles,
+        color: AppColors.primary,
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Loading acceptance profiles...',
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
+              )
             : _error != null
                 ? Center(
                     child: Column(
@@ -116,7 +135,7 @@ class _AcceptanceScreenState extends State<AcceptanceScreen>
                       children: [
                         Text(
                           _error!,
-                          style: const TextStyle(color: AppColors.error),
+                          style: TextStyle(color: theme.colorScheme.error),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 16),
@@ -134,40 +153,50 @@ class _AcceptanceScreenState extends State<AcceptanceScreen>
                             : 'You haven\'t accepted any interests yet.',
                         icon: Icons.favorite_outline,
                       )
-                    : ListView.builder(
-                        padding: const EdgeInsets.all(16),
+                    : PageView.builder(
+                        scrollDirection: Axis.vertical,
                         itemCount: _profiles.length,
                         itemBuilder: (context, index) {
                           final profile = _profiles[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: ProfileMatchCard(
-                              id: profile['id'] ?? '',
-                              name: profile['name'] ?? '',
-                              age: profile['age'] ?? 0,
-                              height: profile['height'] ?? '',
-                              location: profile['location'] ?? '',
-                              religion: profile['religion'],
-                              salary: profile['income'],
-                              imageUrl: profile['imageUrl'],
-                              gender: profile['gender'],
-                              customActions: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  _buildActionButton(
-                                    icon: Icons.chat_bubble_outline,
-                                    label: 'Chat',
-                                    color: Colors.blue,
-                                    onTap: () => _handleChat(profile['id']),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  _buildActionButton(
-                                    icon: Icons.close,
-                                    label: 'Decline',
-                                    color: Colors.red,
-                                    onTap: () => _handleDecline(profile['id']),
-                                  ),
-                                ],
+                          return GestureDetector(
+                            onTap: () => _handleProfileTap(profile['clientID'] ?? profile['id']),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 10,
+                              ),
+                              child: ProfileMatchCard(
+                                id: profile['id'] ?? '',
+                                name: profile['name'] ?? '',
+                                age: profile['age'] ?? 0,
+                                height: profile['height'] ?? '',
+                                location: profile['location'] ?? '',
+                                religion: profile['religion'],
+                                salary: profile['income'],
+                                imageUrl: profile['imageUrl'],
+                                gender: profile['gender'],
+                                customActions: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    ChatButton(
+                                      userId: profile['id'],
+                                      userName: profile['name'] ?? 'User',
+                                      child: _buildActionButton(
+                                        icon: Icons.chat_bubble_outline,
+                                        label: 'Chat',
+                                        color: Colors.blue,
+                                        onTap: () {}, // Handled by ChatButton
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    _buildActionButton(
+                                      icon: Icons.close,
+                                      label: 'Decline',
+                                      color: Colors.red,
+                                      onTap: () => _handleDecline(profile['id']),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           );

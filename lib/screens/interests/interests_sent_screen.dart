@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../theme/colors.dart';
 import '../../widgets/profile/profile_match_card.dart';
 import '../../widgets/common/empty_state_widget.dart';
 import '../../widgets/common/bottom_navigation_widget.dart';
+import '../../widgets/common/header_widget.dart';
 import '../../services/profile_service.dart';
 import '../../utils/profile_utils.dart';
 import '../../providers/notification_count_provider.dart';
@@ -84,6 +86,10 @@ class _InterestsSentScreenState extends State<InterestsSentScreen> {
     );
   }
 
+  void _handleProfileTap(String clientId) {
+    context.push('/profile/$clientId');
+  }
+
   Future<void> _handleUnsendInterest(String profileId) async {
     try {
       // Use receiver_id for unsending interest (as per webapp pattern)
@@ -105,125 +111,90 @@ class _InterestsSentScreenState extends State<InterestsSentScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Interests Sent'),
-      ),
+      appBar: const HeaderWidget(),
       bottomNavigationBar: const BottomNavigationWidget(),
-      body: RefreshIndicator(
-        onRefresh: _loadProfiles,
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : _error != null
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          _error!,
-                          style: const TextStyle(color: AppColors.error),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: _loadProfiles,
-                          child: const Text('Retry'),
-                        ),
-                      ],
-                    ),
-                  )
-                : _profiles.isEmpty
-                    ? const EmptyStateWidget(
-                        message: 'No interests sent yet.',
-                        icon: Icons.send_outlined,
-                      )
-                    : CustomScrollView(
-                        slivers: [
-                          // Header
-                          SliverToBoxAdapter(
-                            child: Container(
-                              margin: const EdgeInsets.all(16),
-                              padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: theme.cardColor,
-                                borderRadius: BorderRadius.circular(24),
-                                border: Border.all(color: theme.dividerColor),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'ABHYASI MATRIMONY',
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      letterSpacing: 2,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Interests Sent',
-                                    style:
-                                        theme.textTheme.headlineSmall?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Profiles you have shown interest in.',
-                                    style: theme.textTheme.bodyMedium,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Showing ${_profiles.length} profiles',
-                                    style: theme.textTheme.bodySmall,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          // Profiles
-                          SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                                final profile = _profiles[index];
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 8,
-                                  ),
-                                  child: ProfileMatchCard(
-                                    id: profile['id'] ?? '',
-                                    name: profile['name'] ?? '',
-                                    age: profile['age'] ?? 0,
-                                    height: profile['height'] ?? '',
-                                    location: profile['location'] ?? '',
-                                    religion: profile['religion'],
-                                    salary: profile['income'],
-                                    imageUrl: profile['imageUrl'],
-                                    gender: profile['gender'],
-                                    customActions: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        _buildCustomButton(
-                                          icon: Icons.cancel_outlined,
-                                          label: 'Cancel Interest',
-                                          color: Colors.orange,
-                                          onTap: () => _handleUnsendInterest(
-                                              profile['id']),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                              childCount: _profiles.length,
-                            ),
-                          ),
-                          const SliverToBoxAdapter(
-                            child: SizedBox(height: 100),
-                          ),
-                        ],
+      body: _isLoading
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Loading interests sent...',
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                ],
+              ),
+            )
+          : _error != null
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _error!,
+                        style: TextStyle(color: theme.colorScheme.error),
+                        textAlign: TextAlign.center,
                       ),
-      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _loadProfiles,
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                )
+              : _profiles.isEmpty
+                  ? const EmptyStateWidget(
+                      message: 'No interests sent yet.',
+                      icon: Icons.send_outlined,
+                    )
+                  : RefreshIndicator(
+                      onRefresh: _loadProfiles,
+                      color: AppColors.primary,
+                      child: PageView.builder(
+                        scrollDirection: Axis.vertical,
+                        itemCount: _profiles.length,
+                        itemBuilder: (context, index) {
+                          final profile = _profiles[index];
+                          return GestureDetector(
+                            onTap: () => _handleProfileTap(
+                                profile['clientID'] ?? profile['id']),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 10,
+                              ),
+                              child: ProfileMatchCard(
+                                id: profile['id'] ?? '',
+                                name: profile['name'] ?? '',
+                                age: profile['age'] ?? 0,
+                                height: profile['height'] ?? '',
+                                location: profile['location'] ?? '',
+                                religion: profile['religion'],
+                                salary: profile['income'],
+                                imageUrl: profile['imageUrl'],
+                                gender: profile['gender'],
+                                customActions: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.center,
+                                  children: [
+                                    _buildCustomButton(
+                                      icon: Icons.cancel_outlined,
+                                      label: 'Cancel Interest',
+                                      color: Colors.orange,
+                                      onTap: () => _handleUnsendInterest(
+                                          profile['id']),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
     );
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../theme/colors.dart';
 import '../../widgets/profile/profile_match_card.dart';
 import '../../widgets/common/empty_state_widget.dart';
@@ -267,6 +268,12 @@ class _ProfileListScreenState extends State<ProfileListScreen> {
     }
   }
 
+  void _handleProfileTap(String profileId) {
+    if (profileId.isNotEmpty) {
+      context.push('/profile/$profileId');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -275,127 +282,91 @@ class _ProfileListScreenState extends State<ProfileListScreen> {
       appBar: const HeaderWidget(),
       drawer: const SidebarWidget(),
       bottomNavigationBar: const BottomNavigationWidget(),
-      body: RefreshIndicator(
-        onRefresh: _loadProfiles,
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : _error != null
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          _error!,
-                          style: const TextStyle(color: AppColors.error),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: _loadProfiles,
-                          child: const Text('Retry'),
-                        ),
-                      ],
-                    ),
-                  )
-                : _profiles.isEmpty
-                    ? const EmptyStateWidget(
-                        message: 'No profiles found.',
-                        icon: Icons.people_outline,
-                      )
-                    : CustomScrollView(
-                        slivers: [
-                          // Header
-                          SliverToBoxAdapter(
-                            child: Container(
-                              margin: const EdgeInsets.all(16),
-                              padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: theme.cardColor,
-                                borderRadius: BorderRadius.circular(24),
-                                border: Border.all(color: theme.dividerColor),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'ABHYASI MATRIMONY',
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      letterSpacing: 2,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    _title,
-                                    style:
-                                        theme.textTheme.headlineSmall?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(_subtitle,
-                                      style: theme.textTheme.bodyMedium),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Showing ${_profiles.length} profiles',
-                                    style: theme.textTheme.bodySmall,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          // Profiles
-                          SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                                final profile = _profiles[index];
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 10,
-                                  ),
-                                  child: ProfileMatchCard(
-                                    id: profile['id'] ?? '',
-                                    name: profile['name'] ?? '',
-                                    age: profile['age'] ?? 0,
-                                    //5'0" (1.52 mts)
-                                    height:
-                                        formatHeightInMeters(profile['height']),
-                                    // height: profile['height'] ?? '',
-                                    location: profile['location'] ?? '',
-                                    religion: profile['religion'],
-                                    salary: profile['income'],
-                                    imageUrl: profile['imageUrl'],
-                                    gender: profile['gender'],
-                                    onSendInterest: _shouldShowSendInterest()
-                                        ? () =>
-                                            _handleSendInterest(profile['id'])
-                                        : null,
-                                    onShortlist: _shouldShowShortlist()
-                                        ? () => _handleShortlist(profile['id'])
-                                        : null,
-                                    onIgnore: _shouldShowIgnore()
-                                        ? () => _handleIgnore(profile['id'])
-                                        : null,
-                                    onAcceptInterest: widget.listType ==
-                                            ProfileListType.interestReceived
-                                        ? () => _handleAccept(profile['id'])
-                                        : null,
-                                    onDeclineInterest: widget.listType ==
-                                            ProfileListType.interestReceived
-                                        ? () => _handleDecline(profile['id'])
-                                        : null,
-                                  ),
-                                );
-                              },
-                              childCount: _profiles.length,
-                            ),
-                          ),
-                          const SliverToBoxAdapter(
-                            child: SizedBox(height: 100),
-                          ),
-                        ],
+      body: _isLoading
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Loading $_title...',
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                ],
+              ),
+            )
+          : _error != null
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _error!,
+                        style: TextStyle(color: theme.colorScheme.error),
+                        textAlign: TextAlign.center,
                       ),
-      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _loadProfiles,
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                )
+              : _profiles.isEmpty
+                  ? const EmptyStateWidget(
+                      message: 'No profiles found.',
+                      icon: Icons.people_outline,
+                    )
+                  : RefreshIndicator(
+                      onRefresh: _loadProfiles,
+                      color: AppColors.primary,
+                      child: PageView.builder(
+                        scrollDirection: Axis.vertical,
+                        itemCount: _profiles.length,
+                        itemBuilder: (context, index) {
+                          final profile = _profiles[index];
+                          return GestureDetector(
+                            onTap: () => _handleProfileTap(profile['clientID'] ?? profile['id']),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 10,
+                              ),
+                              child: ProfileMatchCard(
+                                id: profile['id'] ?? '',
+                                name: profile['name'] ?? '',
+                                age: profile['age'] ?? 0,
+                                height: formatHeightInMeters(profile['height']),
+                                location: profile['location'] ?? '',
+                                religion: profile['religion'],
+                                salary: profile['income'],
+                                imageUrl: profile['imageUrl'],
+                                gender: profile['gender'],
+                                onSendInterest: _shouldShowSendInterest()
+                                    ? () => _handleSendInterest(profile['id'])
+                                    : null,
+                                onShortlist: _shouldShowShortlist()
+                                    ? () => _handleShortlist(profile['id'])
+                                    : null,
+                                onIgnore: _shouldShowIgnore()
+                                    ? () => _handleIgnore(profile['id'])
+                                    : null,
+                                onAcceptInterest: widget.listType ==
+                                        ProfileListType.interestReceived
+                                    ? () => _handleAccept(profile['id'])
+                                    : null,
+                                onDeclineInterest: widget.listType ==
+                                        ProfileListType.interestReceived
+                                    ? () => _handleDecline(profile['id'])
+                                    : null,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
     );
   }
 

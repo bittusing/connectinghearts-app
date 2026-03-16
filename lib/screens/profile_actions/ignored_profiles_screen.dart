@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../theme/colors.dart';
 import '../../widgets/profile/profile_match_card.dart';
 import '../../widgets/common/empty_state_widget.dart';
 import '../../widgets/common/bottom_navigation_widget.dart';
+import '../../widgets/common/header_widget.dart';
 import '../../services/profile_service.dart';
 import '../../utils/profile_utils.dart';
 import '../../providers/notification_count_provider.dart';
@@ -101,12 +103,8 @@ class _IgnoredProfilesScreenState extends State<IgnoredProfilesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Ignored Profiles'),
-      ),
+      appBar: const HeaderWidget(),
       bottomNavigationBar: const BottomNavigationWidget(),
       body: RefreshIndicator(
         onRefresh: _loadProfiles,
@@ -135,92 +133,44 @@ class _IgnoredProfilesScreenState extends State<IgnoredProfilesScreen> {
                         message: 'No ignored profiles.',
                         icon: Icons.visibility_off_outlined,
                       )
-                    : CustomScrollView(
-                        slivers: [
-                          // Header
-                          SliverToBoxAdapter(
-                            child: Container(
-                              margin: const EdgeInsets.all(16),
-                              padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: theme.cardColor,
-                                borderRadius: BorderRadius.circular(24),
-                                border: Border.all(color: theme.dividerColor),
+                    : PageView.builder(
+                        scrollDirection: Axis.vertical,
+                        itemCount: _profiles.length,
+                        itemBuilder: (context, index) {
+                          final profile = _profiles[index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 10,
+                            ),
+                            child: ProfileMatchCard(
+                              id: profile['id'] ?? '',
+                              name: profile['name'] ?? '',
+                              age: profile['age'] ?? 0,
+                              height: profile['height'] ?? '',
+                              location: profile['location'] ?? '',
+                              religion: profile['religion'],
+                              salary: profile['income'],
+                              imageUrl: profile['imageUrl'],
+                              gender: profile['gender'],
+                              onTap: () => context.push(
+                                '/profile/${profile['clientID'] ?? profile['id']}',
                               ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              customActions: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text(
-                                    'ABHYASI MATRIMONY',
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      letterSpacing: 2,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Ignored Profiles',
-                                    style:
-                                        theme.textTheme.headlineSmall?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Profiles you have chosen to ignore.',
-                                    style: theme.textTheme.bodyMedium,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Showing ${_profiles.length} profiles',
-                                    style: theme.textTheme.bodySmall,
+                                  _buildCustomButton(
+                                    icon: Icons.restore,
+                                    label: 'Remove',
+                                    color: Colors.blue,
+                                    onTap: () =>
+                                        _handleUnignore(profile['id']),
                                   ),
                                 ],
                               ),
                             ),
-                          ),
-                          // Profiles
-                          SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                                final profile = _profiles[index];
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 8,
-                                  ),
-                                  child: ProfileMatchCard(
-                                    id: profile['id'] ?? '',
-                                    name: profile['name'] ?? '',
-                                    age: profile['age'] ?? 0,
-                                    height: profile['height'] ?? '',
-                                    location: profile['location'] ?? '',
-                                    religion: profile['religion'],
-                                    salary: profile['income'],
-                                    imageUrl: profile['imageUrl'],
-                                    gender: profile['gender'],
-                                    customActions: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        _buildCustomButton(
-                                          icon: Icons.restore,
-                                          label: 'Remove',
-                                          color: Colors.blue,
-                                          onTap: () =>
-                                              _handleUnignore(profile['id']),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                              childCount: _profiles.length,
-                            ),
-                          ),
-                          const SliverToBoxAdapter(
-                            child: SizedBox(height: 100),
-                          ),
-                        ],
+                          );
+                        },
                       ),
       ),
     );

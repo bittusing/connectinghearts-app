@@ -7,7 +7,7 @@ class BottomNavigationWidget extends StatelessWidget {
 
   int _calculateSelectedIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
-    if (location.startsWith('/search')) return 1;
+    if (location.startsWith('/chat')) return 1;
     if (location.startsWith('/daily-picks')) return 2;
     if (location.startsWith('/profiles')) return 3;
     if (location.startsWith('/membership')) return 4;
@@ -20,7 +20,7 @@ class BottomNavigationWidget extends StatelessWidget {
         context.go('/');
         break;
       case 1:
-        context.go('/search');
+        context.go('/chat');
         break;
       case 2:
         context.go('/daily-picks');
@@ -66,8 +66,8 @@ class BottomNavigationWidget extends StatelessWidget {
             label: 'Dashboard',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
+            icon: Icon(Icons.chat_bubble_outline),
+            label: 'Chat',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.star),

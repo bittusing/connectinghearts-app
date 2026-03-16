@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../theme/colors.dart';
 import '../../services/profile_service.dart';
 import '../../widgets/common/confirm_modal.dart';
+import '../../widgets/chat/chat_button.dart';
 import '../../utils/profile_utils.dart';
 
 class ProfileDetailScreen extends StatefulWidget {
@@ -563,7 +564,8 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
   }
 
   void _handleChat() {
-    _showToast('Chat Coming Soon');
+    // This method is now handled by ChatButton widget
+    // Keeping for backward compatibility but not used
   }
 
   @override
@@ -891,10 +893,43 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen>
                 label: _isIgnored ? 'Restore' : 'Ignore',
                 onTap: _handleIgnore,
               ),
-              _buildActionButton(
-                icon: Icons.chat_bubble_outline,
-                label: 'Chat',
-                onTap: _handleChat,
+              // Chat Button with Credit Checking
+              Expanded(
+                child: ChatButton(
+                  userId: widget.profileId,
+                  userName: _profile?['name'] ?? 'User',
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppColors.primary,
+                            width: 2,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.chat_bubble_outline,
+                          color: AppColors.primary,
+                          size: 28,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'Chat',
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),

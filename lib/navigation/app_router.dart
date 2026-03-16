@@ -48,6 +48,8 @@ import '../screens/feedback/feedback_screen.dart';
 import '../screens/legal/terms_screen.dart';
 import '../screens/legal/privacy_policy_screen.dart';
 import '../screens/legal/policy_screen.dart';
+import '../screens/chat/chat_list_screen.dart';
+import '../screens/chat/chat_screen.dart';
 import '../screens/splash/splash_screen.dart';
 import '../models/profile_models.dart';
 import '../theme/colors.dart';
@@ -177,8 +179,8 @@ GoRouter createAppRouter(AuthProvider authProvider) {
             builder: (context, state) => const DashboardScreen(),
           ),
           GoRoute(
-            path: '/search',
-            builder: (context, state) => const SearchScreen(),
+            path: '/chat',
+            builder: (context, state) => const ChatListScreen(),
           ),
           GoRoute(
             path: '/daily-picks',
@@ -199,12 +201,30 @@ GoRouter createAppRouter(AuthProvider authProvider) {
             path: '/membership',
             builder: (context, state) => const MembershipScreen(),
       ),
+      // Search route outside ShellRoute
+      GoRoute(
+        path: '/search',
+        builder: (context, state) => const SearchScreen(),
+      ),
       // Profile Detail
       GoRoute(
         path: '/profile/:id',
         builder: (context, state) {
           final profileId = state.pathParameters['id']!;
           return ProfileDetailScreen(profileId: profileId);
+        },
+      ),
+      // Chat Routes
+      GoRoute(
+        path: '/chat-list',
+        builder: (context, state) => const ChatListScreen(),
+      ),
+      GoRoute(
+        path: '/chat/:userId',
+        builder: (context, state) {
+          final userId = state.pathParameters['userId']!;
+          final userName = state.uri.queryParameters['name'];
+          return ChatScreen(userId: userId, userName: userName);
         },
       ),
       // Search Results
@@ -388,7 +408,7 @@ class MainTabsScreen extends StatefulWidget {
 class _MainTabsScreenState extends State<MainTabsScreen> {
   int _calculateSelectedIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
-    if (location.startsWith('/search')) return 1;
+    if (location.startsWith('/chat')) return 1;
     if (location.startsWith('/daily-picks')) return 2;
     if (location.startsWith('/profiles')) return 3;
     if (location.startsWith('/membership')) return 4;
@@ -401,7 +421,7 @@ class _MainTabsScreenState extends State<MainTabsScreen> {
         context.go('/');
         break;
       case 1:
-        context.go('/search');
+        context.go('/chat');
         break;
       case 2:
         context.go('/daily-picks');
@@ -451,8 +471,8 @@ class _MainTabsScreenState extends State<MainTabsScreen> {
               label: 'Dashboard',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.search),
-              label: 'Search',
+              icon: Icon(Icons.chat_bubble_outline),
+              label: 'Chat',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.star),
