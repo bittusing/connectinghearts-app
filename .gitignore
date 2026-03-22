@@ -39,7 +39,7 @@ migrate_working_dir/
 
 
 # assets
-assets/
+# assets/
 
 # Symbolication related
 app.*.symbols
@@ -82,15 +82,17 @@ app.*.map.json
 **/ios/Runner/GeneratedPluginRegistrant.*
 
 # Android related
-**/android/**/gradle-wrapper.jar
-**/android/.gradle
-**/android/captures/
-**/android/gradlew
-**/android/gradlew.bat
-**/android/local.properties
-**/android/**/GeneratedPluginRegistrant.java
-**/android/key.properties
-*.jks
+# **/android/**/gradle-wrapper.jar
+# **/android/.gradle
+# **/android/captures/
+# **/android/gradlew
+# **/android/gradlew.bat
+# **/android/local.properties
+# **/android/**/GeneratedPluginRegistrant.java
+
+# Uncomment these lines to include signing files in repository
+# /android/key.properties
+# *.jks
 
 # Exceptions to above rules.
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages

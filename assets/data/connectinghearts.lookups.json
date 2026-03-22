@@ -1,0 +1,6448 @@
+[{
+  "_id": {
+    "$oid": "64b78e9f8a18541320ed5a8f"
+  },
+  "income": [
+    {
+      "label": "No Income",
+      "value": 0.5
+    },
+    {
+      "label": "Rs. 0 - 1 Lakh",
+      "value": 1
+    },
+    {
+      "label": "Rs. 1 - 2 Lakh",
+      "value": 2
+    },
+    {
+      "label": "Rs. 2 - 3 Lakh",
+      "value": 3
+    },
+    {
+      "label": "Rs. 3 - 4 Lakh",
+      "value": 4
+    },
+    {
+      "label": "Rs. 4 - 5 Lakh",
+      "value": 5
+    },
+    {
+      "label": "Rs. 5 - 7.5 Lakh",
+      "value": 6
+    },
+    {
+      "label": "Rs. 7.5 - 10 Lakh",
+      "value": 7
+    },
+    {
+      "label": "Rs. 10 - 15 Lakh",
+      "value": 8
+    },
+    {
+      "label": "Rs. 15 - 20 Lakh",
+      "value": 9
+    },
+    {
+      "label": "Rs. 20 - 25 Lakh",
+      "value": 10
+    },
+    {
+      "label": "Rs. 25 - 35 Lakh",
+      "value": 11
+    },
+    {
+      "label": "Rs. 35 - 50 Lakh",
+      "value": 12
+    },
+    {
+      "label": "Rs. 50 - 70 Lakh",
+      "value": 13
+    },
+    {
+      "label": "Rs. 70 - 1 Crore",
+      "value": 14
+    },
+    {
+      "label": "Rs. 1 Crore & above",
+      "value": 15
+    }
+  ],
+  "employed_in": [
+    {
+      "label": "Private Sector",
+      "value": "pvtSct"
+    },
+    {
+      "label": "Government/Public Sector",
+      "value": "gvtpbcsct"
+    },
+    {
+      "label": "Civil Services",
+      "value": "civSer"
+    },
+    {
+      "label": "Defence",
+      "value": "defe"
+    },
+    {
+      "label": "Business/Self Employed",
+      "value": "busSelf"
+    },
+    {
+      "label": "Not Working ",
+      "value": "nwrk"
+    }
+  ],
+  "familyStatus": [
+    {
+      "label": "Rich/Affluent",
+      "value": "rich"
+    },
+    {
+      "label": "Upper Middle Class",
+      "value": "upper"
+    },
+    {
+      "label": "Middle Class ",
+      "value": "middle"
+    }
+  ],
+  "familyType": [
+    {
+      "label": "Joint Family",
+      "value": "joint"
+    },
+    {
+      "label": "Nuclear Family",
+      "value": "nuclear"
+    },
+    {
+      "label": "Other",
+      "value": "other"
+    }
+  ],
+  "familyValues": [
+    {
+      "label": "Orthodox",
+      "value": "Ort"
+    },
+    {
+      "label": "Conservative",
+      "value": "Con"
+    },
+    {
+      "label": "Moderate",
+      "value": "Mod"
+    },
+    {
+      "label": "Liberal",
+      "value": "Lib"
+    }
+  ],
+  "fathersOccupation": [
+    {
+      "label": "Business/Entrepreneur",
+      "value": "Bus"
+    },
+    {
+      "label": "Service - Private ",
+      "value": "Ser"
+    },
+    {
+      "label": "Service - Govt/PSU",
+      "value": "Serg"
+    },
+    {
+      "label": "Army/Armed Forces ",
+      "value": "Arm"
+    },
+    {
+      "label": "Civil Services ",
+      "value": "Civ"
+    },
+    {
+      "label": "Retired",
+      "value": "Ret"
+    },
+    {
+      "label": "Not Employed",
+      "value": "Not"
+    },
+    {
+      "label": "Expired ",
+      "value": "Exp"
+    }
+  ],
+  "height": [
+    {
+      "label": "<4",
+      "value": 47
+    },
+    {
+      "label": "4'0\"(1.22 mts)",
+      "value": 48
+    },
+    {
+      "label": "4'1\"(1.24 mts)",
+      "value": 49
+    },
+    {
+      "label": "4'2\"(1.28 mts)",
+      "value": 50
+    },
+    {
+      "label": "4'3\"(1.31 mts)",
+      "value": 51
+    },
+    {
+      "label": "4'4\"(1.34 mts)",
+      "value": 52
+    },
+    {
+      "label": "4'5\"(1.35 mts)",
+      "value": 53
+    },
+    {
+      "label": "4'6\"(1.37 mts)",
+      "value": 54
+    },
+    {
+      "label": "4'7\"(1.40 mts)",
+      "value": 55
+    },
+    {
+      "label": "4'8\"(1.42 mts)",
+      "value": 56
+    },
+    {
+      "label": "4'9\"(1.45 mts)",
+      "value": 57
+    },
+    {
+      "label": "4'10\"(1.47 mts)",
+      "value": 58
+    },
+    {
+      "label": "4'11\"(1.50 mts)",
+      "value": 59
+    },
+    {
+      "label": "5'0\"(1.52 mts)",
+      "value": 60
+    },
+    {
+      "label": "5'1\"(1.55 mts)",
+      "value": 61
+    },
+    {
+      "label": "5'2\"(1.58 mts)",
+      "value": 62
+    },
+    {
+      "label": "5'3\"(1.60 mts)",
+      "value": 63
+    },
+    {
+      "label": "5'4\"(1.63 mts)",
+      "value": 64
+    },
+    {
+      "label": "5'5\"(1.65 mts)",
+      "value": 65
+    },
+    {
+      "label": "5'6\"(1.68 mts)",
+      "value": 66
+    },
+    {
+      "label": "5'7\"(1.70 mts)",
+      "value": 67
+    },
+    {
+      "label": "5'8\"(1.73 mts)",
+      "value": 68
+    },
+    {
+      "label": "5'9\"(1.75 mts)",
+      "value": 69
+    },
+    {
+      "label": "5'10\"(1.78 mts)",
+      "value": 70
+    },
+    {
+      "label": "5'11\"(1.80 mts)",
+      "value": 71
+    },
+    {
+      "label": "6'0\"(1.83 mts)",
+      "value": 72
+    },
+    {
+      "label": "6'1\"(1.85 mts)",
+      "value": 73
+    },
+    {
+      "label": "6'2\"(1.88 mts)",
+      "value": 74
+    },
+    {
+      "label": "6'3\"(1.91 mts)",
+      "value": 75
+    },
+    {
+      "label": "6'4\"(1.93 mts)",
+      "value": 76
+    },
+    {
+      "label": "6'5\"(1.96 mts)",
+      "value": 77
+    },
+    {
+      "label": "6'6\"(1.98 mts)",
+      "value": 78
+    },
+    {
+      "label": "6'7\"(2.01 mts)",
+      "value": 79
+    },
+    {
+      "label": "6'8\"(2.03 mts)",
+      "value": 80
+    },
+    {
+      "label": "6'9\"(2.06 mts)",
+      "value": 81
+    },
+    {
+      "label": "6'10\"(2.08 mts)",
+      "value": 82
+    },
+    {
+      "label": "6'11\"(2.11 mts)",
+      "value": 83
+    },
+    {
+      "label": "7'(2.13 mts)",
+      "value": 84
+    },
+    {
+      "label": ">7",
+      "value": 85
+    }
+  ],
+  "highestEducation": [
+    {
+      "label": "B.A",
+      "value": "BA"
+    },
+    {
+      "label": "B.Arch",
+      "value": "BAr"
+    },
+    {
+      "label": "B.Com",
+      "value": "BCo"
+    },
+    {
+      "label": "B.Des",
+      "value": "BDe"
+    },
+    {
+      "label": "B.E/B.Tech",
+      "value": "Btech"
+    },
+    {
+      "label": "B.ED",
+      "value": "BED"
+    },
+    {
+      "label": "B.IT",
+      "value": "BIT"
+    },
+    {
+      "label": "B.Pharma",
+      "value": "BPh"
+    },
+    {
+      "label": "B.SC",
+      "value": "BSC"
+    },
+    {
+      "label": "BAMS",
+      "value": "BAMS"
+    },
+    {
+      "label": "BBA",
+      "value": "BBA"
+    },
+    {
+      "label": "BCA",
+      "value": "BCA"
+    },
+    {
+      "label": "BDS",
+      "value": "BDS"
+    },
+    {
+      "label": "BFA",
+      "value": "BFA"
+    },
+    {
+      "label": "BHM",
+      "value": "BHM"
+    },
+    {
+      "label": "BHMS",
+      "value": "BHMS"
+    },
+    {
+      "label": "BJMC",
+      "value": "BJMC"
+    },
+    {
+      "label": "BL/LLB",
+      "value": "BLL"
+    },
+    {
+      "label": "BPT",
+      "value": "BPT"
+    },
+    {
+      "label": "BVSc.",
+      "value": "BVSc"
+    },
+    {
+      "label": "CA",
+      "value": "CA"
+    },
+    {
+      "label": "CFA",
+      "value": "CFA"
+    },
+    {
+      "label": "CS",
+      "value": "CS"
+    },
+    {
+      "label": "Diploma",
+      "value": "Dipl"
+    },
+    {
+      "label": "DM",
+      "value": "DM"
+    },
+    {
+      "label": "HighSchool",
+      "value": "High"
+    },
+    {
+      "label": "ICWA",
+      "value": "ICWA"
+    },
+    {
+      "label": "M.A",
+      "value": "MA"
+    },
+    {
+      "label": "M.Arch",
+      "value": "MAr"
+    },
+    {
+      "label": "M.COM",
+      "value": "MCO"
+    },
+    {
+      "label": "M.D",
+      "value": "MD"
+    },
+    {
+      "label": "M.Des",
+      "value": "MDe"
+    },
+    {
+      "label": "M.E/M.Tech",
+      "value": "ME"
+    },
+    {
+      "label": "M.Ed",
+      "value": "MEd"
+    },
+    {
+      "label": "M.Pharma",
+      "value": "MPh"
+    },
+    {
+      "label": "M.phil",
+      "value": "Mph"
+    },
+    {
+      "label": "M.S(Engineering)",
+      "value": "MS"
+    },
+    {
+      "label": "M.S.(Medicine)",
+      "value": "MSMed"
+    },
+    {
+      "label": "M.Sc",
+      "value": "M.Sc"
+    },
+    {
+      "label": "MBA/PGDM",
+      "value": "MBA"
+    },
+    {
+      "label": "MBBS",
+      "value": "MBBS"
+    },
+    {
+      "label": "MCA/PGDCA",
+      "value": "MCA"
+    },
+    {
+      "label": "MCh",
+      "value": "MCh"
+    },
+    {
+      "label": "MDS",
+      "value": "MDS"
+    },
+    {
+      "label": "MFA",
+      "value": "MFA"
+    },
+    {
+      "label": "MJMC",
+      "value": "MJMC"
+    },
+    {
+      "label": "ML/LLM",
+      "value": "ML/L"
+    },
+    {
+      "label": "MPT",
+      "value": "MPT"
+    },
+    {
+      "label": "MSW",
+      "value": "MSW"
+    },
+    {
+      "label": "MVSc.",
+      "value": "MVSc"
+    },
+    {
+      "label": "Other",
+      "value": "Othe"
+    },
+    {
+      "label": "Ph.D",
+      "value": "Ph.D"
+    },
+    {
+      "label": "TradeSchool",
+      "value": "Trad"
+    }
+  ],
+  "mothersOccupation": [
+    {
+      "label": "Housewife",
+      "value": "Hous"
+    },
+    {
+      "label": "Business/Entrepreneur",
+      "value": "Busi"
+    },
+    {
+      "label": "Service-Private",
+      "value": "Serv"
+    },
+    {
+      "label": "Service-Govt/PSU",
+      "value": "Servg"
+    },
+    {
+      "label": "Army/Armed forces",
+      "value": "Army"
+    },
+    {
+      "label": "Civil Service ",
+      "value": "Civi"
+    },
+    {
+      "label": "Teacher ",
+      "value": "Teac"
+    },
+    {
+      "label": "Retired",
+      "value": "Reti"
+    },
+    {
+      "label": "Expired ",
+      "value": "Expi"
+    }
+  ],
+  "nakshatra": [
+    {
+      "label": "Don’t know",
+      "value": "Don’0"
+    },
+    {
+      "label": "Anuradha/Anusham/Anizham",
+      "value": "Anur1"
+    },
+    {
+      "label": "Ardra/Thiruvathira",
+      "value": "Ardr2"
+    },
+    {
+      "label": "Ashlesha/Ayilyam",
+      "value": "Ashl3"
+    },
+    {
+      "label": "Ashwini/Ashwathi",
+      "value": "Ashw4"
+    },
+    {
+      "label": "Bharani",
+      "value": "Bhar5"
+    },
+    {
+      "label": "Chitra/Chitha",
+      "value": "Chit6"
+    },
+    {
+      "label": "Dhanista/Avittam",
+      "value": "Dhan7"
+    },
+    {
+      "label": "Hastha/Atham",
+      "value": "Hast8"
+    },
+    {
+      "label": "Jyesta/kettai",
+      "value": "Jyes9"
+    },
+    {
+      "label": "Krithika/Karthika",
+      "value": "Krit10"
+    },
+    {
+      "label": "Makha/Magam",
+      "value": "Makh11"
+    },
+    {
+      "label": "Moolam/Moola",
+      "value": "Mool12"
+    },
+    {
+      "label": "Mrigasira/Makayiram",
+      "value": "Mrig13"
+    },
+    {
+      "label": "Poorvabadrapada/Puratathi",
+      "value": "Poor14"
+    },
+    {
+      "label": "Poorvashada/Pooradam",
+      "value": "Poor15"
+    },
+    {
+      "label": "Poorvapalguni/Puram/Pubbhe",
+      "value": "Poor16"
+    },
+    {
+      "label": "Punavarsu/Punarpusam",
+      "value": "Puna17"
+    },
+    {
+      "label": "Pushya/Poosam/Pooyam",
+      "value": "Push18"
+    },
+    {
+      "label": "Revathi",
+      "value": "Reva19"
+    },
+    {
+      "label": "Rohini",
+      "value": "Rohi20"
+    },
+    {
+      "label": "Shatataraka/Sadayam/Sadabist",
+      "value": "Shat21"
+    },
+    {
+      "label": "Shravan/Thiruvonam",
+      "value": "Shra22"
+    },
+    {
+      "label": "Swati",
+      "value": "Swa22"
+    },
+    {
+      "label": "Uttrabadrapada/Uthratadhi",
+      "value": "Uttr23"
+    },
+    {
+      "label": "Uttarapalguni/Uthram",
+      "value": "Utta24"
+    },
+    {
+      "label": "Uttarashada/Uthradam",
+      "value": "Utta25"
+    },
+    {
+      "label": "Vishaka/Vishakam",
+      "value": "Vish26"
+    }
+  ],
+  "occupation": [
+    {
+      "label": "Accounting Professional",
+      "value": "Acco0"
+    },
+    {
+      "label": "Actor/Model",
+      "value": "Acto1"
+    },
+    {
+      "label": "Admin Professional",
+      "value": "Admi2"
+    },
+    {
+      "label": "Advertising Professional",
+      "value": "Adve3"
+    },
+    {
+      "label": "Agent",
+      "value": "Agen4"
+    },
+    {
+      "label": "Agriculture professional",
+      "value": "Agri5"
+    },
+    {
+      "label": "Air Force",
+      "value": "AirF6"
+    },
+    {
+      "label": "Airline Professional",
+      "value": "Airl7"
+    },
+    {
+      "label": "Analyst",
+      "value": "Anal8"
+    },
+    {
+      "label": "Animator",
+      "value": "Anim9"
+    },
+    {
+      "label": "Architect",
+      "value": "Arch10"
+    },
+    {
+      "label": "Army",
+      "value": "Army11"
+    },
+    {
+      "label": "Artist",
+      "value": "Arti12"
+    },
+    {
+      "label": "Auditor",
+      "value": "Audi13"
+    },
+    {
+      "label": "Banking Professional",
+      "value": "Bank14"
+    },
+    {
+      "label": "Beautician",
+      "value": "Beau15"
+    },
+    {
+      "label": "BPO/ITesProfessional",
+      "value": "BPO/16"
+    },
+    {
+      "label": "Broker",
+      "value": "Brok17"
+    },
+    {
+      "label": "BusinessOwner/Entrepreneur",
+      "value": "Busi18"
+    },
+    {
+      "label": "Business person",
+      "value": "Busi19"
+    },
+    {
+      "label": "Charted Accountant",
+      "value": "Char20"
+    },
+    {
+      "label": "Civil Services(IAS/IPS/IRS/IES/IFS)",
+      "value": "Civi21"
+    },
+    {
+      "label": "Clerk",
+      "value": "Cler22"
+    },
+    {
+      "label": "Consultant",
+      "value": "Cons23"
+    },
+    {
+      "label": "Corporate Communication",
+      "value": "Corp24"
+    },
+    {
+      "label": "Corporate Planning",
+      "value": "Corp25"
+    },
+    {
+      "label": "Customer Service",
+      "value": "Cust26"
+    },
+    {
+      "label": "CXO/Chairman/President/Director",
+      "value": "CXO/27"
+    },
+    {
+      "label": "Cyber/Network Security",
+      "value": "Cybe28"
+    },
+    {
+      "label": "Defence Services",
+      "value": "Defe29"
+    },
+    {
+      "label": "Dentist",
+      "value": "Dent30"
+    },
+    {
+      "label": "Doctor",
+      "value": "Doct31"
+    },
+    {
+      "label": "Education Institution owner",
+      "value": "Educ32"
+    },
+    {
+      "label": "Education professional",
+      "value": "Educ33"
+    },
+    {
+      "label": "Electronics Engineer",
+      "value": "Elec35"
+    },
+    {
+      "label": "Farming",
+      "value": "Farm36"
+    },
+    {
+      "label": "Fashion Designer",
+      "value": "Fash37"
+    },
+    {
+      "label": "Film/Entertainment Professional",
+      "value": "Film38"
+    },
+    {
+      "label": "Finance Professional",
+      "value": "Fina39"
+    },
+    {
+      "label": "Fitness professional",
+      "value": "Fitn40"
+    },
+    {
+      "label": "Flight Attendant",
+      "value": "Flig41"
+    },
+    {
+      "label": "Hardware/Telecom Engineer",
+      "value": "Hard42"
+    },
+    {
+      "label": "Hotels/Hospitality professional",
+      "value": "Hote44"
+    },
+    {
+      "label": "HR Professional",
+      "value": "HRPr45"
+    },
+    {
+      "label": "Information Technology",
+      "value": "Info461"
+    },
+    {
+      "label": "Interior Designer",
+      "value": "Inte46"
+    },
+    {
+      "label": "Journalist",
+      "value": "Jour47"
+    },
+    {
+      "label": "Law Enforcement Officer",
+      "value": "LawE48"
+    },
+    {
+      "label": "Lawyer & Legal Professional",
+      "value": "Lawy49"
+    },
+    {
+      "label": "Librarian",
+      "value": "Libr50"
+    },
+    {
+      "label": "Looking for Job",
+      "value": "Look51"
+    },
+    {
+      "label": "Mariner",
+      "value": "Mari52"
+    },
+    {
+      "label": "Marketing Professional",
+      "value": "Mark53"
+    },
+    {
+      "label": "Media Professional",
+      "value": "Medi54"
+    },
+    {
+      "label": "Medical/Healthcare Professional",
+      "value": "Medi55"
+    },
+    {
+      "label": "Merchant Naval officer",
+      "value": "Merc56"
+    },
+    {
+      "label": "Navy",
+      "value": "Navy57"
+    },
+    {
+      "label": "Non-IT Engineer",
+      "value": "Non-58"
+    },
+    {
+      "label": "Not Working",
+      "value": "NotW59"
+    },
+    {
+      "label": "Nurse",
+      "value": "Nurs60"
+    },
+    {
+      "label": "Operation/Technician",
+      "value": "Oper61"
+    },
+    {
+      "label": "Operations Managemnt",
+      "value": "Oper62"
+    },
+    {
+      "label": "Operator/Technician",
+      "value": "Oper63"
+    },
+    {
+      "label": "Paramedic",
+      "value": "Para65"
+    },
+    {
+      "label": "Pharmacist",
+      "value": "Phar66"
+    },
+    {
+      "label": "Physiotherapist",
+      "value": "Phys67"
+    },
+    {
+      "label": "Pilot",
+      "value": "Pilo68"
+    },
+    {
+      "label": "Police",
+      "value": "Poli69"
+    },
+    {
+      "label": "Politician",
+      "value": "Poli70"
+    },
+    {
+      "label": "PR Professional",
+      "value": "PRPr71"
+    },
+    {
+      "label": "Product manager",
+      "value": "Prod72"
+    },
+    {
+      "label": "Professor/Lecturer",
+      "value": "Prof73"
+    },
+    {
+      "label": "Program Manager",
+      "value": "Prog74"
+    },
+    {
+      "label": "Project Lead-IT",
+      "value": "proj75"
+    },
+    {
+      "label": "Project manager-IT",
+      "value": "Proj76"
+    },
+    {
+      "label": "Project Manager-NonIT",
+      "value": "Proj77"
+    },
+    {
+      "label": "Psychologist",
+      "value": "Psyc78"
+    },
+    {
+      "label": "Quality Assurance Engineer",
+      "value": "Qual79"
+    },
+    {
+      "label": "Quality Assurance Engineer-IT",
+      "value": "Qual80"
+    },
+    {
+      "label": "Quality Assurance Engineer",
+      "value": "Qual81"
+    },
+    {
+      "label": "Quality Assuranvce Engineer-IT",
+      "value": "Qual82"
+    },
+    {
+      "label": "Research Assistant",
+      "value": "Rese83"
+    },
+    {
+      "label": "Research Professional",
+      "value": "Rese84"
+    },
+    {
+      "label": "Retired",
+      "value": "Reti85"
+    },
+    {
+      "label": "Sales Professional",
+      "value": "Sale86"
+    },
+    {
+      "label": "Science & Research",
+      "value": "Scie87"
+    },
+    {
+      "label": "Science Professional",
+      "value": "Scie88"
+    },
+    {
+      "label": "Scientist",
+      "value": "Scie89"
+    },
+    {
+      "label": "Secretary/FrontOffice",
+      "value": "Secr90"
+    },
+    {
+      "label": "SecurityProfessional",
+      "value": "Secu91"
+    },
+    {
+      "label": "Singer",
+      "value": "Sing92"
+    },
+    {
+      "label": "Social Services/NGO/Volunter",
+      "value": "Soci93"
+    },
+    {
+      "label": "Software & IT",
+      "value": "Soft94"
+    },
+    {
+      "label": "Software Professional",
+      "value": "Soft95"
+    },
+    {
+      "label": "Sports person",
+      "value": "Spor96"
+    },
+    {
+      "label": "Sr.Manager/Manager",
+      "value": "Sr.M97"
+    },
+    {
+      "label": "Student",
+      "value": "Stud98"
+    },
+    {
+      "label": "Subject Matter Expert",
+      "value": "Subj99"
+    },
+    {
+      "label": "Surgeon",
+      "value": "Surg100"
+    },
+    {
+      "label": "Teacher",
+      "value": "Teac101"
+    },
+    {
+      "label": "Top Management",
+      "value": "TopM102"
+    },
+    {
+      "label": "Travel Professional",
+      "value": "Trav103"
+    },
+    {
+      "label": "UI/UX designer",
+      "value": "UI/U104"
+    },
+    {
+      "label": "Veterinary Doctor",
+      "value": "Vete105"
+    },
+    {
+      "label": "VP/AVP/GM/DGM",
+      "value": "VP/A106"
+    },
+    {
+      "label": "Web/GraphicDesigner",
+      "value": "Web/107"
+    },
+    {
+      "label": "Writer",
+      "value": "Writ108"
+    },
+    {
+      "label": "Others",
+      "value": "othe64"
+    }
+  ],
+  "rashi": [
+    {
+      "label": "Don’t Know",
+      "value": "Don’0"
+    },
+    {
+      "label": "Mesh",
+      "value": "Mesh1"
+    },
+    {
+      "label": "Virshabh",
+      "value": "Virs2"
+    },
+    {
+      "label": "Mithun",
+      "value": "Mith3"
+    },
+    {
+      "label": "kark",
+      "value": "kark4"
+    },
+    {
+      "label": "Simha",
+      "value": "Simh5"
+    },
+    {
+      "label": "Kanya",
+      "value": "Kany6"
+    },
+    {
+      "label": "Tula",
+      "value": "Tula7"
+    },
+    {
+      "label": "Vrishchick",
+      "value": "Vris8"
+    },
+    {
+      "label": "Dhanu",
+      "value": "Dhan9"
+    },
+    {
+      "label": "Makar",
+      "value": "Maka10"
+    },
+    {
+      "label": "Kumbh",
+      "value": "Kumb11"
+    },
+    {
+      "label": "Meen",
+      "value": "Meen12"
+    }
+  ],
+  "horoscopes": [
+    {
+      "label": "Aries",
+      "value": "AR"
+    },
+    {
+      "label": "Taurus",
+      "value": "TA"
+    },
+    {
+      "label": "Gemini",
+      "value": "GE"
+    },
+    {
+      "label": "Cancer",
+      "value": "CA"
+    },
+    {
+      "label": "Leo",
+      "value": "LE"
+    },
+    {
+      "label": "Virgo",
+      "value": "VI"
+    },
+    {
+      "label": "Libra",
+      "value": "LI"
+    },
+    {
+      "label": "Scorpio",
+      "value": "SC"
+    },
+    {
+      "label": "Sagittarius",
+      "value": "SA"
+    },
+    {
+      "label": "Capricorn",
+      "value": "CP"
+    },
+    {
+      "label": "Aquarius",
+      "value": "AQ"
+    },
+    {
+      "label": "Pisces",
+      "value": "PI"
+    }
+  ],
+  "manglik": [
+    {
+      "label": "Manglik",
+      "value": "man"
+    },
+    {
+      "label": "Non-Manglik",
+      "value": "non"
+    },
+    {
+      "label": "Angshik(Partial manglik)",
+      "value": "ang"
+    }
+  ],
+  "motherTongue": [
+    {
+      "label": "Arabic",
+      "value": "Arab0"
+    },
+    {
+      "label": "Assamese",
+      "value": "Assa1"
+    },
+    {
+      "label": "Bengali",
+      "value": "Beng2"
+    },
+    {
+      "label": "English",
+      "value": "Engl3"
+    },
+    {
+      "label": "French ",
+      "value": "Fren4"
+    },
+    {
+      "label": "Gujarati",
+      "value": "Guja5"
+    },
+    {
+      "label": "Haryanvi",
+      "value": "Hary6"
+    },
+    {
+      "label": "Himachali",
+      "value": "Hima7"
+    },
+    {
+      "label": "Hindi",
+      "value": "Hind8"
+    },
+    {
+      "label": "Kannada",
+      "value": "Kann13"
+    },
+    {
+      "label": "Kashmiri",
+      "value": "Kash14"
+    },
+    {
+      "label": "Konkani",
+      "value": "Konk15"
+    },
+    {
+      "label": "Kutchi",
+      "value": "Kutc16"
+    },
+    {
+      "label": "Malayalam",
+      "value": "Mala17"
+    },
+    {
+      "label": "Mandarin",
+      "value": "Mand18"
+    },
+    {
+      "label": "Marathi",
+      "value": "Mara19"
+    },
+    {
+      "label": "Oriya",
+      "value": "Oriy20"
+    },
+    {
+      "label": "Others",
+      "value": "Othe21"
+    },
+    {
+      "label": "Portuguese",
+      "value": "Port22"
+    },
+    {
+      "label": "Punjabi",
+      "value": "Punj23"
+    },
+    {
+      "label": "Russian",
+      "value": "Russ24"
+    },
+    {
+      "label": "Sikkim/ Nepali",
+      "value": "Sikk25"
+    },
+    {
+      "label": "Sindhi",
+      "value": "Sind26"
+    },
+    {
+      "label": "Spanish",
+      "value": "Span27"
+    },
+    {
+      "label": "Tamil",
+      "value": "Tami28"
+    },
+    {
+      "label": "Telugu",
+      "value": "Telu29"
+    },
+    {
+      "label": "Tulu",
+      "value": "Tulu30"
+    },
+    {
+      "label": "Urdu",
+      "value": "Urdu31"
+    }
+  ],
+  "residentialStatus": [
+    {
+      "label": "Citizen",
+      "value": "Citi1"
+    },
+    {
+      "label": "Permanent Resident",
+      "value": "Perm2"
+    },
+    {
+      "label": "Work Permit",
+      "value": "Work3"
+    },
+    {
+      "label": "Student Visa",
+      "value": "Stud4"
+    },
+    {
+      "label": "Temporary Visa",
+      "value": "Temp5"
+    }
+  ],
+  "books": [
+    {
+      "label": "Biographies",
+      "value": "Biog0"
+    },
+    {
+      "label": "Business / Occupational",
+      "value": "Busi1"
+    },
+    {
+      "label": "Classic literature",
+      "value": "Clas2"
+    },
+    {
+      "label": "Comics",
+      "value": "Comi3"
+    },
+    {
+      "label": "Fantasy",
+      "value": "Fant4"
+    },
+    {
+      "label": "History",
+      "value": "Hist5"
+    },
+    {
+      "label": "Humour",
+      "value": "Humo6"
+    },
+    {
+      "label": "Magazines & Newspapers",
+      "value": "Maga7"
+    },
+    {
+      "label": "Philosophy/Spiritual",
+      "value": "Phil8"
+    },
+    {
+      "label": "Poetry",
+      "value": "Poet9"
+    },
+    {
+      "label": "Romance",
+      "value": "Roma10"
+    },
+    {
+      "label": "Science Fiction",
+      "value": "Scie11"
+    },
+    {
+      "label": "Self-help",
+      "value": "Self12"
+    },
+    {
+      "label": "Short stories",
+      "value": "Shor13"
+    },
+    {
+      "label": "Thriller/Suspense",
+      "value": "Thri14"
+    }
+  ],
+  "cuisines": [
+    {
+      "label": "Arabic",
+      "value": "Arab0"
+    },
+    {
+      "label": "Bengali",
+      "value": "Beng1"
+    },
+    {
+      "label": "Chinese",
+      "value": "Chin2"
+    },
+    {
+      "label": "Continental",
+      "value": "Cont3"
+    },
+    {
+      "label": "Fast food",
+      "value": "Fast4"
+    },
+    {
+      "label": "Gujarati",
+      "value": "Guja5"
+    },
+    {
+      "label": "Italian",
+      "value": "Ital6"
+    },
+    {
+      "label": "Konkan",
+      "value": "Konk7"
+    },
+    {
+      "label": "Latin American",
+      "value": "Lati8"
+    },
+    {
+      "label": "Lebanese",
+      "value": "Leba9"
+    },
+    {
+      "label": "Mexican",
+      "value": "Mexi10"
+    },
+    {
+      "label": "Moghlai",
+      "value": "Mogh11"
+    },
+    {
+      "label": "Punjabi",
+      "value": "Punj12"
+    },
+    {
+      "label": "Rajasthani",
+      "value": "Raja13"
+    },
+    {
+      "label": "South Indian",
+      "value": "Sout14"
+    },
+    {
+      "label": "Spanish",
+      "value": "Span15"
+    },
+    {
+      "label": "Sushi",
+      "value": "Sush16"
+    },
+    {
+      "label": "Thai",
+      "value": "Thai17"
+    }
+  ],
+  "dietaryHabits": [
+    {
+      "label": "Vegetarian",
+      "value": "Vege0"
+    },
+    {
+      "label": "Non Vegetarian",
+      "value": "Non1"
+    },
+    {
+      "label": "Jain",
+      "value": "Jain2"
+    },
+    {
+      "label": "Eggetarian",
+      "value": "Egge3"
+    }
+  ],
+  "dressStyle": [
+    {
+      "label": "Casual - usually in jeans and T-shirts",
+      "value": "Casu0"
+    },
+    {
+      "label": "Classic Indian - typically Indian formal wear",
+      "value": "Clas1"
+    },
+    {
+      "label": "Classic Western - typically western",
+      "value": "Clas2"
+    },
+    {
+      "label": "Designer - only leading brands will do",
+      "value": "Desi3"
+    },
+    {
+      "label": "Formal wear",
+      "value": "Form4"
+    },
+    {
+      "label": "Trendy in line with the latest fashion",
+      "value": "Tren5"
+    }
+  ],
+  "drinkingHabits": [
+    {
+      "label": "Yes",
+      "value": "Yes0"
+    },
+    {
+      "label": "No",
+      "value": "No1"
+    },
+    {
+      "label": "Occasionally",
+      "value": "Occa2"
+    }
+  ],
+  "hobbies": [
+    {
+      "label": "Collecting Stamps",
+      "value": "Coll0"
+    },
+    {
+      "label": "Collecting Coins",
+      "value": "Coll1"
+    },
+    {
+      "label": "Collecting antiques",
+      "value": "Coll2"
+    },
+    {
+      "label": "Art/Handicraft",
+      "value": "Art/3"
+    },
+    {
+      "label": "Painting",
+      "value": "Pain4"
+    },
+    {
+      "label": "Cooking",
+      "value": "Cook5"
+    },
+    {
+      "label": "Photography",
+      "value": "Phot6"
+    },
+    {
+      "label": "Film-making",
+      "value": "Film7"
+    },
+    {
+      "label": "Model building",
+      "value": "Mode8"
+    },
+    {
+      "label": "Gardening/Landscaping",
+      "value": "Gard9"
+    },
+    {
+      "label": "Fishing",
+      "value": "Fish10"
+    },
+    {
+      "label": "Bird watching",
+      "value": "Bird11"
+    },
+    {
+      "label": "Taking care of pets",
+      "value": "Taki12"
+    },
+    {
+      "label": "Playing musical instruments",
+      "value": "Play13"
+    },
+    {
+      "label": "Singing",
+      "value": "Sing14"
+    },
+    {
+      "label": "Dancing",
+      "value": "Danc15"
+    },
+    {
+      "label": "Acting",
+      "value": "Acti16"
+    },
+    {
+      "label": "Ham radio",
+      "value": "Ham17"
+    },
+    {
+      "label": "Astrology / Palmistry / Numerology",
+      "value": "Astr18"
+    },
+    {
+      "label": "Graphology",
+      "value": "Grap19"
+    },
+    {
+      "label": "Solving Crosswords, Puzzles",
+      "value": "Solv20"
+    }
+  ],
+  "interests": [
+    {
+      "label": "Writing",
+      "value": "Writ0"
+    },
+    {
+      "label": "Reading / Book clubs",
+      "value": "Read1"
+    },
+    {
+      "label": "Learning new languages",
+      "value": "Lear2"
+    },
+    {
+      "label": "Listening to music",
+      "value": "List3"
+    },
+    {
+      "label": "Movies",
+      "value": "Movi4"
+    },
+    {
+      "label": "Theatre",
+      "value": "Thea5"
+    },
+    {
+      "label": "Watching television",
+      "value": "Watc6"
+    },
+    {
+      "label": "Travel/Sightseeing",
+      "value": "Trav7"
+    },
+    {
+      "label": "Sports - Outdoor",
+      "value": "Spor8"
+    },
+    {
+      "label": "Sports - Indoor",
+      "value": "Spor9"
+    },
+    {
+      "label": "Trekking / Adventure sports",
+      "value": "Trek10"
+    },
+    {
+      "label": "Video/ Computer games",
+      "value": "Vide11"
+    },
+    {
+      "label": "Health & Fitness",
+      "value": "Heal12"
+    },
+    {
+      "label": "Yoga / Meditation",
+      "value": "Yoga13"
+    },
+    {
+      "label": "Alternative healing",
+      "value": "Alte14"
+    },
+    {
+      "label": "Volunteering / Social Service",
+      "value": "Volu15"
+    },
+    {
+      "label": "Politics",
+      "value": "Poli16"
+    },
+    {
+      "label": "Net surfing",
+      "value": "Net17"
+    },
+    {
+      "label": "Blogging",
+      "value": "Blog18"
+    }
+  ],
+  "music": [
+    {
+      "label": "Bhajans/Devotional",
+      "value": "Bhaj0"
+    },
+    {
+      "label": "Classical - Carnatic",
+      "value": "Clas1"
+    },
+    {
+      "label": "Classical - Hindustani",
+      "value": "Clas2"
+    },
+    {
+      "label": "Classical-Western",
+      "value": "Clas3"
+    },
+    {
+      "label": "Ghazals",
+      "value": "Ghaz4"
+    },
+    {
+      "label": "Instrumental - Indian",
+      "value": "Inst5"
+    },
+    {
+      "label": "Instrumental - Western",
+      "value": "Inst6"
+    },
+    {
+      "label": "Latest film songs",
+      "value": "Late7"
+    },
+    {
+      "label": "Latest film songs",
+      "value": "Late8"
+    },
+    {
+      "label": "Latest film songs",
+      "value": "Late9"
+    },
+    {
+      "label": "Old film songs",
+      "value": "Old10"
+    },
+    {
+      "label": "Old film songs",
+      "value": "Old11"
+    },
+    {
+      "label": "Old film songs",
+      "value": "Old12"
+    },
+    {
+      "label": "Qawalis",
+      "value": "Qawa13"
+    },
+    {
+      "label": "Sufi music",
+      "value": "Sufi14"
+    }
+  ],
+  "smokingHabits": [
+    {
+      "label": "Yes",
+      "value": "Yes0"
+    },
+    {
+      "label": "No",
+      "value": "No1"
+    },
+    {
+      "label": "Occasionally",
+      "value": "Occa2"
+    }
+  ],
+  "sports": [
+    {
+      "label": "Adventure sports",
+      "value": "Adve0"
+    },
+    {
+      "label": "Aerobics",
+      "value": "Aero1"
+    },
+    {
+      "label": "Badminton",
+      "value": "Badm2"
+    },
+    {
+      "label": "Baseball",
+      "value": "Base3"
+    },
+    {
+      "label": "Basketball",
+      "value": "Bask4"
+    },
+    {
+      "label": "Billiards/Snooker / Pool",
+      "value": "Bill5"
+    },
+    {
+      "label": "Bowling",
+      "value": "Bowl6"
+    },
+    {
+      "label": "Card games",
+      "value": "Card7"
+    },
+    {
+      "label": "Carrom",
+      "value": "Carr8"
+    },
+    {
+      "label": "Chess",
+      "value": "Ches9"
+    },
+    {
+      "label": "Cricket",
+      "value": "Cric10"
+    },
+    {
+      "label": "Cycling",
+      "value": "Cycl11"
+    },
+    {
+      "label": "Football",
+      "value": "Foot12"
+    },
+    {
+      "label": "Golf",
+      "value": "Golf13"
+    },
+    {
+      "label": "Hockey",
+      "value": "Hock14"
+    },
+    {
+      "label": "Jogging/Walking",
+      "value": "Jogg15"
+    },
+    {
+      "label": "Martial Arts",
+      "value": "Mart16"
+    },
+    {
+      "label": "Rugby",
+      "value": "Rugb17"
+    },
+    {
+      "label": "Scrabble",
+      "value": "Scra18"
+    },
+    {
+      "label": "Squash",
+      "value": "Squa19"
+    },
+    {
+      "label": "Swimming / Water sports",
+      "value": "Swim20"
+    },
+    {
+      "label": "Table-tennis",
+      "value": "Tabl21"
+    },
+    {
+      "label": "Tennis",
+      "value": "Tenn22"
+    },
+    {
+      "label": "Volleyball",
+      "value": "Voll23"
+    },
+    {
+      "label": "Weight training",
+      "value": "Weig24"
+    },
+    {
+      "label": "Yoga/Meditation",
+      "value": "Yoga25"
+    }
+  ],
+  "managedBy": [
+    {
+      "label": "Family",
+      "value": "Fami0"
+    },
+    {
+      "label": "Other",
+      "value": "Othe2"
+    },
+    {
+      "label": "Relative/Friend",
+      "value": "Rela3"
+    },
+    {
+      "label": "Self",
+      "value": "Self4"
+    },
+    {
+      "label": "Sibling",
+      "value": "Sibl5"
+    }
+  ],
+  "callingCodes": [
+    {
+      "label": "Afghanistan",
+      "value": "+93"
+    },
+    {
+      "label": "Albania",
+      "value": "+355"
+    },
+    {
+      "label": "Algeria",
+      "value": "+213"
+    },
+    {
+      "label": "Andorra",
+      "value": "+376"
+    },
+    {
+      "label": "Angola",
+      "value": "+244"
+    },
+    {
+      "label": "Antigua and Barbuda",
+      "value": "+1-268"
+    },
+    {
+      "label": "Argentina",
+      "value": "+54"
+    },
+    {
+      "label": "Armenia",
+      "value": "+374"
+    },
+    {
+      "label": "Australia",
+      "value": "+61"
+    },
+    {
+      "label": "Austria",
+      "value": "+43"
+    },
+    {
+      "label": "Azerbaijan",
+      "value": "+994"
+    },
+    {
+      "label": "Bahamas",
+      "value": "+1-242"
+    },
+    {
+      "label": "Bahrain",
+      "value": "+973"
+    },
+    {
+      "label": "Bangladesh",
+      "value": "+880"
+    },
+    {
+      "label": "Barbados",
+      "value": "+1-246"
+    },
+    {
+      "label": "Belarus",
+      "value": "+375"
+    },
+    {
+      "label": "Belgium",
+      "value": "+32"
+    },
+    {
+      "label": "Belize",
+      "value": "+501"
+    },
+    {
+      "label": "Benin",
+      "value": "+229"
+    },
+    {
+      "label": "Bhutan",
+      "value": "+975"
+    },
+    {
+      "label": "Bolivia",
+      "value": "+591"
+    },
+    {
+      "label": "Bosnia and Herzegovina",
+      "value": "+387"
+    },
+    {
+      "label": "Botswana",
+      "value": "+267"
+    },
+    {
+      "label": "Brazil",
+      "value": "+55"
+    },
+    {
+      "label": "Brunei",
+      "value": "+673"
+    },
+    {
+      "label": "Bulgaria",
+      "value": "+359"
+    },
+    {
+      "label": "Burkina Faso",
+      "value": "+226"
+    },
+    {
+      "label": "Burundi",
+      "value": "+257"
+    },
+    {
+      "label": "Cabo Verde",
+      "value": "+238"
+    },
+    {
+      "label": "Cambodia",
+      "value": "+855"
+    },
+    {
+      "label": "Cameroon",
+      "value": "+237"
+    },
+    {
+      "label": "Canada",
+      "value": "+1"
+    },
+    {
+      "label": "Central African Republic",
+      "value": "+236"
+    },
+    {
+      "label": "Chad",
+      "value": "+235"
+    },
+    {
+      "label": "Chile",
+      "value": "+56"
+    },
+    {
+      "label": "China",
+      "value": "+86"
+    },
+    {
+      "label": "Colombia",
+      "value": "+57"
+    },
+    {
+      "label": "Comoros",
+      "value": "+269"
+    },
+    {
+      "label": "Congo",
+      "value": "+242"
+    },
+    {
+      "label": "Costa Rica",
+      "value": "+506"
+    },
+    {
+      "label": "Cote d'Ivoire",
+      "value": "+225"
+    },
+    {
+      "label": "Croatia",
+      "value": "+385"
+    },
+    {
+      "label": "Cuba",
+      "value": "+53"
+    },
+    {
+      "label": "Cyprus",
+      "value": "+357"
+    },
+    {
+      "label": "Czech Republic",
+      "value": "+420"
+    },
+    {
+      "label": "Denmark",
+      "value": "+45"
+    },
+    {
+      "label": "Djibouti",
+      "value": "+253"
+    },
+    {
+      "label": "Dominica",
+      "value": "+1-767"
+    },
+    {
+      "label": "Dominican Republic",
+      "value": "+1-809, +1-829, +1-849"
+    },
+    {
+      "label": "Ecuador",
+      "value": "+593"
+    },
+    {
+      "label": "Egypt",
+      "value": "+20"
+    },
+    {
+      "label": "El Salvador",
+      "value": "+503"
+    },
+    {
+      "label": "Equatorial Guinea",
+      "value": "+240"
+    },
+    {
+      "label": "Eritrea",
+      "value": "+291"
+    },
+    {
+      "label": "Estonia",
+      "value": "+372"
+    },
+    {
+      "label": "Eswatini",
+      "value": "+268"
+    },
+    {
+      "label": "Ethiopia",
+      "value": "+251"
+    },
+    {
+      "label": "Fiji",
+      "value": "+679"
+    },
+    {
+      "label": "Finland",
+      "value": "+358"
+    },
+    {
+      "label": "France",
+      "value": "+33"
+    },
+    {
+      "label": "Gabon",
+      "value": "+241"
+    },
+    {
+      "label": "Gambia",
+      "value": "+220"
+    },
+    {
+      "label": "Georgia",
+      "value": "+995"
+    },
+    {
+      "label": "Germany",
+      "value": "+49"
+    },
+    {
+      "label": "Ghana",
+      "value": "+233"
+    },
+    {
+      "label": "Greece",
+      "value": "+30"
+    },
+    {
+      "label": "Grenada",
+      "value": "+1-473"
+    },
+    {
+      "label": "Guatemala",
+      "value": "+502"
+    },
+    {
+      "label": "Guinea",
+      "value": "+224"
+    },
+    {
+      "label": "Guinea-Bissau",
+      "value": "+245"
+    },
+    {
+      "label": "Guyana",
+      "value": "+592"
+    },
+    {
+      "label": "Haiti",
+      "value": "+509"
+    },
+    {
+      "label": "Honduras",
+      "value": "+504"
+    },
+    {
+      "label": "Hungary",
+      "value": "+36"
+    },
+    {
+      "label": "Iceland",
+      "value": "+354"
+    },
+    {
+      "label": "India",
+      "value": "+91"
+    },
+    {
+      "label": "Indonesia",
+      "value": "+62"
+    },
+    {
+      "label": "Iran",
+      "value": "+98"
+    },
+    {
+      "label": "Iraq",
+      "value": "+964"
+    },
+    {
+      "label": "Ireland",
+      "value": "+353"
+    },
+    {
+      "label": "Israel",
+      "value": "+972"
+    },
+    {
+      "label": "Italy",
+      "value": "+39"
+    },
+    {
+      "label": "Jamaica",
+      "value": "+1-876"
+    },
+    {
+      "label": "Japan",
+      "value": "+81"
+    },
+    {
+      "label": "Jordan",
+      "value": "+962"
+    },
+    {
+      "label": "Kazakhstan",
+      "value": "+7"
+    },
+    {
+      "label": "Kenya",
+      "value": "+254"
+    },
+    {
+      "label": "Kiribati",
+      "value": "+686"
+    },
+    {
+      "label": "Korea, North",
+      "value": "+850"
+    },
+    {
+      "label": "Korea, South",
+      "value": "+82"
+    },
+    {
+      "label": "Kosovo",
+      "value": "+383"
+    },
+    {
+      "label": "Kuwait",
+      "value": "+965"
+    },
+    {
+      "label": "Kyrgyzstan",
+      "value": "+996"
+    },
+    {
+      "label": "Laos",
+      "value": "+856"
+    },
+    {
+      "label": "Latvia",
+      "value": "+371"
+    },
+    {
+      "label": "Lebanon",
+      "value": "+961"
+    },
+    {
+      "label": "Lesotho",
+      "value": "+266"
+    },
+    {
+      "label": "Liberia",
+      "value": "+231"
+    },
+    {
+      "label": "Libya",
+      "value": "+218"
+    },
+    {
+      "label": "Liechtenstein",
+      "value": "+423"
+    },
+    {
+      "label": "Lithuania",
+      "value": "+370"
+    },
+    {
+      "label": "Luxembourg",
+      "value": "+352"
+    },
+    {
+      "label": "Madagascar",
+      "value": "+261"
+    },
+    {
+      "label": "Malawi",
+      "value": "+265"
+    },
+    {
+      "label": "Malaysia",
+      "value": "+60"
+    },
+    {
+      "label": "Maldives",
+      "value": "+960"
+    },
+    {
+      "label": "Mali",
+      "value": "+223"
+    },
+    {
+      "label": "Malta",
+      "value": "+356"
+    },
+    {
+      "label": "Marshall Islands",
+      "value": "+692"
+    },
+    {
+      "label": "Mauritania",
+      "value": "+222"
+    },
+    {
+      "label": "Mauritius",
+      "value": "+230"
+    },
+    {
+      "label": "Mexico",
+      "value": "+52"
+    },
+    {
+      "label": "Micronesia",
+      "value": "+691"
+    },
+    {
+      "label": "Moldova",
+      "value": "+373"
+    },
+    {
+      "label": "Monaco",
+      "value": "+377"
+    },
+    {
+      "label": "Mongolia",
+      "value": "+976"
+    },
+    {
+      "label": "Montenegro",
+      "value": "+382"
+    },
+    {
+      "label": "Morocco",
+      "value": "+212"
+    },
+    {
+      "label": "Mozambique",
+      "value": "+258"
+    },
+    {
+      "label": "Myanmar",
+      "value": "+95"
+    },
+    {
+      "label": "Namibia",
+      "value": "+264"
+    },
+    {
+      "label": "Nauru",
+      "value": "+674"
+    },
+    {
+      "label": "Nepal",
+      "value": "+977"
+    },
+    {
+      "label": "Netherlands",
+      "value": "+31"
+    },
+    {
+      "label": "New Zealand",
+      "value": "+64"
+    },
+    {
+      "label": "Nicaragua",
+      "value": "+505"
+    },
+    {
+      "label": "Niger",
+      "value": "+227"
+    },
+    {
+      "label": "Nigeria",
+      "value": "+234"
+    },
+    {
+      "label": "North Macedonia",
+      "value": "+389"
+    },
+    {
+      "label": "Norway",
+      "value": "+47"
+    },
+    {
+      "label": "Oman",
+      "value": "+968"
+    },
+    {
+      "label": "Pakistan",
+      "value": "+92"
+    },
+    {
+      "label": "Palau",
+      "value": "+680"
+    },
+    {
+      "label": "Palestine",
+      "value": "+970"
+    },
+    {
+      "label": "Panama",
+      "value": "+507"
+    },
+    {
+      "label": "Papua New Guinea",
+      "value": "+675"
+    },
+    {
+      "label": "Paraguay",
+      "value": "+595"
+    },
+    {
+      "label": "Peru",
+      "value": "+51"
+    },
+    {
+      "label": "Philippines",
+      "value": "+63"
+    },
+    {
+      "label": "Poland",
+      "value": "+48"
+    },
+    {
+      "label": "Portugal",
+      "value": "+351"
+    },
+    {
+      "label": "Qatar",
+      "value": "+974"
+    },
+    {
+      "label": "Romania",
+      "value": "+40"
+    },
+    {
+      "label": "Russia",
+      "value": "+7"
+    },
+    {
+      "label": "Rwanda",
+      "value": "+250"
+    },
+    {
+      "label": "Saint Kitts and Nevis",
+      "value": "+1-869"
+    },
+    {
+      "label": "Saint Lucia",
+      "value": "+1-758"
+    },
+    {
+      "label": "Saint Vincent and the Grenadines",
+      "value": "+1-784"
+    },
+    {
+      "label": "Samoa",
+      "value": "+685"
+    },
+    {
+      "label": "San Marino",
+      "value": "+378"
+    },
+    {
+      "label": "Sao Tome and Principe",
+      "value": "+239"
+    },
+    {
+      "label": "Saudi Arabia",
+      "value": "+966"
+    },
+    {
+      "label": "Senegal",
+      "value": "+221"
+    },
+    {
+      "label": "Serbia",
+      "value": "+381"
+    },
+    {
+      "label": "Seychelles",
+      "value": "+248"
+    },
+    {
+      "label": "Sierra Leone",
+      "value": "+232"
+    },
+    {
+      "label": "Singapore",
+      "value": "+65"
+    },
+    {
+      "label": "Slovakia",
+      "value": "+421"
+    },
+    {
+      "label": "Slovenia",
+      "value": "+386"
+    },
+    {
+      "label": "Solomon Islands",
+      "value": "+677"
+    },
+    {
+      "label": "Somalia",
+      "value": "+252"
+    },
+    {
+      "label": "South Africa",
+      "value": "+27"
+    },
+    {
+      "label": "South Sudan",
+      "value": "+211"
+    },
+    {
+      "label": "Spain",
+      "value": "+34"
+    },
+    {
+      "label": "Sri Lanka",
+      "value": "+94"
+    },
+    {
+      "label": "Sudan",
+      "value": "+249"
+    },
+    {
+      "label": "Suriname",
+      "value": "+597"
+    },
+    {
+      "label": "Sweden",
+      "value": "+46"
+    },
+    {
+      "label": "Switzerland",
+      "value": "+41"
+    },
+    {
+      "label": "Syria",
+      "value": "+963"
+    },
+    {
+      "label": "Taiwan",
+      "value": "+886"
+    },
+    {
+      "label": "Tajikistan",
+      "value": "+992"
+    },
+    {
+      "label": "Tanzania",
+      "value": "+255"
+    },
+    {
+      "label": "Thailand",
+      "value": "+66"
+    },
+    {
+      "label": "Timor-Leste",
+      "value": "+670"
+    },
+    {
+      "label": "Togo",
+      "value": "+228"
+    },
+    {
+      "label": "Tonga",
+      "value": "+676"
+    },
+    {
+      "label": "Trinidad and Tobago",
+      "value": "+1-868"
+    },
+    {
+      "label": "Tunisia",
+      "value": "+216"
+    },
+    {
+      "label": "Turkey",
+      "value": "+90"
+    },
+    {
+      "label": "Turkmenistan",
+      "value": "+993"
+    },
+    {
+      "label": "Tuvalu",
+      "value": "+688"
+    },
+    {
+      "label": "Uganda",
+      "value": "+256"
+    },
+    {
+      "label": "Ukraine",
+      "value": "+380"
+    },
+    {
+      "label": "United Arab Emirates",
+      "value": "+971"
+    },
+    {
+      "label": "United Kingdom",
+      "value": "+44"
+    },
+    {
+      "label": "United States",
+      "value": "+1"
+    },
+    {
+      "label": "Uruguay",
+      "value": "+598"
+    },
+    {
+      "label": "Uzbekistan",
+      "value": "+998"
+    },
+    {
+      "label": "Vanuatu",
+      "value": "+678"
+    },
+    {
+      "label": "Vatican City",
+      "value": "+379"
+    },
+    {
+      "label": "Venezuela",
+      "value": "+58"
+    },
+    {
+      "label": "Vietnam",
+      "value": "+84"
+    },
+    {
+      "label": "Yemen",
+      "value": "+967"
+    },
+    {
+      "label": "Zambia",
+      "value": "+260"
+    },
+    {
+      "label": "Zimbabwe",
+      "value": "+263"
+    }
+  ],
+  "siblings": [
+    {
+      "label": "None",
+      "value": 1
+    },
+    {
+      "label": "1",
+      "value": 2
+    },
+    {
+      "label": "2",
+      "value": 3
+    },
+    {
+      "label": "3",
+      "value": 4
+    },
+    {
+      "label": "4",
+      "value": 5
+    }
+  ],
+  "age": [
+    {
+      "label": "18",
+      "value": 18
+    },
+    {
+      "label": "19",
+      "value": 19
+    },
+    {
+      "label": "20",
+      "value": 20
+    },
+    {
+      "label": "21",
+      "value": 21
+    },
+    {
+      "label": "22",
+      "value": 22
+    },
+    {
+      "label": "23",
+      "value": 23
+    },
+    {
+      "label": "24",
+      "value": 24
+    },
+    {
+      "label": "25",
+      "value": 25
+    },
+    {
+      "label": "26",
+      "value": 26
+    },
+    {
+      "label": "27",
+      "value": 27
+    },
+    {
+      "label": "28",
+      "value": 28
+    },
+    {
+      "label": "29",
+      "value": 29
+    },
+    {
+      "label": "30",
+      "value": 30
+    },
+    {
+      "label": "31",
+      "value": 31
+    },
+    {
+      "label": "32",
+      "value": 32
+    },
+    {
+      "label": "33",
+      "value": 33
+    },
+    {
+      "label": "34",
+      "value": 34
+    },
+    {
+      "label": "35",
+      "value": 35
+    },
+    {
+      "label": "36",
+      "value": 36
+    },
+    {
+      "label": "37",
+      "value": 37
+    },
+    {
+      "label": "38",
+      "value": 38
+    },
+    {
+      "label": "39",
+      "value": 39
+    },
+    {
+      "label": "40",
+      "value": 40
+    },
+    {
+      "label": "41",
+      "value": 41
+    },
+    {
+      "label": "42",
+      "value": 42
+    },
+    {
+      "label": "43",
+      "value": 43
+    },
+    {
+      "label": "44",
+      "value": 44
+    },
+    {
+      "label": "45",
+      "value": 45
+    },
+    {
+      "label": "46",
+      "value": 46
+    },
+    {
+      "label": "47",
+      "value": 47
+    },
+    {
+      "label": "48",
+      "value": 48
+    },
+    {
+      "label": "49",
+      "value": 49
+    },
+    {
+      "label": "50",
+      "value": 50
+    },
+    {
+      "label": "51",
+      "value": 51
+    },
+    {
+      "label": "52",
+      "value": 52
+    },
+    {
+      "label": "53",
+      "value": 53
+    },
+    {
+      "label": "54",
+      "value": 54
+    },
+    {
+      "label": "55",
+      "value": 55
+    },
+    {
+      "label": "56",
+      "value": 56
+    },
+    {
+      "label": "57",
+      "value": 57
+    },
+    {
+      "label": "58",
+      "value": 58
+    },
+    {
+      "label": "59",
+      "value": 59
+    },
+    {
+      "label": "60",
+      "value": 60
+    },
+    {
+      "label": "61",
+      "value": 61
+    },
+    {
+      "label": "62",
+      "value": 62
+    },
+    {
+      "label": "63",
+      "value": 63
+    },
+    {
+      "label": "64",
+      "value": 64
+    },
+    {
+      "label": "65",
+      "value": 65
+    },
+    {
+      "label": "66",
+      "value": 66
+    },
+    {
+      "label": "67",
+      "value": 67
+    },
+    {
+      "label": "68",
+      "value": 68
+    },
+    {
+      "label": "69",
+      "value": 69
+    },
+    {
+      "label": "70",
+      "value": 70
+    },
+    {
+      "label": "71",
+      "value": 71
+    },
+    {
+      "label": "72",
+      "value": 72
+    },
+    {
+      "label": "73",
+      "value": 73
+    },
+    {
+      "label": "74",
+      "value": 74
+    },
+    {
+      "label": "75",
+      "value": 75
+    },
+    {
+      "label": "76",
+      "value": 76
+    },
+    {
+      "label": "77",
+      "value": 77
+    },
+    {
+      "label": "78",
+      "value": 78
+    },
+    {
+      "label": "79",
+      "value": 79
+    },
+    {
+      "label": "80",
+      "value": 80
+    }
+  ],
+  "haveChildren": [
+    {
+      "label": "Yes",
+      "value": "Y"
+    },
+    {
+      "label": "No",
+      "value": "N"
+    }
+  ],
+  "livingWithParents": [
+    {
+      "label": "Yes",
+      "value": "Y"
+    },
+    {
+      "label": "No",
+      "value": "N"
+    }
+  ],
+  "usdIncome": [
+    {
+      "label": "No Income",
+      "value": 0.5
+    },
+    {
+      "label": "$0 - $25,000",
+      "value": 1
+    },
+    {
+      "label": "$25,001 - 40,000",
+      "value": 2
+    },
+    {
+      "label": "$40,001 - 60,000",
+      "value": 3
+    },
+    {
+      "label": "$60,001 - 80,000",
+      "value": 4
+    },
+    {
+      "label": "$80,001-100,000",
+      "value": 5
+    },
+    {
+      "label": "$100,001 150,000",
+      "value": 6
+    },
+    {
+      "label": "$150,001 - 200,000",
+      "value": 7
+    },
+    {
+      "label": "$200,001 and above",
+      "value": 8
+    }
+  ],
+  "single_decision": [
+    {
+      "label": "Yes",
+      "value": "Y"
+    },
+    {
+      "label": "No",
+      "value": "N"
+    }
+  ],
+  "disability": [
+    {
+      "label": "None",
+      "value": "non0"
+    },
+    {
+      "label": "Physically disabled from birth",
+      "value": "phy1"
+    },
+    {
+      "label": "Physically disabled due to accident",
+      "value": "phy2"
+    },
+    {
+      "label": "Mentally disabled from birth",
+      "value": "men2"
+    },
+    {
+      "label": "Mentally disabled due to accident",
+      "value": "men3"
+    }
+  ],
+  "thalassemia": [
+    {
+      "label": "Major",
+      "value": "maj1"
+    },
+    {
+      "label": "Minor",
+      "value": "min2"
+    },
+    {
+      "label": "No",
+      "value": "no3"
+    }
+  ],
+  "bodyType": [
+    {
+      "label": "Slim",
+      "value": "sli0"
+    },
+    {
+      "label": "Average",
+      "value": "ave1"
+    },
+    {
+      "label": "Athletic",
+      "value": "ath2"
+    },
+    {
+      "label": "Heavy",
+      "value": "hea3"
+    }
+  ],
+  "deletionReason": [
+    {
+      "label": "I found my match on connecting hearts",
+      "value": 7
+    },
+    {
+      "label": "I found my match elsewhere",
+      "value": 1
+    },
+    {
+      "label": "I am unhappy with services",
+      "value": 2
+    },
+    {
+      "label": "Marry later/create profile later",
+      "value": 3
+    },
+    {
+      "label": "I have to do some changes in my profile",
+      "value": 4
+    },
+    {
+      "label": "Privacy issues",
+      "value": 5
+    },
+    {
+      "label": "Other reasons",
+      "value": 6
+    }
+  ],
+  "religion": [
+    {
+      "value": "bud",
+      "label": "Buddhist"
+    },
+    {
+      "value": "chr",
+      "label": "Christian"
+    },
+    {
+      "value": "hin",
+      "label": "Hindu"
+    },
+    {
+      "value": "Jain",
+      "label": "Jain"
+    },
+    {
+      "value": "oth",
+      "label": "Others"
+    },
+    {
+      "value": "mus",
+      "label": "Muslim"
+    },
+    {
+      "value": "par",
+      "label": "Parsi"
+    },
+    {
+      "value": "sik",
+      "label": "Sikh"
+    }
+  ],
+  "maritalStatus": [
+    {
+      "label": "Annulled",
+      "value": "ann"
+    },
+    {
+      "label": "Never married",
+      "value": "nvm"
+    },
+    {
+      "label": "Widowed",
+      "value": "wid"
+    },
+    {
+      "label": "Divorced",
+      "value": "div"
+    },
+    {
+      "label": "Pending divorce",
+      "value": "pend"
+    }
+  ],
+  "casts": [
+    {
+      "religion": "bud",
+      "label": "Mahayana",
+      "value": "Budd101"
+    },
+    {
+      "religion": "bud",
+      "label": "Nichiren Buddhism",
+      "value": "Budd102"
+    },
+    {
+      "religion": "bud",
+      "label": "Others",
+      "value": "Budd108"
+    },
+    {
+      "religion": "bud",
+      "label": "Pure Land Buddhism",
+      "value": "Budd103"
+    },
+    {
+      "religion": "bud",
+      "label": "Tantrayana (Vajrayana Tibetan)",
+      "value": "Budd104"
+    },
+    {
+      "religion": "bud",
+      "label": "Tendai Buddhism (Japanese)",
+      "value": "Budd106"
+    },
+    {
+      "religion": "bud",
+      "label": "Theravada (Hinayana)",
+      "value": "Budd105"
+    },
+    {
+      "religion": "bud",
+      "label": "Zen Buddhism (China)",
+      "value": "Budd107"
+    },
+    {
+      "religion": "bud",
+      "label": "Other Backward Class(OBC)",
+      "value": "Budd-obc107"
+    },
+    {
+      "religion": "chr",
+      "label": "Adventist",
+      "value": "Chri41"
+    },
+    {
+      "religion": "chr",
+      "label": "Anglican / Episcopal",
+      "value": "Chri42"
+    },
+    {
+      "religion": "chr",
+      "label": "Apostolic",
+      "value": "Chri43"
+    },
+    {
+      "religion": "chr",
+      "label": "Assembly of God (AG)",
+      "value": "Chri45"
+    },
+    {
+      "religion": "chr",
+      "label": "Assyrian",
+      "value": "Chri44"
+    },
+    {
+      "religion": "chr",
+      "label": "Baptist",
+      "value": "Chri46"
+    },
+    {
+      "religion": "chr",
+      "label": "Calvinist",
+      "value": "Chri47"
+    },
+    {
+      "religion": "chr",
+      "label": "Born Again",
+      "value": "Chri48"
+    },
+    {
+      "religion": "chr",
+      "label": "Bretheren",
+      "value": "Chri49"
+    },
+    {
+      "religion": "chr",
+      "label": "Church of South India",
+      "value": "Chri410"
+    },
+    {
+      "religion": "chr",
+      "label": "Evangelist",
+      "value": "Chri411"
+    },
+    {
+      "religion": "chr",
+      "label": "Jacobite",
+      "value": "Chri412"
+    },
+    {
+      "religion": "chr",
+      "label": "Knanaya",
+      "value": "Chri413"
+    },
+    {
+      "religion": "chr",
+      "label": "Knanaya Catholic",
+      "value": "Chri414"
+    },
+    {
+      "religion": "chr",
+      "label": "Knanaya Jacobite",
+      "value": "Chri415"
+    },
+    {
+      "religion": "chr",
+      "label": "Latin Catholic",
+      "value": "Chri416"
+    },
+    {
+      "religion": "chr",
+      "label": "Malankara",
+      "value": "Chri417"
+    },
+    {
+      "religion": "chr",
+      "label": "Marthoma",
+      "value": "Chri418"
+    },
+    {
+      "religion": "chr",
+      "label": "Pentacost",
+      "value": "Chri419"
+    },
+    {
+      "religion": "chr",
+      "label": "Roman Catholic",
+      "value": "Chri420"
+    },
+    {
+      "religion": "chr",
+      "label": "Syrian Catholic",
+      "value": "Chri421"
+    },
+    {
+      "religion": "chr",
+      "label": "Syrian Jacobite",
+      "value": "Chri422"
+    },
+    {
+      "religion": "chr",
+      "label": "Syrian Orthodox",
+      "value": "Chri423"
+    },
+    {
+      "religion": "chr",
+      "label": "Syro Malabar",
+      "value": "Chri424"
+    },
+    {
+      "religion": "chr",
+      "label": "Unspecified",
+      "value": "Chri425"
+    },
+    {
+      "religion": "chr",
+      "label": "Church of Christ",
+      "value": "Chri427"
+    },
+    {
+      "religion": "chr",
+      "label": "Church of God",
+      "value": "Chri426"
+    },
+    {
+      "religion": "chr",
+      "label": "Church of North India",
+      "value": "Chri428"
+    },
+    {
+      "religion": "chr",
+      "label": "Congregational",
+      "value": "Chri429"
+    },
+    {
+      "religion": "chr",
+      "label": "East Indian Catholic",
+      "value": "Chri430"
+    },
+    {
+      "religion": "chr",
+      "label": "Jehovah's Witnesses",
+      "value": "Chri431"
+    },
+    {
+      "religion": "chr",
+      "label": "Knanaya",
+      "value": "Chri444"
+    },
+    {
+      "religion": "chr",
+      "label": "Knanaya Catholic",
+      "value": "Chri445"
+    },
+    {
+      "religion": "chr",
+      "label": "Knanaya Jacobite",
+      "value": "Chri446"
+    },
+    {
+      "religion": "chr",
+      "label": "Latter day saints",
+      "value": "Chri432"
+    },
+    {
+      "religion": "chr",
+      "label": "Lutheran",
+      "value": "Chri433"
+    },
+    {
+      "religion": "chr",
+      "label": "Malabar Independent Syrian Church",
+      "value": "Chri435"
+    },
+    {
+      "religion": "chr",
+      "label": "Melkite",
+      "value": "Chri434"
+    },
+    {
+      "religion": "chr",
+      "label": "Mennonite",
+      "value": "Chri436"
+    },
+    {
+      "religion": "chr",
+      "label": "Methodist",
+      "value": "Chri437"
+    },
+    {
+      "religion": "chr",
+      "label": "Moravian",
+      "value": "Chri438"
+    },
+    {
+      "religion": "chr",
+      "label": "Others",
+      "value": "Chri450"
+    },
+    {
+      "religion": "chr",
+      "label": "Presbyterian",
+      "value": "Chri440"
+    },
+    {
+      "religion": "chr",
+      "label": "Protestant",
+      "value": "Chri439"
+    },
+    {
+      "religion": "chr",
+      "label": "Reformed Baptist",
+      "value": "Chri442"
+    },
+    {
+      "religion": "chr",
+      "label": "Reformed Presbyterian",
+      "value": "Chri443"
+    },
+    {
+      "religion": "chr",
+      "label": "Seventh-day Adventist",
+      "value": "Chri441"
+    },
+    {
+      "religion": "chr",
+      "label": "St. Thomas Evangelical",
+      "value": "Chri447"
+    },
+    {
+      "religion": "chr",
+      "label": "Syrian Jacobite",
+      "value": "Chri448"
+    },
+    {
+      "religion": "chr",
+      "label": "Syrian Orthodox",
+      "value": "Chri449"
+    },
+    {
+      "religion": "chr",
+      "label": "Other Backward Class(OBC)",
+      "value": "Chr-obc107"
+    },
+    {
+      "religion": "hin",
+      "label": "Ad Dharmi",
+      "value": "Hind01"
+    },
+    {
+      "religion": "hin",
+      "label": "Adi Andhra",
+      "value": "Hind02"
+    },
+    {
+      "religion": "hin",
+      "label": "Adi Dravida",
+      "value": "Hind03"
+    },
+    {
+      "religion": "hin",
+      "label": "Adi-karnataka",
+      "value": "Hind04"
+    },
+    {
+      "religion": "hin",
+      "label": "Agarwal",
+      "value": "Hind05"
+    },
+    {
+      "religion": "hin",
+      "label": "Agnikula Kshatriya",
+      "value": "Hind06"
+    },
+    {
+      "religion": "hin",
+      "label": "Agri",
+      "value": "Hind07"
+    },
+    {
+      "religion": "hin",
+      "label": "Ahir Shimpi",
+      "value": "Hind08"
+    },
+    {
+      "religion": "hin",
+      "label": "Ahom",
+      "value": "Hind09"
+    },
+    {
+      "religion": "hin",
+      "label": "Ambalavasi",
+      "value": "Hind010"
+    },
+    {
+      "religion": "hin",
+      "label": "Arekatica",
+      "value": "Hind011"
+    },
+    {
+      "religion": "hin",
+      "label": "Arora",
+      "value": "Hind012"
+    },
+    {
+      "religion": "hin",
+      "label": "Arunthathiyar",
+      "value": "Hind013"
+    },
+    {
+      "religion": "hin",
+      "label": "Arya Vysya",
+      "value": "Hind014"
+    },
+    {
+      "religion": "hin",
+      "label": "Ayyaraka",
+      "value": "Hind015"
+    },
+    {
+      "religion": "hin",
+      "label": "Badaga",
+      "value": "Hind016"
+    },
+    {
+      "religion": "hin",
+      "label": "Bagdi",
+      "value": "Hind017"
+    },
+    {
+      "religion": "hin",
+      "label": "Baidya",
+      "value": "Hind018"
+    },
+    {
+      "religion": "hin",
+      "label": "Baishnab",
+      "value": "Hind019"
+    },
+    {
+      "religion": "hin",
+      "label": "Baishya",
+      "value": "Hind020"
+    },
+    {
+      "religion": "hin",
+      "label": "Bajantri",
+      "value": "Hind021"
+    },
+    {
+      "religion": "hin",
+      "label": "Balija",
+      "value": "Hind022"
+    },
+    {
+      "religion": "hin",
+      "label": "Banayat Oriya",
+      "value": "Hind023"
+    },
+    {
+      "religion": "hin",
+      "label": "Banik",
+      "value": "Hind024"
+    },
+    {
+      "religion": "hin",
+      "label": "Baniya",
+      "value": "Hind025"
+    },
+    {
+      "religion": "hin",
+      "label": "Baniya - Bania",
+      "value": "Hind026"
+    },
+    {
+      "religion": "hin",
+      "label": "Baniya - Kumuti",
+      "value": "Hind027"
+    },
+    {
+      "religion": "hin",
+      "label": "Banjara",
+      "value": "Hind028"
+    },
+    {
+      "religion": "hin",
+      "label": "Barai",
+      "value": "Hind029"
+    },
+    {
+      "religion": "hin",
+      "label": "Bari",
+      "value": "Hind030"
+    },
+    {
+      "religion": "hin",
+      "label": "Baria",
+      "value": "Hind031"
+    },
+    {
+      "religion": "hin",
+      "label": "Barujibi",
+      "value": "Hind032"
+    },
+    {
+      "religion": "hin",
+      "label": "Besta",
+      "value": "Hind033"
+    },
+    {
+      "religion": "hin",
+      "label": "Bhandari",
+      "value": "Hind034"
+    },
+    {
+      "religion": "hin",
+      "label": "Bhatia",
+      "value": "Hind035"
+    },
+    {
+      "religion": "hin",
+      "label": "Bhatraju",
+      "value": "Hind036"
+    },
+    {
+      "religion": "hin",
+      "label": "Bhavasar Kshatriya",
+      "value": "Hind037"
+    },
+    {
+      "religion": "hin",
+      "label": "Bhoi",
+      "value": "Hind038"
+    },
+    {
+      "religion": "hin",
+      "label": "Bhovi",
+      "value": "Hind039"
+    },
+    {
+      "religion": "hin",
+      "label": "Bhoyar",
+      "value": "Hind040"
+    },
+    {
+      "religion": "hin",
+      "label": "Billava",
+      "value": "Hind041"
+    },
+    {
+      "religion": "hin",
+      "label": "Bishnoi/Vishnoi",
+      "value": "Hind042"
+    },
+    {
+      "religion": "hin",
+      "label": "Bondili",
+      "value": "Hind043"
+    },
+    {
+      "religion": "hin",
+      "label": "Boyer",
+      "value": "Hind044"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmbatt",
+      "value": "Hind045"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin",
+      "value": "Hind046"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Anavil",
+      "value": "Hind047"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Audichya",
+      "value": "Hind048"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Barendra",
+      "value": "Hind049"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Bhatt",
+      "value": "Hind050"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Bhumihar",
+      "value": "Hind051"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Daivadnya",
+      "value": "Hind052"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Danua",
+      "value": "Hind053"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Deshastha",
+      "value": "Hind054"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Dhiman",
+      "value": "Hind055"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Dravida",
+      "value": "Hind056"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Embrandiri",
+      "value": "Hind057"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Garhwali",
+      "value": "Hind058"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Gaur",
+      "value": "Hind059"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Goswami",
+      "value": "Hind060"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Gujar Gaur",
+      "value": "Hind061"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Gurukkal",
+      "value": "Hind062"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Halua",
+      "value": "Hind063"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Havyaka",
+      "value": "Hind064"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Hoysala",
+      "value": "Hind065"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Iyengar",
+      "value": "Hind066"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Iyer",
+      "value": "Hind067"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Jangid",
+      "value": "Hind068"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Jhadua",
+      "value": "Hind069"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Jyotish",
+      "value": "Hind070"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Kanyakubj",
+      "value": "Hind071"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Karhade",
+      "value": "Hind072"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Khandelwal",
+      "value": "Hind073"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Kokanastha",
+      "value": "Hind074"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Kota",
+      "value": "Hind075"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Kulin",
+      "value": "Hind076"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Kumoani",
+      "value": "Hind077"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Madhwa",
+      "value": "Hind078"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Maithil",
+      "value": "Hind079"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Modh",
+      "value": "Hind080"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Mohyal",
+      "value": "Hind081"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Nagar",
+      "value": "Hind082"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Namboodiri",
+      "value": "Hind083"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Narmadiya",
+      "value": "Hind084"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Niyogi",
+      "value": "Hind085"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Paliwal",
+      "value": "Hind086"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Panda",
+      "value": "Hind087"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Pandit",
+      "value": "Hind088"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Pareek",
+      "value": "Hind089"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Pushkarna",
+      "value": "Hind090"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Rarhi",
+      "value": "Hind091"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Rigvedi",
+      "value": "Hind092"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Rudraj",
+      "value": "Hind093"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Sakaldwipi",
+      "value": "Hind094"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Sanadya",
+      "value": "Hind095"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Sanketi",
+      "value": "Hind096"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Saraswat",
+      "value": "Hind097"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Saryuparin",
+      "value": "Hind098"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Shivhalli",
+      "value": "Hind099"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Shrimali",
+      "value": "Hind0100"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Sikhwal",
+      "value": "Hind0101"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Smartha",
+      "value": "Hind0102"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Sri Vishnava",
+      "value": "Hind0103"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Stanika",
+      "value": "Hind0104"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Tyagi",
+      "value": "Hind0105"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Vaidiki",
+      "value": "Hind0106"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Vaikhanasa",
+      "value": "Hind0107"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Velanadu",
+      "value": "Hind0108"
+    },
+    {
+      "religion": "hin",
+      "label": "Brahmin - Vyas",
+      "value": "Hind0109"
+    },
+    {
+      "religion": "hin",
+      "label": "Brajastha Maithil",
+      "value": "Hind0110"
+    },
+    {
+      "religion": "hin",
+      "label": "Brajastha Maithil",
+      "value": "Hind0111"
+    },
+    {
+      "religion": "hin",
+      "label": "Bunt (Shetty)",
+      "value": "Hind0112"
+    },
+    {
+      "religion": "hin",
+      "label": "Chalawadi and Holeya",
+      "value": "Hind0114"
+    },
+    {
+      "religion": "hin",
+      "label": "Chambhar",
+      "value": "Hind0115"
+    },
+    {
+      "religion": "hin",
+      "label": "Chandravanshi Kahar",
+      "value": "Hind0116"
+    },
+    {
+      "religion": "hin",
+      "label": "Chasa",
+      "value": "Hind0117"
+    },
+    {
+      "religion": "hin",
+      "label": "Chattada Sri Vaishnava",
+      "value": "Hind0118"
+    },
+    {
+      "religion": "hin",
+      "label": "Chaudary",
+      "value": "Hind0119"
+    },
+    {
+      "religion": "hin",
+      "label": "Chaurasia",
+      "value": "Hind0120"
+    },
+    {
+      "religion": "hin",
+      "label": "Chennadasar",
+      "value": "Hind0121"
+    },
+    {
+      "religion": "hin",
+      "label": "Chettiar",
+      "value": "Hind0122"
+    },
+    {
+      "religion": "hin",
+      "label": "Chhetri",
+      "value": "Hind0123"
+    },
+    {
+      "religion": "hin",
+      "label": "Chippolu (Mera)",
+      "value": "Hind0124"
+    },
+    {
+      "religion": "hin",
+      "label": "CKP",
+      "value": "Hind0113"
+    },
+    {
+      "religion": "hin",
+      "label": "Coorgi",
+      "value": "Hind0125"
+    },
+    {
+      "religion": "hin",
+      "label": "Devadiga",
+      "value": "Hind0126"
+    },
+    {
+      "religion": "hin",
+      "label": "Devandra Kula Vellalar",
+      "value": "Hind0127"
+    },
+    {
+      "religion": "hin",
+      "label": "Devang Koshthi",
+      "value": "Hind0128"
+    },
+    {
+      "religion": "hin",
+      "label": "Devanga",
+      "value": "Hind0129"
+    },
+    {
+      "religion": "hin",
+      "label": "Devrukhe Brahmin",
+      "value": "Hind0130"
+    },
+    {
+      "religion": "hin",
+      "label": "Dhangar",
+      "value": "Hind0131"
+    },
+    {
+      "religion": "hin",
+      "label": "Dheevara",
+      "value": "Hind0132"
+    },
+    {
+      "religion": "hin",
+      "label": "Dhiman",
+      "value": "Hind0133"
+    },
+    {
+      "religion": "hin",
+      "label": "Dhoba",
+      "value": "Hind0134"
+    },
+    {
+      "religion": "hin",
+      "label": "Dhobi",
+      "value": "Hind0135"
+    },
+    {
+      "religion": "hin",
+      "label": "Dhor / Kakkayya",
+      "value": "Hind0136"
+    },
+    {
+      "religion": "hin",
+      "label": "Dommala",
+      "value": "Hind0137"
+    },
+    {
+      "religion": "hin",
+      "label": "Dumal",
+      "value": "Hind0138"
+    },
+    {
+      "religion": "hin",
+      "label": "Dusadh (Paswan)",
+      "value": "Hind0139"
+    },
+    {
+      "religion": "hin",
+      "label": "Ediga",
+      "value": "Hind0140"
+    },
+    {
+      "religion": "hin",
+      "label": "Ezhava",
+      "value": "Hind0141"
+    },
+    {
+      "religion": "hin",
+      "label": "Ezhuthachan",
+      "value": "Hind0142"
+    },
+    {
+      "religion": "hin",
+      "label": "Gabit",
+      "value": "Hind0143"
+    },
+    {
+      "religion": "hin",
+      "label": "Ganda",
+      "value": "Hind0144"
+    },
+    {
+      "religion": "hin",
+      "label": "Gandla",
+      "value": "Hind0145"
+    },
+    {
+      "religion": "hin",
+      "label": "Ganiga",
+      "value": "Hind0146"
+    },
+    {
+      "religion": "hin",
+      "label": "Garhwali",
+      "value": "Hind0147"
+    },
+    {
+      "religion": "hin",
+      "label": "Gatti",
+      "value": "Hind0148"
+    },
+    {
+      "religion": "hin",
+      "label": "Gavara",
+      "value": "Hind0149"
+    },
+    {
+      "religion": "hin",
+      "label": "Gawali",
+      "value": "Hind0150"
+    },
+    {
+      "religion": "hin",
+      "label": "Ghisadi",
+      "value": "Hind0151"
+    },
+    {
+      "religion": "hin",
+      "label": "Ghumar",
+      "value": "Hind0152"
+    },
+    {
+      "religion": "hin",
+      "label": "Goala",
+      "value": "Hind0153"
+    },
+    {
+      "religion": "hin",
+      "label": "Goan",
+      "value": "Hind0154"
+    },
+    {
+      "religion": "hin",
+      "label": "Gomantak",
+      "value": "Hind0155"
+    },
+    {
+      "religion": "hin",
+      "label": "Gondhali",
+      "value": "Hind0156"
+    },
+    {
+      "religion": "hin",
+      "label": "Goud",
+      "value": "Hind0157"
+    },
+    {
+      "religion": "hin",
+      "label": "Gounder",
+      "value": "Hind0158"
+    },
+    {
+      "religion": "hin",
+      "label": "Gowda",
+      "value": "Hind0159"
+    },
+    {
+      "religion": "hin",
+      "label": "Gramani",
+      "value": "Hind0160"
+    },
+    {
+      "religion": "hin",
+      "label": "Gudia",
+      "value": "Hind0161"
+    },
+    {
+      "religion": "hin",
+      "label": "Gujjar",
+      "value": "Hind0162"
+    },
+    {
+      "religion": "hin",
+      "label": "Gupta",
+      "value": "Hind0163"
+    },
+    {
+      "religion": "hin",
+      "label": "Guptan",
+      "value": "Hind0164"
+    },
+    {
+      "religion": "hin",
+      "label": "Gurav",
+      "value": "Hind0165"
+    },
+    {
+      "religion": "hin",
+      "label": "Gurjar",
+      "value": "Hind0166"
+    },
+    {
+      "religion": "hin",
+      "label": "Halba Koshti",
+      "value": "Hind0167"
+    },
+    {
+      "religion": "hin",
+      "label": "Helava",
+      "value": "Hind0168"
+    },
+    {
+      "religion": "hin",
+      "label": "Hugar (Jeer)",
+      "value": "Hind0169"
+    },
+    {
+      "religion": "hin",
+      "label": "Intercaste",
+      "value": "Hind0170"
+    },
+    {
+      "religion": "hin",
+      "label": "Irani",
+      "value": "Hind0171"
+    },
+    {
+      "religion": "hin",
+      "label": "Jaalari",
+      "value": "Hind0172"
+    },
+    {
+      "religion": "hin",
+      "label": "Jaiswal",
+      "value": "Hind0173"
+    },
+    {
+      "religion": "hin",
+      "label": "Jandra",
+      "value": "Hind0174"
+    },
+    {
+      "religion": "hin",
+      "label": "Jangam",
+      "value": "Hind0175"
+    },
+    {
+      "religion": "hin",
+      "label": "Jangra - Brahmin",
+      "value": "Hind0176"
+    },
+    {
+      "religion": "hin",
+      "label": "Jat",
+      "value": "Hind0177"
+    },
+    {
+      "religion": "hin",
+      "label": "Jatav",
+      "value": "Hind0178"
+    },
+    {
+      "religion": "hin",
+      "label": "Jetty/Malla",
+      "value": "Hind0179"
+    },
+    {
+      "religion": "hin",
+      "label": "Jogi (Nath)",
+      "value": "Hind0180"
+    },
+    {
+      "religion": "hin",
+      "label": "Kachara",
+      "value": "Hind0181"
+    },
+    {
+      "religion": "hin",
+      "label": "Kadava Patel",
+      "value": "Hind0182"
+    },
+    {
+      "religion": "hin",
+      "label": "Kahar",
+      "value": "Hind0183"
+    },
+    {
+      "religion": "hin",
+      "label": "Kaibarta",
+      "value": "Hind0184"
+    },
+    {
+      "religion": "hin",
+      "label": "Kalal",
+      "value": "Hind0185"
+    },
+    {
+      "religion": "hin",
+      "label": "Kalanji",
+      "value": "Hind0186"
+    },
+    {
+      "religion": "hin",
+      "label": "Kalar",
+      "value": "Hind0187"
+    },
+    {
+      "religion": "hin",
+      "label": "Kalinga",
+      "value": "Hind0188"
+    },
+    {
+      "religion": "hin",
+      "label": "Kalinga Vysya",
+      "value": "Hind0189"
+    },
+    {
+      "religion": "hin",
+      "label": "Kalita",
+      "value": "Hind0190"
+    },
+    {
+      "religion": "hin",
+      "label": "Kalwar",
+      "value": "Hind0191"
+    },
+    {
+      "religion": "hin",
+      "label": "Kamboj",
+      "value": "Hind0192"
+    },
+    {
+      "religion": "hin",
+      "label": "Kamma",
+      "value": "Hind0193"
+    },
+    {
+      "religion": "hin",
+      "label": "Kansari",
+      "value": "Hind0194"
+    },
+    {
+      "religion": "hin",
+      "label": "Kapu",
+      "value": "Hind0195"
+    },
+    {
+      "religion": "hin",
+      "label": "Karana",
+      "value": "Hind0196"
+    },
+    {
+      "religion": "hin",
+      "label": "Karmakar",
+      "value": "Hind0197"
+    },
+    {
+      "religion": "hin",
+      "label": "Karuneegar",
+      "value": "Hind0198"
+    },
+    {
+      "religion": "hin",
+      "label": "Kasar",
+      "value": "Hind0199"
+    },
+    {
+      "religion": "hin",
+      "label": "Kashyap",
+      "value": "Hind0200"
+    },
+    {
+      "religion": "hin",
+      "label": "Katiya",
+      "value": "Hind0201"
+    },
+    {
+      "religion": "hin",
+      "label": "Kavuthiyya/Ezhavathy",
+      "value": "Hind0202"
+    },
+    {
+      "religion": "hin",
+      "label": "Kayastha",
+      "value": "Hind0203"
+    },
+    {
+      "religion": "hin",
+      "label": "Khandayat",
+      "value": "Hind0204"
+    },
+    {
+      "religion": "hin",
+      "label": "Khandelwal",
+      "value": "Hind0205"
+    },
+    {
+      "religion": "hin",
+      "label": "Kharwa",
+      "value": "Hind0206"
+    },
+    {
+      "religion": "hin",
+      "label": "Kharwar",
+      "value": "Hind0207"
+    },
+    {
+      "religion": "hin",
+      "label": "Khatri",
+      "value": "Hind0208"
+    },
+    {
+      "religion": "hin",
+      "label": "Kirar",
+      "value": "Hind0209"
+    },
+    {
+      "religion": "hin",
+      "label": "Kokanastha Maratha",
+      "value": "Hind0210"
+    },
+    {
+      "religion": "hin",
+      "label": "Koli",
+      "value": "Hind0211"
+    },
+    {
+      "religion": "hin",
+      "label": "Koli Mahadev",
+      "value": "Hind0212"
+    },
+    {
+      "religion": "hin",
+      "label": "Koli Patel",
+      "value": "Hind0213"
+    },
+    {
+      "religion": "hin",
+      "label": "Kongu Vellala Gounder",
+      "value": "Hind0214"
+    },
+    {
+      "religion": "hin",
+      "label": "Konkani",
+      "value": "Hind0215"
+    },
+    {
+      "religion": "hin",
+      "label": "Korama",
+      "value": "Hind0216"
+    },
+    {
+      "religion": "hin",
+      "label": "Kori",
+      "value": "Hind0217"
+    },
+    {
+      "religion": "hin",
+      "label": "Kosthi",
+      "value": "Hind0218"
+    },
+    {
+      "religion": "hin",
+      "label": "Krishnavaka",
+      "value": "Hind0219"
+    },
+    {
+      "religion": "hin",
+      "label": "Kshatriya",
+      "value": "Hind0220"
+    },
+    {
+      "religion": "hin",
+      "label": "Kudumbi",
+      "value": "Hind0221"
+    },
+    {
+      "religion": "hin",
+      "label": "Kulal",
+      "value": "Hind0222"
+    },
+    {
+      "religion": "hin",
+      "label": "Kulalar",
+      "value": "Hind0223"
+    },
+    {
+      "religion": "hin",
+      "label": "Kulita",
+      "value": "Hind0224"
+    },
+    {
+      "religion": "hin",
+      "label": "Kumawat",
+      "value": "Hind0225"
+    },
+    {
+      "religion": "hin",
+      "label": "Kumbhakar",
+      "value": "Hind0226"
+    },
+    {
+      "religion": "hin",
+      "label": "Kumbhar",
+      "value": "Hind0227"
+    },
+    {
+      "religion": "hin",
+      "label": "Kumhar",
+      "value": "Hind0228"
+    },
+    {
+      "religion": "hin",
+      "label": "Kummari",
+      "value": "Hind0229"
+    },
+    {
+      "religion": "hin",
+      "label": "Kunbi",
+      "value": "Hind0230"
+    },
+    {
+      "religion": "hin",
+      "label": "Kuravan",
+      "value": "Hind0231"
+    },
+    {
+      "religion": "hin",
+      "label": "Kurmi",
+      "value": "Hind0232"
+    },
+    {
+      "religion": "hin",
+      "label": "Kurmi Kshatriya",
+      "value": "Hind0233"
+    },
+    {
+      "religion": "hin",
+      "label": "Kuruba",
+      "value": "Hind0234"
+    },
+    {
+      "religion": "hin",
+      "label": "Kuruhina Shetty",
+      "value": "Hind0235"
+    },
+    {
+      "religion": "hin",
+      "label": "Kurumbar",
+      "value": "Hind0236"
+    },
+    {
+      "religion": "hin",
+      "label": "Kushwaha (Koiri)",
+      "value": "Hind0237"
+    },
+    {
+      "religion": "hin",
+      "label": "Kutchi",
+      "value": "Hind0238"
+    },
+    {
+      "religion": "hin",
+      "label": "Lambadi",
+      "value": "Hind0239"
+    },
+    {
+      "religion": "hin",
+      "label": "Leva patel",
+      "value": "Hind0240"
+    },
+    {
+      "religion": "hin",
+      "label": "Leva patil",
+      "value": "Hind0241"
+    },
+    {
+      "religion": "hin",
+      "label": "Lingayath",
+      "value": "Hind0242"
+    },
+    {
+      "religion": "hin",
+      "label": "Lodhi Rajput",
+      "value": "Hind0243"
+    },
+    {
+      "religion": "hin",
+      "label": "Lohana",
+      "value": "Hind0244"
+    },
+    {
+      "religion": "hin",
+      "label": "Lohar",
+      "value": "Hind0245"
+    },
+    {
+      "religion": "hin",
+      "label": "Loniya",
+      "value": "Hind0246"
+    },
+    {
+      "religion": "hin",
+      "label": "Lubana",
+      "value": "Hind0247"
+    },
+    {
+      "religion": "hin",
+      "label": "Madiga",
+      "value": "Hind0248"
+    },
+    {
+      "religion": "hin",
+      "label": "Mahajan",
+      "value": "Hind0249"
+    },
+    {
+      "religion": "hin",
+      "label": "Mahar",
+      "value": "Hind0250"
+    },
+    {
+      "religion": "hin",
+      "label": "Mahendra",
+      "value": "Hind0251"
+    },
+    {
+      "religion": "hin",
+      "label": "Maheshwari",
+      "value": "Hind0252"
+    },
+    {
+      "religion": "hin",
+      "label": "Mahishya",
+      "value": "Hind0253"
+    },
+    {
+      "religion": "hin",
+      "label": "Majabi",
+      "value": "Hind0254"
+    },
+    {
+      "religion": "hin",
+      "label": "Mala",
+      "value": "Hind0255"
+    },
+    {
+      "religion": "hin",
+      "label": "Mali",
+      "value": "Hind0256"
+    },
+    {
+      "religion": "hin",
+      "label": "Malla",
+      "value": "Hind0257"
+    },
+    {
+      "religion": "hin",
+      "label": "Malviya Brahmin",
+      "value": "Hind0258"
+    },
+    {
+      "religion": "hin",
+      "label": "Mangalorean",
+      "value": "Hind0259"
+    },
+    {
+      "religion": "hin",
+      "label": "Manipuri",
+      "value": "Hind0260"
+    },
+    {
+      "religion": "hin",
+      "label": "Mapila",
+      "value": "Hind0261"
+    },
+    {
+      "religion": "hin",
+      "label": "Maratha",
+      "value": "Hind0262"
+    },
+    {
+      "religion": "hin",
+      "label": "Maruthuvar",
+      "value": "Hind0263"
+    },
+    {
+      "religion": "hin",
+      "label": "Matang",
+      "value": "Hind0264"
+    },
+    {
+      "religion": "hin",
+      "label": "Mathur",
+      "value": "Hind0265"
+    },
+    {
+      "religion": "hin",
+      "label": "Maurya / Shakya",
+      "value": "Hind0266"
+    },
+    {
+      "religion": "hin",
+      "label": "Meena",
+      "value": "Hind0267"
+    },
+    {
+      "religion": "hin",
+      "label": "Meenavar",
+      "value": "Hind0268"
+    },
+    {
+      "religion": "hin",
+      "label": "Mehra",
+      "value": "Hind0269"
+    },
+    {
+      "religion": "hin",
+      "label": "Meru Darji",
+      "value": "Hind0270"
+    },
+    {
+      "religion": "hin",
+      "label": "Mochi",
+      "value": "Hind0271"
+    },
+    {
+      "religion": "hin",
+      "label": "Modak",
+      "value": "Hind0272"
+    },
+    {
+      "religion": "hin",
+      "label": "Mogaveera",
+      "value": "Hind0273"
+    },
+    {
+      "religion": "hin",
+      "label": "Mudaliyar",
+      "value": "Hind0274"
+    },
+    {
+      "religion": "hin",
+      "label": "Mudiraj",
+      "value": "Hind0275"
+    },
+    {
+      "religion": "hin",
+      "label": "Mukkulathor",
+      "value": "Hind0276"
+    },
+    {
+      "religion": "hin",
+      "label": "Munnuru Kapu",
+      "value": "Hind0277"
+    },
+    {
+      "religion": "hin",
+      "label": "Muthuraja",
+      "value": "Hind0278"
+    },
+    {
+      "religion": "hin",
+      "label": "Naagavamsam",
+      "value": "Hind0279"
+    },
+    {
+      "religion": "hin",
+      "label": "Nadar",
+      "value": "Hind0280"
+    },
+    {
+      "religion": "hin",
+      "label": "Nagaralu",
+      "value": "Hind0281"
+    },
+    {
+      "religion": "hin",
+      "label": "Nai",
+      "value": "Hind0282"
+    },
+    {
+      "religion": "hin",
+      "label": "Naicker",
+      "value": "Hind0283"
+    },
+    {
+      "religion": "hin",
+      "label": "Naidu",
+      "value": "Hind0284"
+    },
+    {
+      "religion": "hin",
+      "label": "Naik",
+      "value": "Hind0285"
+    },
+    {
+      "religion": "hin",
+      "label": "Nair",
+      "value": "Hind0286"
+    },
+    {
+      "religion": "hin",
+      "label": "Nambiar",
+      "value": "Hind0287"
+    },
+    {
+      "religion": "hin",
+      "label": "Namosudra",
+      "value": "Hind0288"
+    },
+    {
+      "religion": "hin",
+      "label": "Napit",
+      "value": "Hind0289"
+    },
+    {
+      "religion": "hin",
+      "label": "Nayaka",
+      "value": "Hind0290"
+    },
+    {
+      "religion": "hin",
+      "label": "Neeli",
+      "value": "Hind0291"
+    },
+    {
+      "religion": "hin",
+      "label": "Nepali",
+      "value": "Hind0292"
+    },
+    {
+      "religion": "hin",
+      "label": "Nhavi",
+      "value": "Hind0293"
+    },
+    {
+      "religion": "hin",
+      "label": "Oswal",
+      "value": "Hind0294"
+    },
+    {
+      "religion": "hin",
+      "label": "Otari",
+      "value": "Hind0295"
+    },
+    {
+      "religion": "hin",
+      "label": "Others",
+      "value": "Hind0421"
+    },
+    {
+      "religion": "hin",
+      "label": "Padmasali",
+      "value": "Hind0296"
+    },
+    {
+      "religion": "hin",
+      "label": "Pal",
+      "value": "Hind0297"
+    },
+    {
+      "religion": "hin",
+      "label": "Panchal",
+      "value": "Hind0298"
+    },
+    {
+      "religion": "hin",
+      "label": "Pandaram",
+      "value": "Hind0299"
+    },
+    {
+      "religion": "hin",
+      "label": "Panicker",
+      "value": "Hind0300"
+    },
+    {
+      "religion": "hin",
+      "label": "Parkava Kulam",
+      "value": "Hind0301"
+    },
+    {
+      "religion": "hin",
+      "label": "Parsi",
+      "value": "Hind0302"
+    },
+    {
+      "religion": "hin",
+      "label": "Partraj",
+      "value": "Hind0303"
+    },
+    {
+      "religion": "hin",
+      "label": "Pasi",
+      "value": "Hind0304"
+    },
+    {
+      "religion": "hin",
+      "label": "Patel",
+      "value": "Hind0305"
+    },
+    {
+      "religion": "hin",
+      "label": "Pathare Prabhu",
+      "value": "Hind0306"
+    },
+    {
+      "religion": "hin",
+      "label": "Patnaick",
+      "value": "Hind0307"
+    },
+    {
+      "religion": "hin",
+      "label": "Patra",
+      "value": "Hind0308"
+    },
+    {
+      "religion": "hin",
+      "label": "Perika",
+      "value": "Hind0309"
+    },
+    {
+      "religion": "hin",
+      "label": "Pillai",
+      "value": "Hind0310"
+    },
+    {
+      "religion": "hin",
+      "label": "Poosala",
+      "value": "Hind0311"
+    },
+    {
+      "religion": "hin",
+      "label": "Porwal",
+      "value": "Hind0312"
+    },
+    {
+      "religion": "hin",
+      "label": "Prajapati",
+      "value": "Hind0313"
+    },
+    {
+      "religion": "hin",
+      "label": "Raigar",
+      "value": "Hind0314"
+    },
+    {
+      "religion": "hin",
+      "label": "Rajaka",
+      "value": "Hind0315"
+    },
+    {
+      "religion": "hin",
+      "label": "Rajastani",
+      "value": "Hind0316"
+    },
+    {
+      "religion": "hin",
+      "label": "Rajbhar",
+      "value": "Hind0317"
+    },
+    {
+      "religion": "hin",
+      "label": "Rajbonshi",
+      "value": "Hind0318"
+    },
+    {
+      "religion": "hin",
+      "label": "Rajpurohit",
+      "value": "Hind0319"
+    },
+    {
+      "religion": "hin",
+      "label": "Rajput",
+      "value": "Hind0320"
+    },
+    {
+      "religion": "hin",
+      "label": "Ramanandi",
+      "value": "Hind0321"
+    },
+    {
+      "religion": "hin",
+      "label": "Ramdasia",
+      "value": "Hind0322"
+    },
+    {
+      "religion": "hin",
+      "label": "Ramgariah",
+      "value": "Hind0323"
+    },
+    {
+      "religion": "hin",
+      "label": "Ramoshi",
+      "value": "Hind0324"
+    },
+    {
+      "religion": "hin",
+      "label": "Ravidasia",
+      "value": "Hind0325"
+    },
+    {
+      "religion": "hin",
+      "label": "Rawat",
+      "value": "Hind0326"
+    },
+    {
+      "religion": "hin",
+      "label": "Reddy",
+      "value": "Hind0327"
+    },
+    {
+      "religion": "hin",
+      "label": "Relli",
+      "value": "Hind0328"
+    },
+    {
+      "religion": "hin",
+      "label": "Ror",
+      "value": "Hind0329"
+    },
+    {
+      "religion": "hin",
+      "label": "Sadgope",
+      "value": "Hind0333"
+    },
+    {
+      "religion": "hin",
+      "label": "Saha",
+      "value": "Hind0334"
+    },
+    {
+      "religion": "hin",
+      "label": "Sahu",
+      "value": "Hind0335"
+    },
+    {
+      "religion": "hin",
+      "label": "Saini",
+      "value": "Hind0336"
+    },
+    {
+      "religion": "hin",
+      "label": "Saliya",
+      "value": "Hind0337"
+    },
+    {
+      "religion": "hin",
+      "label": "Sathwara",
+      "value": "Hind0338"
+    },
+    {
+      "religion": "hin",
+      "label": "Savji",
+      "value": "Hind0339"
+    },
+    {
+      "religion": "hin",
+      "label": "SC",
+      "value": "Hind0330"
+    },
+    {
+      "religion": "hin",
+      "label": "Senai Thalaivar",
+      "value": "Hind0340"
+    },
+    {
+      "religion": "hin",
+      "label": "Senguntha Mudaliyar",
+      "value": "Hind0341"
+    },
+    {
+      "religion": "hin",
+      "label": "Settibalija",
+      "value": "Hind0342"
+    },
+    {
+      "religion": "hin",
+      "label": "Shimpi",
+      "value": "Hind0343"
+    },
+    {
+      "religion": "hin",
+      "label": "Sindhi",
+      "value": "Hind0344"
+    },
+    {
+      "religion": "hin",
+      "label": "Sindhi-Amil",
+      "value": "Hind0345"
+    },
+    {
+      "religion": "hin",
+      "label": "Sindhi-Baibhand",
+      "value": "Hind0346"
+    },
+    {
+      "religion": "hin",
+      "label": "Sindhi-Bhanusali",
+      "value": "Hind0347"
+    },
+    {
+      "religion": "hin",
+      "label": "Sindhi-Bhatia",
+      "value": "Hind0348"
+    },
+    {
+      "religion": "hin",
+      "label": "Sindhi-Chhapru",
+      "value": "Hind0349"
+    },
+    {
+      "religion": "hin",
+      "label": "Sindhi-Dadu",
+      "value": "Hind0350"
+    },
+    {
+      "religion": "hin",
+      "label": "Sindhi-Hyderabadi",
+      "value": "Hind0351"
+    },
+    {
+      "religion": "hin",
+      "label": "Sindhi-Larai",
+      "value": "Hind0352"
+    },
+    {
+      "religion": "hin",
+      "label": "Sindhi-Larkana",
+      "value": "Hind0353"
+    },
+    {
+      "religion": "hin",
+      "label": "Sindhi-Lohana",
+      "value": "Hind0354"
+    },
+    {
+      "religion": "hin",
+      "label": "Sindhi-Rohiri",
+      "value": "Hind0355"
+    },
+    {
+      "religion": "hin",
+      "label": "Sindhi-Sahiti",
+      "value": "Hind0356"
+    },
+    {
+      "religion": "hin",
+      "label": "Sindhi-Sakkhar",
+      "value": "Hind0357"
+    },
+    {
+      "religion": "hin",
+      "label": "Sindhi-Sehwani",
+      "value": "Hind0358"
+    },
+    {
+      "religion": "hin",
+      "label": "Sindhi-Shikarpuri",
+      "value": "Hind0359"
+    },
+    {
+      "religion": "hin",
+      "label": "Sindhi-Thatai",
+      "value": "Hind0360"
+    },
+    {
+      "religion": "hin",
+      "label": "SKP",
+      "value": "Hind0331"
+    },
+    {
+      "religion": "hin",
+      "label": "Sonar",
+      "value": "Hind0361"
+    },
+    {
+      "religion": "hin",
+      "label": "Soni",
+      "value": "Hind0362"
+    },
+    {
+      "religion": "hin",
+      "label": "Sourashtra",
+      "value": "Hind0363"
+    },
+    {
+      "religion": "hin",
+      "label": "Sozhiya Vellalar",
+      "value": "Hind0364"
+    },
+    {
+      "religion": "hin",
+      "label": "Srisayana",
+      "value": "Hind0365"
+    },
+    {
+      "religion": "hin",
+      "label": "ST",
+      "value": "Hind0332"
+    },
+    {
+      "religion": "hin",
+      "label": "Sugali (Naika)",
+      "value": "Hind0366"
+    },
+    {
+      "religion": "hin",
+      "label": "Sunari",
+      "value": "Hind0367"
+    },
+    {
+      "religion": "hin",
+      "label": "Sundhi",
+      "value": "Hind0368"
+    },
+    {
+      "religion": "hin",
+      "label": "Surya Balija",
+      "value": "Hind0369"
+    },
+    {
+      "religion": "hin",
+      "label": "Suthar",
+      "value": "Hind0370"
+    },
+    {
+      "religion": "hin",
+      "label": "Swakula Sali",
+      "value": "Hind0371"
+    },
+    {
+      "religion": "hin",
+      "label": "Tamboli",
+      "value": "Hind0372"
+    },
+    {
+      "religion": "hin",
+      "label": "Tanti",
+      "value": "Hind0373"
+    },
+    {
+      "religion": "hin",
+      "label": "Tantubai",
+      "value": "Hind0374"
+    },
+    {
+      "religion": "hin",
+      "label": "Telaga",
+      "value": "Hind0375"
+    },
+    {
+      "religion": "hin",
+      "label": "Teli",
+      "value": "Hind0376"
+    },
+    {
+      "religion": "hin",
+      "label": "Thakkar",
+      "value": "Hind0377"
+    },
+    {
+      "religion": "hin",
+      "label": "Thakore",
+      "value": "Hind0378"
+    },
+    {
+      "religion": "hin",
+      "label": "Thakur",
+      "value": "Hind0379"
+    },
+    {
+      "religion": "hin",
+      "label": "Thigala",
+      "value": "Hind0380"
+    },
+    {
+      "religion": "hin",
+      "label": "Thiyya",
+      "value": "Hind0381"
+    },
+    {
+      "religion": "hin",
+      "label": "Tili",
+      "value": "Hind0382"
+    },
+    {
+      "religion": "hin",
+      "label": "Togata",
+      "value": "Hind0383"
+    },
+    {
+      "religion": "hin",
+      "label": "Tonk Kshatriya",
+      "value": "Hind0384"
+    },
+    {
+      "religion": "hin",
+      "label": "Turupu Kapu",
+      "value": "Hind0385"
+    },
+    {
+      "religion": "hin",
+      "label": "Uppara",
+      "value": "Hind0386"
+    },
+    {
+      "religion": "hin",
+      "label": "Urali Gounder",
+      "value": "Hind0387"
+    },
+    {
+      "religion": "hin",
+      "label": "Urs",
+      "value": "Hind0388"
+    },
+    {
+      "religion": "hin",
+      "label": "Vada Balija",
+      "value": "Hind0389"
+    },
+    {
+      "religion": "hin",
+      "label": "Vaddera",
+      "value": "Hind0390"
+    },
+    {
+      "religion": "hin",
+      "label": "Vaish",
+      "value": "Hind0391"
+    },
+    {
+      "religion": "hin",
+      "label": "Vaishnav",
+      "value": "Hind0392"
+    },
+    {
+      "religion": "hin",
+      "label": "Vaishnava",
+      "value": "Hind0393"
+    },
+    {
+      "religion": "hin",
+      "label": "Vaishya",
+      "value": "Hind0394"
+    },
+    {
+      "religion": "hin",
+      "label": "Vaishya Vani",
+      "value": "Hind0395"
+    },
+    {
+      "religion": "hin",
+      "label": "Valluvan",
+      "value": "Hind0396"
+    },
+    {
+      "religion": "hin",
+      "label": "Valmiki",
+      "value": "Hind0397"
+    },
+    {
+      "religion": "hin",
+      "label": "Vania",
+      "value": "Hind0398"
+    },
+    {
+      "religion": "hin",
+      "label": "Vanika Vyshya",
+      "value": "Hind0399"
+    },
+    {
+      "religion": "hin",
+      "label": "Vaniya",
+      "value": "Hind0400"
+    },
+    {
+      "religion": "hin",
+      "label": "Vanjara",
+      "value": "Hind0401"
+    },
+    {
+      "religion": "hin",
+      "label": "Vanjari",
+      "value": "Hind0402"
+    },
+    {
+      "religion": "hin",
+      "label": "Vankar",
+      "value": "Hind0403"
+    },
+    {
+      "religion": "hin",
+      "label": "Vannar",
+      "value": "Hind0404"
+    },
+    {
+      "religion": "hin",
+      "label": "Vannia Kula Kshatriyar",
+      "value": "Hind0405"
+    },
+    {
+      "religion": "hin",
+      "label": "Variar",
+      "value": "Hind0406"
+    },
+    {
+      "religion": "hin",
+      "label": "Varshney",
+      "value": "Hind0407"
+    },
+    {
+      "religion": "hin",
+      "label": "Veera Saivam",
+      "value": "Hind0408"
+    },
+    {
+      "religion": "hin",
+      "label": "Velaan",
+      "value": "Hind0409"
+    },
+    {
+      "religion": "hin",
+      "label": "Velama",
+      "value": "Hind0410"
+    },
+    {
+      "religion": "hin",
+      "label": "Vellalar",
+      "value": "Hind0411"
+    },
+    {
+      "religion": "hin",
+      "label": "Veluthedathu Nair",
+      "value": "Hind0412"
+    },
+    {
+      "religion": "hin",
+      "label": "Vettuva Gounder",
+      "value": "Hind0413"
+    },
+    {
+      "religion": "hin",
+      "label": "Vilakkithala Nair",
+      "value": "Hind0414"
+    },
+    {
+      "religion": "hin",
+      "label": "Viswabrahmin",
+      "value": "Hind0415"
+    },
+    {
+      "religion": "hin",
+      "label": "Viswakarma",
+      "value": "Hind0416"
+    },
+    {
+      "religion": "hin",
+      "label": "Vokkaliga",
+      "value": "Hind0417"
+    },
+    {
+      "religion": "hin",
+      "label": "Vysya",
+      "value": "Hind0418"
+    },
+    {
+      "religion": "hin",
+      "label": "Yadav",
+      "value": "Hind0419"
+    },
+    {
+      "religion": "hin",
+      "label": "Yellapu",
+      "value": "Hind0420"
+    },
+    {
+      "religion": "hin",
+      "label": "Other Backward Class(OBC)",
+      "value": "Hin-obc107"
+    },
+    {
+      "religion": "oth",
+      "label": "Inter-Religion-Others",
+      "value": "Inte121"
+    },
+    {
+      "religion": "oth",
+      "label": "Other Backward Class(OBC)",
+      "value": "Oth-obc107"
+    },
+    {
+      "religion": "Jain",
+      "label": "Agarwal",
+      "value": "Jain61"
+    },
+    {
+      "religion": "Jain",
+      "label": "Bania",
+      "value": "Jain62"
+    },
+    {
+      "religion": "Jain",
+      "label": "Intercaste",
+      "value": "Jain63"
+    },
+    {
+      "religion": "Jain",
+      "label": "Jaiswal",
+      "value": "Jain64"
+    },
+    {
+      "religion": "Jain",
+      "label": "Khandelwal",
+      "value": "Jain65"
+    },
+    {
+      "religion": "Jain",
+      "label": "Kutchi",
+      "value": "Jain66"
+    },
+    {
+      "religion": "Jain",
+      "label": "KVO",
+      "value": "Jain612"
+    },
+    {
+      "religion": "Jain",
+      "label": "No Bar",
+      "value": "Jain67"
+    },
+    {
+      "religion": "Jain",
+      "label": "Oswal",
+      "value": "Jain68"
+    },
+    {
+      "religion": "Jain",
+      "label": "Porwal",
+      "value": "Jain69"
+    },
+    {
+      "religion": "Jain",
+      "label": "Unspecified",
+      "value": "Jain610"
+    },
+    {
+      "religion": "Jain",
+      "label": "Vaishya",
+      "value": "Jain611"
+    },
+    {
+      "religion": "Jain",
+      "label": "All-Others",
+      "value": "Jain613"
+    },
+    {
+      "religion": "Jain",
+      "label": "Digambar-Digambar-Bisapanthi",
+      "value": "Jain71"
+    },
+    {
+      "religion": "Jain",
+      "label": "Digambar-Digambar-Gumanapanthi",
+      "value": "Jain72"
+    },
+    {
+      "religion": "Jain",
+      "label": "Digambar-Digambar-Taranapanthi",
+      "value": "Jain73"
+    },
+    {
+      "religion": "Jain",
+      "label": "Digambar-Digambar-Terapanthi",
+      "value": "Jain74"
+    },
+    {
+      "religion": "Jain",
+      "label": "Digambar-Digambar-Totapanthi",
+      "value": "Jain75"
+    },
+    {
+      "religion": "Jain",
+      "label": "Digambar-Agarwal",
+      "value": "Jain76"
+    },
+    {
+      "religion": "Jain",
+      "label": "Digambar-Bania",
+      "value": "Jain77"
+    },
+    {
+      "religion": "Jain",
+      "label": "Digambar-Intercaste",
+      "value": "Jain78"
+    },
+    {
+      "religion": "Jain",
+      "label": "Digambar-Jaiswal",
+      "value": "Jain79"
+    },
+    {
+      "religion": "Jain",
+      "label": "Digambar-Khandelwal",
+      "value": "Jain710"
+    },
+    {
+      "religion": "Jain",
+      "label": "Digambar-Kutchi",
+      "value": "Jain711"
+    },
+    {
+      "religion": "Jain",
+      "label": "Digambar-KVO",
+      "value": "Jain717"
+    },
+    {
+      "religion": "Jain",
+      "label": "Digambar-No Bar",
+      "value": "Jain712"
+    },
+    {
+      "religion": "Jain",
+      "label": "Digambar-Oswal",
+      "value": "Jain713"
+    },
+    {
+      "religion": "Jain",
+      "label": "Digambar-Porwal",
+      "value": "Jain714"
+    },
+    {
+      "religion": "Jain",
+      "label": "Digambar-Unspecified",
+      "value": "Jain715"
+    },
+    {
+      "religion": "Jain",
+      "label": "Digambar-Vaishya",
+      "value": "Jain716"
+    },
+    {
+      "religion": "Jain",
+      "label": "Digambar-Others",
+      "value": "Jain718"
+    },
+    {
+      "religion": "Jain",
+      "label": "Shwetambar-Agarwal",
+      "value": "Jain84"
+    },
+    {
+      "religion": "Jain",
+      "label": "Shwetambar-Bania",
+      "value": "Jain85"
+    },
+    {
+      "religion": "Jain",
+      "label": "Shwetambar-Intercaste",
+      "value": "Jain86"
+    },
+    {
+      "religion": "Jain",
+      "label": "Shwetambar-Jaiswal",
+      "value": "Jain87"
+    },
+    {
+      "religion": "Jain",
+      "label": "Shwetambar-Khandelwal",
+      "value": "Jain88"
+    },
+    {
+      "religion": "Jain",
+      "label": "Shwetambar-Kutchi",
+      "value": "Jain89"
+    },
+    {
+      "religion": "Jain",
+      "label": "Shwetambar-KVO",
+      "value": "Jain815"
+    },
+    {
+      "religion": "Jain",
+      "label": "Shwetambar-No Bar",
+      "value": "Jain810"
+    },
+    {
+      "religion": "Jain",
+      "label": "Shwetambar-Oswal",
+      "value": "Jain811"
+    },
+    {
+      "religion": "Jain",
+      "label": "Shwetambar-Porwal",
+      "value": "Jain812"
+    },
+    {
+      "religion": "Jain",
+      "label": "Shwetambar-Unspecified",
+      "value": "Jain813"
+    },
+    {
+      "religion": "Jain",
+      "label": "Shwetambar-Vaishya",
+      "value": "Jain814"
+    },
+    {
+      "religion": "Jain",
+      "label": "Shwetambar-Others",
+      "value": "Jain816"
+    },
+    {
+      "religion": "Jain",
+      "label": "Shwetambar-Shvetambar-Murtipujaka",
+      "value": "Jain81"
+    },
+    {
+      "religion": "Jain",
+      "label": "Shwetambar-Shvetambar-Sthanakvasi",
+      "value": "Jain82"
+    },
+    {
+      "religion": "Jain",
+      "label": "Shwetambar-Shvetambar-Terapanthi",
+      "value": "Jain83"
+    },
+    {
+      "religion": "Jain",
+      "label": "Other Backward Class(OBC)",
+      "value": "Jain-obc107"
+    },
+    {
+      "religion": "oth",
+      "label": "Jewish-Others",
+      "value": "Jewi111"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Alavi - Bohra",
+      "value": "Musl27"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Ansari",
+      "value": "Musl24"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Arain",
+      "value": "Musl25"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Awan",
+      "value": "Musl26"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Dakhini",
+      "value": "Musl28"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Dudekula",
+      "value": "Musl29"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Hanafi",
+      "value": "Musl210"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Jat",
+      "value": "Musl211"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Khoja",
+      "value": "Musl212"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Labbay",
+      "value": "Musl213"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Malik",
+      "value": "Musl214"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Mappila",
+      "value": "Musl215"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Marakayar",
+      "value": "Musl216"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Memon",
+      "value": "Musl217"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Mughal",
+      "value": "Musl218"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Pathan",
+      "value": "Musl219"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Qureshi",
+      "value": "Musl220"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Rajput",
+      "value": "Musl221"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Rowther",
+      "value": "Musl222"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Shafi",
+      "value": "Musl223"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Sheikh",
+      "value": "Musl224"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Siddiqui",
+      "value": "Musl225"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Syed",
+      "value": "Musl226"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-UnSpecified",
+      "value": "Musl227"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Others",
+      "value": "Musl228"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Shia Isma'ilis (Seveners)",
+      "value": "Musl21"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Shia Ithna Asharis (Twelvers)",
+      "value": "Musl22"
+    },
+    {
+      "religion": "mus",
+      "label": "Shia-Shia Zaidis (Fivers)",
+      "value": "Musl23"
+    },
+    {
+      "religion": "mus",
+      "label": "Alavi - Bohra",
+      "value": "Musl38"
+    },
+    {
+      "religion": "mus",
+      "label": "Ansari",
+      "value": "Musl35"
+    },
+    {
+      "religion": "mus",
+      "label": "Arain",
+      "value": "Musl36"
+    },
+    {
+      "religion": "mus",
+      "label": "Awan",
+      "value": "Musl37"
+    },
+    {
+      "religion": "mus",
+      "label": "Dakhini",
+      "value": "Musl39"
+    },
+    {
+      "religion": "mus",
+      "label": "Dudekula",
+      "value": "Musl310"
+    },
+    {
+      "religion": "mus",
+      "label": "Hanafi",
+      "value": "Musl311"
+    },
+    {
+      "religion": "mus",
+      "label": "Jat",
+      "value": "Musl312"
+    },
+    {
+      "religion": "mus",
+      "label": "Khoja",
+      "value": "Musl313"
+    },
+    {
+      "religion": "mus",
+      "label": "Labbay",
+      "value": "Musl314"
+    },
+    {
+      "religion": "mus",
+      "label": "Malik",
+      "value": "Musl315"
+    },
+    {
+      "religion": "mus",
+      "label": "Mappila",
+      "value": "Musl316"
+    },
+    {
+      "religion": "mus",
+      "label": "Marakayar",
+      "value": "Musl317"
+    },
+    {
+      "religion": "mus",
+      "label": "Memon",
+      "value": "Musl318"
+    },
+    {
+      "religion": "mus",
+      "label": "Mughal",
+      "value": "Musl319"
+    },
+    {
+      "religion": "mus",
+      "label": "Pathan",
+      "value": "Musl320"
+    },
+    {
+      "religion": "mus",
+      "label": "Qureshi",
+      "value": "Musl321"
+    },
+    {
+      "religion": "mus",
+      "label": "Rajput",
+      "value": "Musl322"
+    },
+    {
+      "religion": "mus",
+      "label": "Rowther",
+      "value": "Musl323"
+    },
+    {
+      "religion": "mus",
+      "label": "Shafi",
+      "value": "Musl324"
+    },
+    {
+      "religion": "mus",
+      "label": "Sheikh",
+      "value": "Musl325"
+    },
+    {
+      "religion": "mus",
+      "label": "Siddiqui",
+      "value": "Musl326"
+    },
+    {
+      "religion": "mus",
+      "label": "Syed",
+      "value": "Musl327"
+    },
+    {
+      "religion": "mus",
+      "label": "UnSpecified",
+      "value": "Musl328"
+    },
+    {
+      "religion": "mus",
+      "label": "Others",
+      "value": "Musl329"
+    },
+    {
+      "religion": "mus",
+      "label": "Sunni Hanabali",
+      "value": "Musl31"
+    },
+    {
+      "religion": "mus",
+      "label": "Sunni Hanafi",
+      "value": "Musl32"
+    },
+    {
+      "religion": "mus",
+      "label": "Sunni Maliki",
+      "value": "Musl33"
+    },
+    {
+      "religion": "mus",
+      "label": "Sunni Shafii",
+      "value": "Musl34"
+    },
+    {
+      "religion": "mus",
+      "label": "Alavi - Bohra",
+      "value": "Musl14"
+    },
+    {
+      "religion": "mus",
+      "label": "Ansari",
+      "value": "Musl11"
+    },
+    {
+      "religion": "mus",
+      "label": "Arain",
+      "value": "Musl12"
+    },
+    {
+      "religion": "mus",
+      "label": "Awan",
+      "value": "Musl13"
+    },
+    {
+      "religion": "mus",
+      "label": "Dakhini",
+      "value": "Musl15"
+    },
+    {
+      "religion": "mus",
+      "label": "Dudekula",
+      "value": "Musl16"
+    },
+    {
+      "religion": "mus",
+      "label": "Hanafi",
+      "value": "Musl17"
+    },
+    {
+      "religion": "mus",
+      "label": "Jat",
+      "value": "Musl18"
+    },
+    {
+      "religion": "mus",
+      "label": "Khoja",
+      "value": "Musl19"
+    },
+    {
+      "religion": "mus",
+      "label": "Labbay",
+      "value": "Musl110"
+    },
+    {
+      "religion": "mus",
+      "label": "Malik",
+      "value": "Musl111"
+    },
+    {
+      "religion": "mus",
+      "label": "Mappila",
+      "value": "Musl112"
+    },
+    {
+      "religion": "mus",
+      "label": "Marakayar",
+      "value": "Musl113"
+    },
+    {
+      "religion": "mus",
+      "label": "Memon",
+      "value": "Musl114"
+    },
+    {
+      "religion": "mus",
+      "label": "Mughal",
+      "value": "Musl115"
+    },
+    {
+      "religion": "mus",
+      "label": "Pathan",
+      "value": "Musl116"
+    },
+    {
+      "religion": "mus",
+      "label": "Qureshi",
+      "value": "Musl117"
+    },
+    {
+      "religion": "mus",
+      "label": "Rajput",
+      "value": "Musl118"
+    },
+    {
+      "religion": "mus",
+      "label": "Rowther",
+      "value": "Musl119"
+    },
+    {
+      "religion": "mus",
+      "label": "Shafi",
+      "value": "Musl120"
+    },
+    {
+      "religion": "mus",
+      "label": "Sheikh",
+      "value": "Musl121"
+    },
+    {
+      "religion": "mus",
+      "label": "Siddiqui",
+      "value": "Musl122"
+    },
+    {
+      "religion": "mus",
+      "label": "Syed",
+      "value": "Musl123"
+    },
+    {
+      "religion": "mus",
+      "label": "UnSpecified",
+      "value": "Musl124"
+    },
+    {
+      "religion": "mus",
+      "label": "Others",
+      "value": "Musl125"
+    },
+    {
+      "religion": "mus",
+      "label": "Other Backward Class(OBC)",
+      "value": "Mus-obc107"
+    },
+    {
+      "religion": "oth",
+      "label": "No Religious Belief-Others",
+      "value": "No R131"
+    },
+    {
+      "religion": "par",
+      "label": "Intercaste",
+      "value": "Pars93"
+    },
+    {
+      "religion": "par",
+      "label": "Irani",
+      "value": "Pars91"
+    },
+    {
+      "religion": "par",
+      "label": "Others",
+      "value": "Pars94"
+    },
+    {
+      "religion": "par",
+      "label": "Parsi",
+      "value": "Pars92"
+    },
+    {
+      "religion": "par",
+      "label": "Other Backward Class(OBC)",
+      "value": "Par-obc107"
+    },
+    {
+      "religion": "sik",
+      "label": "Others",
+      "value": "Sikh522"
+    },
+    {
+      "religion": "sik",
+      "label": "Ahluwalia",
+      "value": "Sikh51"
+    },
+    {
+      "religion": "sik",
+      "label": "Arora",
+      "value": "Sikh52"
+    },
+    {
+      "religion": "sik",
+      "label": "Bhatia",
+      "value": "Sikh53"
+    },
+    {
+      "religion": "sik",
+      "label": "Bhatra",
+      "value": "Sikh519"
+    },
+    {
+      "religion": "sik",
+      "label": "Ghumar",
+      "value": "Sikh54"
+    },
+    {
+      "religion": "sik",
+      "label": "Intercaste",
+      "value": "Sikh55"
+    },
+    {
+      "religion": "sik",
+      "label": "Jat",
+      "value": "Sikh56"
+    },
+    {
+      "religion": "sik",
+      "label": "Kamboj",
+      "value": "Sikh57"
+    },
+    {
+      "religion": "sik",
+      "label": "Khatri",
+      "value": "Sikh58"
+    },
+    {
+      "religion": "sik",
+      "label": "Kshatriya",
+      "value": "Sikh59"
+    },
+    {
+      "religion": "sik",
+      "label": "Lubana",
+      "value": "Sikh510"
+    },
+    {
+      "religion": "sik",
+      "label": "Majabi",
+      "value": "Sikh511"
+    },
+    {
+      "religion": "sik",
+      "label": "Nai",
+      "value": "Sikh512"
+    },
+    {
+      "religion": "sik",
+      "label": "No Bar",
+      "value": "Sikh513"
+    },
+    {
+      "religion": "sik",
+      "label": "Rajput",
+      "value": "Sikh514"
+    },
+    {
+      "religion": "sik",
+      "label": "Ramdasia",
+      "value": "Sikh515"
+    },
+    {
+      "religion": "sik",
+      "label": "Ramgharia",
+      "value": "Sikh516"
+    },
+    {
+      "religion": "sik",
+      "label": "Ravidasia",
+      "value": "Sikh518"
+    },
+    {
+      "religion": "sik",
+      "label": "Saini",
+      "value": "Sikh517"
+    },
+    {
+      "religion": "sik",
+      "label": "Tonk Kshatriya",
+      "value": "Sikh520"
+    },
+    {
+      "religion": "sik",
+      "label": "Unspecified",
+      "value": "Sikh521"
+    },
+    {
+      "religion": "sik",
+      "label": "Other Backward Class(OBC)",
+      "value": "Sikh-obc107"
+    }
+  ]
+}]
